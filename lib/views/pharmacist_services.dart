@@ -167,7 +167,7 @@ class _PharmaState extends State<PharmaServices> {
                             MaterialPageRoute(
                               builder: (context) => PersonalPage(
                                 title: "Pharma Services Case",
-                                serviceType: "Pharma",
+                                serviceType: "Pharmacist",
                                 onItemTap: (item) {
                                   // Handle item tap
                                 },
@@ -183,7 +183,7 @@ class _PharmaState extends State<PharmaServices> {
                             MaterialPageRoute(
                               builder: (context) => PersonalPage(
                                 title: "Pharma Services Case",
-                                serviceType: "Pharma",
+                                serviceType: "Pharmacist",
                                 onItemTap: (item) {
                                   // Handle item tap
                                 },

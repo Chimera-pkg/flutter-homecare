@@ -1,6 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:m2health/cubit/nursingclean/presentation/pages/nursing_services_page.dart';
-import '../cubit/nursing/pages/pharmacist_services.dart';
+import 'package:m2health/views/pharmacist_services.dart';
 import '../cubit/precision/precision_page.dart';
 import '../views/diabetic_care.dart';
 import '../views/home_health_screening.dart';

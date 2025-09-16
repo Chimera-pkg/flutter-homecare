@@ -57,7 +57,7 @@ class _AddOnState extends State<AddOn> {
     try {
       final token = await Utils.getSpString(Const.TOKEN);
       String endpoint;
-      if (widget.serviceType == "Pharma") {
+      if (widget.serviceType == "Pharmacist") {
         endpoint = '${Const.URL_API}/service-titles/pharma';
       } else if (widget.serviceType == "Radiologist") {
         endpoint = '${Const.URL_API}/service-titles/radiologist';
@@ -91,7 +91,7 @@ class _AddOnState extends State<AddOn> {
   }
 
   void _initializeDefaultServiceTitles() {
-    if (widget.serviceType == "Pharma") {
+    if (widget.serviceType == "Pharmacist") {
       serviceData = const [
         AddOnService(id: 1, title: 'Medication Review', price: 15.0),
         AddOnService(id: 2, title: 'Prescription Consultation', price: 10.0),

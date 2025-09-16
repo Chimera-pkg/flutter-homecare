@@ -226,6 +226,16 @@ class _MyAppState extends State<MyApp> {
             title: 'm2health',
             theme: ThemeData(
               fontFamily: 'Poppins', // Set Poppins as the default font
+              appBarTheme: const AppBarTheme(
+                backgroundColor: Colors.white,
+                surfaceTintColor: Colors.transparent,
+                foregroundColor: Colors.black,
+                elevation: 0,
+              ),
+              cardTheme: const CardThemeData(
+                color: Colors.white,
+                surfaceTintColor: Colors.transparent,
+              ),
               textTheme: const TextTheme(
                 displayLarge: TextStyle(fontFamily: 'Poppins'),
                 displayMedium: TextStyle(fontFamily: 'Poppins'),
@@ -243,6 +253,7 @@ class _MyAppState extends State<MyApp> {
                 labelMedium: TextStyle(fontFamily: 'Poppins'),
                 labelSmall: TextStyle(fontFamily: 'Poppins'),
               ),
+              scaffoldBackgroundColor: Colors.white,
               colorScheme:
                   ColorScheme.fromSeed(seedColor: Const.colorDashboard),
               useMaterial3: true,

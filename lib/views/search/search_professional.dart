@@ -246,11 +246,7 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    final String role = widget.serviceType == "Pharma"
-        ? "Pharmacist"
-        : widget.serviceType == "Radiologist"
-            ? "Radiologist"
-            : "Nurse";
+    final String role = widget.serviceType;
 
     return Scaffold(
       appBar: AppBar(

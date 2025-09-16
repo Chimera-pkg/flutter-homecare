@@ -112,9 +112,6 @@ class ProfilePage extends StatelessWidget {
                                   width: 100,
                                   height: 100,
                                   fit: BoxFit.cover,
-                                  webHtmlElementStrategy: kIsWeb
-                                      ? WebHtmlElementStrategy.prefer
-                                      : WebHtmlElementStrategy.never,
                                   errorBuilder: (context, error, stackTrace) {
                                     return Container(
                                       width: 100,
