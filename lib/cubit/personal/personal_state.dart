@@ -74,7 +74,8 @@ class Issue extends Equatable {
           ? MedicalRecord.fromJson(json['related_health_record'])
           : null,
       addOn: json['add_on'] ?? '',
-      estimatedBudget: (json['estimated_budget'] as num?)?.toDouble() ?? 0.0,
+      estimatedBudget:
+          double.tryParse(json['estimated_budget']?.toString() ?? '') ?? 0.0,
       caseType: json['case_type'],
       createdAt: DateTime.parse(
           json['created_at'] ?? DateTime.now().toIso8601String()),

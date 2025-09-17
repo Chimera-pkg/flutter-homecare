@@ -45,7 +45,8 @@ class NursingIssue {
           ? Map<String, dynamic>.from(json['related_health_record'])
           : {}, // Convert to
       addOn: json['add_on'] ?? '',
-      estimatedBudget: (json['estimated_budget'] as num?)?.toDouble() ?? 0.0,
+      estimatedBudget:
+          double.tryParse(json['estimated_budget']?.toString() ?? '') ?? 0.0,
       caseType: json['case_type'], // Add case_type parsing
       createdAt: DateTime.parse(
           json['created_at'] ?? DateTime.now().toIso8601String()),
