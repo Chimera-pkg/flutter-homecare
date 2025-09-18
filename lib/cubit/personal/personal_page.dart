@@ -4,6 +4,7 @@ import 'package:m2health/const.dart';
 import 'package:m2health/cubit/personal/personal_case_detail_page.dart';
 import 'package:m2health/utils.dart'; // Import the utils file
 import 'package:m2health/widgets/add_concern_page.dart';
+import 'package:m2health/widgets/authentication_required_dialog.dart';
 import 'personal_cubit.dart';
 import 'personal_state.dart';
 import 'package:m2health/widgets/add_issue_page.dart';
@@ -65,7 +66,11 @@ class _PersonalPageState extends State<PersonalPage> {
               ],
             ),
             Expanded(
-              child: BlocBuilder<PersonalCubit, PersonalState>(
+              child: BlocConsumer<PersonalCubit, PersonalState>(
+                listener: (context, state) => {
+                  if (state is PersonalUnauthenticated)
+                    showAuthenticationRequiredDialog(context)
+                },
                 builder: (context, state) {
                   if (state is PersonalLoading) {
                     return const Center(child: CircularProgressIndicator());

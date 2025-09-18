@@ -1,13 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:m2health/cubit/nursing/pages/nursing_services.dart';
-import 'package:m2health/cubit/profiles/profile_page.dart';
 import 'package:m2health/route/app_routes.dart';
-import 'package:m2health/views/diabetic_care.dart';
-import 'package:m2health/views/home_health_screening.dart';
-import 'package:m2health/views/pharmacist_services.dart';
-import 'package:m2health/views/remote_patient_monitoring.dart';
-import 'package:m2health/views/second_opinion.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../const.dart';
 import '../AppLanguage.dart';
@@ -16,12 +10,11 @@ import 'package:provider/provider.dart';
 import 'package:m2health/cubit/profiles/profile_cubit.dart';
 import 'package:m2health/cubit/profiles/profile_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:m2health/cubit/precision/precision_page.dart';
 
 class Dashboard extends StatefulWidget {
-  Dashboard({
-    Key? key,
-  }) : super(key: key);
+  const Dashboard({
+    super.key,
+  });
   @override
   _DashboardState createState() => _DashboardState();
 }
@@ -72,7 +65,7 @@ class _DashboardState extends State<Dashboard> {
     },
     {'image': 'assets/icons/ilu_sleep.png', 'name': 'Sleep & Mental\nHealth'},
     {'image': 'assets/icons/ilu_health.png', 'name': 'Health Risk\nAssessment'},
-    {'image': 'assets/icons/ilu_dietitian.png', 'name': 'Dietitian Services'},
+    {'image': 'assets/icons/ilu_dietitian.jpg', 'name': 'Dietitian Services'},
   ];
 
   @override
@@ -174,10 +167,10 @@ class _DashboardState extends State<Dashboard> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Image.asset(
+                          SvgPicture.asset(
                             Const.banner,
                             fit: BoxFit.contain,
-                            height: 25,
+                            height: 36,
                           ),
                           const Spacer(),
                           GestureDetector(
@@ -227,14 +220,13 @@ class _DashboardState extends State<Dashboard> {
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                           ],
                         ),
                       ),
-                      // ...existing code for search field...
-                      const SizedBox(height: 20), // Jarak di bawah teks
+                      const SizedBox(height: 20),
                       Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 0),
@@ -257,7 +249,7 @@ class _DashboardState extends State<Dashboard> {
                                   hintText:
                                       "Chat With AI doctor for all your health questions",
                                   hintStyle: TextStyle(
-                                      color: Color(0xFF8A96BC), fontSize: 13),
+                                      color: Color(0xFF8A96BC), fontSize: 11),
                                   border: InputBorder.none,
                                 ),
                               ),
@@ -278,111 +270,105 @@ class _DashboardState extends State<Dashboard> {
               controller: _scrollController,
               child: Column(
                 children: [
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 30.0, top: 16.0),
-                          child: Text(
-                            AppLocalizations.of(context)!.translate('services'),
-                            textAlign: TextAlign.left,
-                            style: const TextStyle(
-                              color: Color(0xFF232F55),
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                              height: 0,
-                            ),
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(top: 40, right: 24, left: 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          AppLocalizations.of(context)!.translate('services'),
+                          textAlign: TextAlign.left,
+                          style: const TextStyle(
+                            color: Color(0xFF232F55),
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            height: 0,
                           ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            RectangularIconWithTitle(
+                              onTap: () {
+                                context.push(AppRoutes.pharmaServices);
+                              },
+                              iconPath: 'assets/icons/ic_pharma_service.png',
+                              title: AppLocalizations.of(context)!
+                                  .translate('pharmacist_services2'),
+                              backgroundColor:
+                                  const Color.fromRGBO(142, 244, 220, 0.4),
+                              titleColor: Colors.black,
+                            ),
+                            RectangularIconWithTitle(
+                              onTap: () {
+                                context.push(AppRoutes.nursingServices);
+                              },
+                              iconPath: 'assets/icons/ic_nurse.png',
+                              title: AppLocalizations.of(context)!
+                                  .translate('home_nursing'),
+                              backgroundColor:
+                                  const Color.fromRGBO(154, 225, 255, 0.35),
+                              titleColor: Colors.black,
+                            ),
+                            RectangularIconWithTitle(
+                              onTap: () {
+                                context.push(AppRoutes.diabeticCare);
+                              },
+                              iconPath: 'assets/icons/ic_diabetic.png',
+                              title: AppLocalizations.of(context)!
+                                  .translate('diabetic_care'),
+                              backgroundColor:
+                                  const Color.fromRGBO(142, 244, 220, 0.4),
+                              titleColor: Colors.black,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            RectangularIconWithTitle(
+                              onTap: () {
+                                context.push(AppRoutes.homeHealthScreening);
+                              },
+                              iconPath:
+                                  'assets/icons/ic_home_health_screening.png',
+                              title: AppLocalizations.of(context)!
+                                  .translate('home_screening'),
+                              backgroundColor:
+                                  const Color.fromRGBO(178, 140, 255, 0.2),
+                              titleColor: Colors.black,
+                            ),
+                            RectangularIconWithTitle(
+                              onTap: () {
+                                context.push(AppRoutes.remotePatientMonitoring);
+                              },
+                              iconPath: 'assets/icons/ic_remote_monitoring.png',
+                              title: AppLocalizations.of(context)!
+                                  .translate('remote_monitoring'),
+                              backgroundColor:
+                                  const Color.fromRGBO(154, 225, 255, 0.33),
+                              titleColor: Colors.black,
+                            ),
+                            RectangularIconWithTitle(
+                              onTap: () {
+                                context.push(AppRoutes.secondOpinionMedical);
+                              },
+                              iconPath: 'assets/icons/ic_2nd_opinion.png',
+                              title: AppLocalizations.of(context)!
+                                  .translate('2nd_opinion'),
+                              backgroundColor:
+                                  const Color.fromRGBO(178, 140, 255, 0.2),
+                              titleColor: Colors.black,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                  // SearchInputBox(),
-                  // SizedBox(height: 20),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      RectangularIconWithTitle(
-                        onTap: () {
-                          // navbarVisibility(true);
-                          context.push(AppRoutes.pharmaServices);
-                        },
-                        iconPath:
-                            'assets/icons/ic_pharma_service.png', // Replace with your actual image path
-                        title: AppLocalizations.of(context)!
-                            .translate('pharmacist_services'),
-                        backgroundColor: const Color(0x559AE1FF),
-                        // iconColor: Colors.white,
-                        titleColor: Colors.black,
-                      ),
-                      RectangularIconWithTitle(
-                        onTap: () {
-                          // navbarVisibility(true);
-                          context.push(AppRoutes.nursingServices);
-                        },
-                        iconPath:
-                            'assets/icons/ic_nurse.png', // Replace with your actual image path
-                        title: AppLocalizations.of(context)!
-                            .translate('home_nursing'),
-                        backgroundColor: const Color(0x33B28CFF),
-                        // iconColor: Colors.white,
-                        titleColor: Colors.black,
-                      ),
-                      RectangularIconWithTitle(
-                        onTap: () {
-                          // navbarVisibility(true);
-                          context.push(AppRoutes.diabeticCare);
-                        },
-                        iconPath:
-                            'assets/icons/ic_diabetic.png', // Replace with your actual image path
-                        title: AppLocalizations.of(context)!
-                            .translate('diabetic_care'),
-                        backgroundColor: const Color(0x33B28CFF),
-                        // iconColor: Colors.white,
-                        titleColor: Colors.black,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      RectangularIconWithTitle(
-                        onTap: () {
-                          context.push(AppRoutes.homeHealthScreening);
-                        },
-                        iconPath: 'assets/icons/ic_report.png',
-                        title: AppLocalizations.of(context)!
-                            .translate('home_screening'),
-                        backgroundColor: const Color(0x6B8EF4DC),
-                        // iconColor: Colors.white,
-                        titleColor: Colors.black,
-                      ),
-                      RectangularIconWithTitle(
-                        onTap: () {
-                          context.push(AppRoutes.remotePatientMonitoring);
-                        },
-                        iconPath: 'assets/icons/ic_drug.png',
-                        title: AppLocalizations.of(context)!
-                            .translate('remote_monitoring'),
-                        backgroundColor: const Color(0xFFD3F2FF),
-                        // iconColor: Colors.white,
-                        titleColor: Colors.black,
-                      ),
-                      RectangularIconWithTitle(
-                        onTap: () {
-                          context.push(AppRoutes.secondOpinionMedical);
-                        },
-                        iconPath: 'assets/icons/ic_lung.png',
-                        title: AppLocalizations.of(context)!
-                            .translate('2nd_opinion'),
-                        backgroundColor: const Color(0x6B8EF4DC),
-                        // iconColor: Colors.white,
-                        titleColor: Colors.black,
-                      ),
-                    ],
-                  ),
+
                   const SizedBox(height: 30),
                   // Card(
                   //   color: Colors.white,
@@ -413,113 +399,114 @@ class _DashboardState extends State<Dashboard> {
                   //     ),
                   //   ),
                   // ),
-                  // const SizedBox(height: 20),
+
                   const Row(
                     children: <Widget>[
                       Expanded(
-                        // Expanded agar garis memenuhi lebar layar
-                        child: Padding(
-                          // Padding untuk memberi jarak kiri dan kanan pada garis
-                          padding: EdgeInsets.symmetric(horizontal: 24.0),
-                          child: Divider(
-                            color: Color.fromARGB(255, 88, 88,
-                                88), // Anda bisa ganti warna garisnya
-                            thickness: 2, // Anda bisa ganti ketebalan garisnya
-                          ),
+                        child: Divider(
+                          color: Color.fromRGBO(244, 244, 244, 1),
+                          thickness: 8,
                         ),
                       ),
                     ],
                   ),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 30.0, top: 16.0),
-                          child: Text(
-                            AppLocalizations.of(context)!
-                                .translate('allied_services'),
-                            textAlign: TextAlign.left,
-                            style: const TextStyle(
-                              color: Color(0xFF232F55),
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                              height: 0,
-                            ),
+
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(top: 40, right: 24, left: 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          AppLocalizations.of(context)!
+                              .translate('allied_services'),
+                          textAlign: TextAlign.left,
+                          style: const TextStyle(
+                            color: Color(0xFF232F55),
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            height: 0,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      childAspectRatio: 2 / 3,
-                    ),
-                    itemCount: services.length,
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                          onTap: () {
-                            if (services[index]['name'] ==
-                                'Precision\nNutrition') {
-                              context.push(AppRoutes.precisionNutrition);
-                            } else {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(15),
-                                    ),
-                                    title: const Text('Coming Soon'),
-                                    content: const Text(
-                                        'This feature will be available soon!'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: const Text('OK'),
-                                      ),
-                                    ],
-                                  );
+                        const SizedBox(height: 28),
+                        GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 0,
+                            childAspectRatio: 2 / 3,
+                          ),
+                          itemCount: services.length,
+                          itemBuilder: (context, index) {
+                            return GestureDetector(
+                                onTap: () {
+                                  if (services[index]['name'] ==
+                                      'Precision\nNutrition') {
+                                    context.push(AppRoutes.precisionNutrition);
+                                  } else {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                          ),
+                                          title: const Text('Coming Soon'),
+                                          content: const Text(
+                                              'This feature will be available soon!'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(context),
+                                              child: const Text('OK'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  }
                                 },
-                              );
-                            }
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: const Color.fromRGBO(
+                                              247, 248, 248, 1),
+                                          width: 2,
+                                        ),
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(16),
+                                        child: Image.asset(
+                                          services[index]['image']!,
+                                          height: 72,
+                                          width: 111,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      services[index]['name']!,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                ));
                           },
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(
-                                      8.0), // Match the container's border radius
-                                  child: Image.asset(
-                                    services[index][
-                                        'image']!, // Use the image path from the list
-                                    height: 72,
-                                    width: 111,
-                                    fit: BoxFit
-                                        .cover, // Ensure the image fills the box
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                services[index]
-                                    ['name']!, // Use the name from the list
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ));
-                    },
-                  )
+                        )
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -538,7 +525,8 @@ class CircularIconWithTitle extends StatelessWidget {
   final Color titleColor;
   final VoidCallback onTap;
 
-  CircularIconWithTitle({
+  const CircularIconWithTitle({
+    super.key,
     required this.iconPath,
     required this.title,
     required this.backgroundColor,
@@ -587,7 +575,8 @@ class RectangularIconWithTitle extends StatelessWidget {
   final Color titleColor;
   final VoidCallback onTap;
 
-  RectangularIconWithTitle({
+  const RectangularIconWithTitle({
+    super.key,
     required this.iconPath,
     required this.title,
     required this.backgroundColor,
@@ -599,48 +588,54 @@ class RectangularIconWithTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 80, // Adjust the width as needed
-              height: 80, // Adjust the height as needed
-              decoration: BoxDecoration(
-                color: backgroundColor,
-                borderRadius:
-                    BorderRadius.circular(15), // Membuat sudut membulat
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              border: Border.all(
+                color: const Color.fromRGBO(247, 248, 248, 1),
+                width: 2,
               ),
-              child: Center(
-                child: Image.asset(
-                  iconPath,
-                  width: 50, // Adjust the size as needed
-                  height: 50, // Adjust the size as needed
-                ),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Center(
+              child: Image.asset(
+                iconPath,
+                width: 50,
+                height: 50,
               ),
             ),
-            const SizedBox(
-                height: 8), // Add some space between the avatar and the title
-            Text(
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: 100,
+            child: Text(
               title,
               textAlign: TextAlign.center,
-              maxLines: 2, // Membatasi teks menjadi 2 baris
-              overflow: TextOverflow
-                  .ellipsis, // Menambahkan elipsis jika teks terlalu panjang
+              maxLines: 2,
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: titleColor,
                 fontSize: 12,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
+                // height: 13.25 / 12,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
 
 class SearchInputBox extends StatefulWidget {
+  const SearchInputBox({super.key});
+
   @override
   _SearchInputBoxState createState() => _SearchInputBoxState();
 }

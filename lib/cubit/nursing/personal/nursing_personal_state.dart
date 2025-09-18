@@ -116,6 +116,8 @@ class NursingPersonalLoaded extends NursingPersonalState {
   List<Object> get props => [issues];
 }
 
+class NursingPersonalUnauthenticated extends NursingPersonalState {}
+
 class NursingPersonalError extends NursingPersonalState {
   final String message;
 
