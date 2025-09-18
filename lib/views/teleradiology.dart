@@ -14,11 +14,11 @@ class _TeleradiologyDetailState extends State<TeleradiologyDetail> {
   bool mriScanChecked = false;
   bool mammogramScanChecked = false;
 
-  List<File> _images = [];
+  final List<File?> _images = List.filled(3, null);
 
-  void _addImage(File image) {
+  Future<void> setImageAt(int index, File? image) async {
     setState(() {
-      _images.add(image);
+      _images[index] = image;
     });
   }
 
@@ -119,7 +119,10 @@ class _TeleradiologyDetailState extends State<TeleradiologyDetail> {
             const SizedBox(
               height: 10,
             ),
-            ImagePreview(onImageSelected: _addImage),
+            ImagePreview(
+              imageFile: _images[0],
+              onChooseImage: (image) => setImageAt(0, image),
+            ),
             Card(
               margin: const EdgeInsets.symmetric(vertical: 8.0),
               child: Padding(
@@ -149,7 +152,10 @@ class _TeleradiologyDetailState extends State<TeleradiologyDetail> {
             const SizedBox(
               height: 10,
             ),
-            ImagePreview(onImageSelected: _addImage),
+            ImagePreview(
+              imageFile: _images[1],
+              onChooseImage: (image) => setImageAt(1, image),
+            ),
             Card(
               margin: const EdgeInsets.symmetric(vertical: 8.0),
               child: Padding(
@@ -179,7 +185,10 @@ class _TeleradiologyDetailState extends State<TeleradiologyDetail> {
             const SizedBox(
               height: 10,
             ),
-            ImagePreview(onImageSelected: _addImage),
+            ImagePreview(
+              imageFile: _images[2],
+              onChooseImage: (image) => setImageAt(2, image),
+            ),
             Card(
               margin: const EdgeInsets.symmetric(vertical: 8.0),
               child: Padding(
