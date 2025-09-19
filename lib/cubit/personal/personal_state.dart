@@ -162,6 +162,10 @@ class PersonalLoaded extends PersonalState {
   List<Object> get props => [issues];
 }
 
+class PersonalUnauthenticated extends PersonalState {
+  const PersonalUnauthenticated();
+}
+
 class PersonalError extends PersonalState {
   final String message;
 

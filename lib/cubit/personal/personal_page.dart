@@ -4,6 +4,7 @@ import 'package:m2health/const.dart';
 import 'package:m2health/cubit/personal/personal_case_detail_page.dart';
 import 'package:m2health/utils.dart'; // Import the utils file
 import 'package:m2health/widgets/add_concern_page.dart';
+import 'package:m2health/widgets/auth_guard_dialog.dart';
 import 'personal_cubit.dart';
 import 'personal_state.dart';
 import 'package:m2health/widgets/add_issue_page.dart';
@@ -183,7 +184,11 @@ class _PersonalPageState extends State<PersonalPage> {
                 },
               ),
             ),
-            BlocBuilder<PersonalCubit, PersonalState>(
+            BlocConsumer<PersonalCubit, PersonalState>(
+              listener: (context, state) => {
+                if (state is PersonalUnauthenticated)
+                  showAuthGuardDialog(context)
+              },
               builder: (context, state) {
                 final bool hasIssues =
                     state is PersonalLoaded && state.issues.isNotEmpty;

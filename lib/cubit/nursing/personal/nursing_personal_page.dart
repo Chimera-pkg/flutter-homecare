@@ -5,6 +5,7 @@ import 'package:m2health/cubit/nursing/pages/nursing_add_concern_page.dart';
 import 'package:m2health/cubit/nursing/personal/nursing_personal_case_detail_page.dart';
 import 'package:m2health/cubit/nursing/personal/nursing_personal_cubit.dart';
 import 'package:m2health/utils.dart'; // Import the utils file
+import 'package:m2health/widgets/auth_guard_dialog.dart';
 import 'nursing_personal_cubit.dart';
 import 'nursing_personal_state.dart';
 import 'package:m2health/cubit/nursing/pages/nursing_add_issue_page.dart';
@@ -187,7 +188,11 @@ class _PersonalPageState extends State<PersonalPage> {
                 },
               ),
             ),
-            BlocBuilder<NursingPersonalCubit, NursingPersonalState>(
+            BlocConsumer<NursingPersonalCubit, NursingPersonalState>(
+              listener: (context, state) => {
+                if (state is NursingPersonalUnauthenticated)
+                  showAuthGuardDialog(context)
+              },
               builder: (context, state) {
                 final bool hasIssues =
                     state is NursingPersonalLoaded && state.issues.isNotEmpty;

@@ -64,7 +64,11 @@ class NursingPersonalCubit extends Cubit<NursingPersonalState> {
       }
     } catch (e) {
       print('Error: $e');
-      emit(NursingPersonalError(e.toString()));
+      if (e is DioException && e.response?.statusCode == 401) {
+        emit(const NursingPersonalUnauthenticated());
+      } else {
+        emit(NursingPersonalError(e.toString()));
+      }
     }
   }
 
