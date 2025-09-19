@@ -158,7 +158,7 @@ class _PersonalPageState extends State<PersonalPage> {
                                               children:
                                                   issue.images.map((image) {
                                                 return Image.network(
-                                                  getImageUrl(image),
+                                                  image,
                                                   width: 100,
                                                   height: 100,
                                                   fit: BoxFit.cover,
