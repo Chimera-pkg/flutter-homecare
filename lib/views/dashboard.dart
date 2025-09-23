@@ -65,6 +65,7 @@ class _DashboardState extends State<Dashboard> {
 
   final List<Map<String, String>> services = [
     {'image': 'assets/icons/ilu_physio.png', 'name': 'Physiotherapy'},
+    {'image': 'assets/icons/ilu_precision.png', 'name': 'Precision\nNutrition'},
     {
       'image': 'assets/icons/ilu_ocuTherapy.png',
       'name': 'Occupational\nTherapy'
@@ -72,7 +73,6 @@ class _DashboardState extends State<Dashboard> {
     {'image': 'assets/icons/ilu_sleep.png', 'name': 'Sleep & Mental\nHealth'},
     {'image': 'assets/icons/ilu_health.png', 'name': 'Health Risk\nAssessment'},
     {'image': 'assets/icons/ilu_dietitian.png', 'name': 'Dietitian Services'},
-    {'image': 'assets/icons/ilu_precision.png', 'name': 'Precision\nNutrition'},
   ];
 
   @override
@@ -466,7 +466,7 @@ class _DashboardState extends State<Dashboard> {
                       return GestureDetector(
                           onTap: () {
                             if (services[index]['name'] ==
-                                'Occupational\nTherapy') {
+                                'Precision\nNutrition') {
                               context.push(AppRoutes.precisionNutrition);
                             } else {
                               showDialog(
