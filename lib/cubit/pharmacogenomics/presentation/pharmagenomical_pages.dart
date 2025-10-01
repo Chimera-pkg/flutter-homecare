@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
-import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:m2health/cubit/pharmacogenomics/presentation/bloc/pharmacogenomic_report_cubit.dart';
 import 'package:m2health/cubit/pharmacogenomics/presentation/pharmagenomical_detail.dart';
 import 'package:m2health/cubit/pharmacogenomics/presentation/bloc/pharmacogenomics_cubit.dart';
 import 'package:m2health/cubit/pharmacogenomics/presentation/bloc/pharmacogenomics_state.dart';
+import 'package:m2health/cubit/pharmacogenomics/presentation/widgets/pharmacogenomic_report_form.dart';
 
 class PharmagenomicsProfilePage extends StatefulWidget {
   @override
@@ -97,6 +97,22 @@ class _PharmagenomicsProfilePageState extends State<PharmagenomicsProfilePage> {
               ),
             ),
             const SizedBox(height: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Full Report File",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const SizedBox(height: 8),
+                BlocProvider(
+                  create: (context) =>
+                      PharmacogenomicReportCubit()..fetchReport(),
+                  child: const PharamacogenomicReportForm(),
+                ),
+              ],
+            ),
+            const SizedBox(height: 32),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
