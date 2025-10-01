@@ -1,10 +1,8 @@
-import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/cubit/pharmacogenomics/data/datasources/pharmacogenomics_remote_datasource.dart';
 import 'package:m2health/cubit/pharmacogenomics/data/models/pharmacogenomics_model.dart';
 import 'package:m2health/utils.dart';
-import 'dart:convert';
 import 'dart:developer'; // Menggunakan 'log' untuk debug yang lebih baik
 
 class PharmacogenomicsRemoteDataSourceImpl
@@ -82,14 +80,13 @@ class PharmacogenomicsRemoteDataSourceImpl
 
   @override
   Future<void> createPharmacogenomic(String gene, String genotype,
-      String phenotype, String medicationGuidance, File fullPathReport) async {
+      String phenotype, String medicationGuidance) async {
     try {
       final formData = FormData.fromMap({
         'gene': gene,
         'genotype': genotype,
         'phenotype': phenotype,
         'medication_guidance': medicationGuidance,
-        'full_report_path': await MultipartFile.fromFile(fullPathReport.path),
       });
 
       await dio.post(
@@ -109,14 +106,13 @@ class PharmacogenomicsRemoteDataSourceImpl
 
   @override
   Future<void> updatePharmacogenomic(int id, String gene, String genotype,
-      String phenotype, String medicationGuidance, File fullPathReport) async {
+      String phenotype, String medicationGuidance) async {
     try {
       final formData = FormData.fromMap({
         'gene': gene,
         'genotype': genotype,
         'phenotype': phenotype,
         'medication_guidance': medicationGuidance,
-        'full_report_path': await MultipartFile.fromFile(fullPathReport.path),
         // [FIX] Menggunakan POST dengan _method 'PUT' lebih stabil untuk FormData
         '_method': 'PUT',
       });

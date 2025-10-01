@@ -27,7 +27,7 @@ class _PharmagenomicsProfilePageState extends State<PharmagenomicsProfilePage> {
       appBar: AppBar(
         title: const Text(
           'Pharmagenomic Profile',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -45,12 +45,13 @@ class _PharmagenomicsProfilePageState extends State<PharmagenomicsProfilePage> {
               child: BlocBuilder<PharmacogenomicsCubit, PharmacogenomicsState>(
                 builder: (context, state) {
                   if (state is PharmacogenomicsLoading) {
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   }
                   if (state is PharmacogenomicsLoaded) {
                     final items = state.pharmacogenomics;
                     if (items.isEmpty) {
-                      return Center(child: Text('No pharmacogenomics data.'));
+                      return const Center(
+                          child: Text('No pharmacogenomics data.'));
                     }
                     return ListView.builder(
                       itemCount: items.length,
@@ -64,10 +65,10 @@ class _PharmagenomicsProfilePageState extends State<PharmagenomicsProfilePage> {
                               style: const TextStyle(fontSize: 16),
                             ),
                             subtitle: Text(
-                              'Genotype: ${item.genotype}\nPhenotype: ${item.phenotype}\nGuidance: ${item.medicationGuidance}\nFile: ${item.fullReportPath ?? '-'}',
+                              'Genotype: ${item.genotype}\nPhenotype: ${item.phenotype}\nGuidance: ${item.medicationGuidance}',
                             ),
                             trailing: item.fullReportPath != null
-                                ? Icon(Icons.file_present)
+                                ? const Icon(Icons.file_present)
                                 : null,
                             onTap: () {
                               Navigator.push(
@@ -91,7 +92,7 @@ class _PharmagenomicsProfilePageState extends State<PharmagenomicsProfilePage> {
                   if (state is PharmacogenomicsError) {
                     return Center(child: Text('Error: ${state.message}'));
                   }
-                  return Center(child: Text('No pharmacogenomics data.'));
+                  return const Center(child: Text('No pharmacogenomics data.'));
                 },
               ),
             ),
@@ -102,7 +103,8 @@ class _PharmagenomicsProfilePageState extends State<PharmagenomicsProfilePage> {
                 icon: const Icon(Icons.add),
                 label: const Text('Add Pharmacogenomics'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.cyan,
+                  backgroundColor: const Color(0xFF35C5CF),
+                  foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -152,34 +154,12 @@ class _PharmacogenomicsFormModalState
   final TextEditingController _medicationGuidanceController =
       TextEditingController();
 
-  File? _selectedFile;
-  String? _uploadedFileName;
   bool _loading = false;
-
-  Future<void> _pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['csv', 'pdf'],
-    );
-    if (result != null && result.files.single.path != null) {
-      setState(() {
-        _selectedFile = File(result.files.single.path!);
-        _uploadedFileName = result.files.single.name;
-      });
-    }
-  }
-
-  void _removeFile() {
-    setState(() {
-      _selectedFile = null;
-      _uploadedFileName = null;
-    });
-  }
 
   Future<void> _saveReport() async {
     if (_geneController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Gene cannot be empty")),
+        const SnackBar(content: Text("Gene cannot be empty")),
       );
       return;
     }
@@ -189,21 +169,19 @@ class _PharmacogenomicsFormModalState
     final genotype = _genotypeController.text;
     final phenotype = _phenotypeController.text;
     final medicationGuidance = _medicationGuidanceController.text;
-    final fullReportPath = _selectedFile ?? File('');
 
     await context.read<PharmacogenomicsCubit>().create(
           gene,
           genotype,
           phenotype,
           medicationGuidance,
-          fullReportPath,
         );
 
     await context.read<PharmacogenomicsCubit>().fetchPharmacogenomics();
 
     setState(() => _loading = false);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Report submitted")),
+      const SnackBar(content: Text("Report submitted")),
     );
     Navigator.pop(context);
   }
@@ -226,41 +204,8 @@ class _PharmacogenomicsFormModalState
             ),
           ),
           const Text(
-            'Upload Full Report',
+            'Add Pharmacogenomic',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  readOnly: true,
-                  decoration: InputDecoration(
-                    hintText: _uploadedFileName ?? 'Choose File',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              ElevatedButton(
-                onPressed: _pickFile,
-                child: const Text('Choose File'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  foregroundColor: Colors.white,
-                ),
-              ),
-              if (_uploadedFileName != null)
-                IconButton(
-                  icon: Icon(Icons.clear),
-                  onPressed: _removeFile,
-                ),
-            ],
           ),
           const SizedBox(height: 8),
           TextField(

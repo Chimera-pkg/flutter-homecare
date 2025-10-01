@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:m2health/cubit/pharmacogenomics/domain/repositories/pharmacogenomics_repository.dart';
 
 class CreatePharmacogenomic {
@@ -11,14 +10,12 @@ class CreatePharmacogenomic {
     String genotype,
     String phenotype,
     String medicationGuidance,
-    File fullPathReport,
   ) async {
     await repository.createPharmacogenomic(
       gene,
       genotype,
       phenotype,
-      medicationGuidance,
-      fullPathReport,
+      medicationGuidance
     );
   }
 }
@@ -34,15 +31,13 @@ class UpdatePharmacogenomic {
     String genotype,
     String phenotype,
     String medicationGuidance,
-    File fullPathReport,
   ) async {
     await repository.updatePharmacogenomic(
       id,
       gene,
       genotype,
       phenotype,
-      medicationGuidance,
-      fullPathReport,
+      medicationGuidance
     );
   }
 }
