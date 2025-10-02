@@ -1,5 +1,5 @@
 import 'package:go_router/go_router.dart';
-import 'package:m2health/cubit/nursingclean/presentation/pages/nursing_services_page.dart';
+import 'package:m2health/cubit/nursing/pages/nursing_services.dart';
 import 'package:m2health/views/pharmacist_services.dart';
 import '../cubit/precision/precision_page.dart';
 import '../views/diabetic_care.dart';
@@ -19,7 +19,7 @@ class DashboardRoutes {
     GoRoute(
       path: AppRoutes.nursingServices,
       builder: (context, state) {
-        return NursingService(); // From nursingclean module
+        return NursingService(); // From nursing module
       },
     ),
     GoRoute(
