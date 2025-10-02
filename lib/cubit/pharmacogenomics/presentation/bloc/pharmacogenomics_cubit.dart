@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/cubit/pharmacogenomics/domain/usecases/crud_pharmacogenomics.dart';
 import 'package:m2health/cubit/pharmacogenomics/domain/usecases/get_pharmacogenomics.dart';
@@ -37,7 +36,6 @@ class PharmacogenomicsCubit extends Cubit<PharmacogenomicsState> {
     String genotype,
     String phenotype,
     String medicationGuidance,
-    File fullPathReport,
   ) async {
     try {
       await createPharmacogenomic(
@@ -45,7 +43,6 @@ class PharmacogenomicsCubit extends Cubit<PharmacogenomicsState> {
         genotype,
         phenotype,
         medicationGuidance,
-        fullPathReport,
       );
       fetchPharmacogenomics();
     } catch (e) {
@@ -59,7 +56,6 @@ class PharmacogenomicsCubit extends Cubit<PharmacogenomicsState> {
     String genotype,
     String phenotype,
     String medicationGuidance,
-    File fullPathReport,
   ) async {
     try {
       await updatePharmacogenomic(
@@ -68,7 +64,6 @@ class PharmacogenomicsCubit extends Cubit<PharmacogenomicsState> {
         genotype,
         phenotype,
         medicationGuidance,
-        fullPathReport,
       );
       fetchPharmacogenomics();
     } catch (e) {

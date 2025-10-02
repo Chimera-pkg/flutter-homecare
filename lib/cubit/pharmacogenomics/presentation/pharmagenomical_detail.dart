@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
-import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:m2health/cubit/pharmacogenomics/presentation/bloc/pharmacogenomics_cubit.dart';
 
 class GeneDetailPage extends StatefulWidget {
@@ -32,8 +29,6 @@ class _GeneDetailPageState extends State<GeneDetailPage> {
   late String genotype;
   late String phenotype;
   late String medicationGuidance;
-  String? fullReportPath;
-  File? pickedFile;
 
   @override
   void initState() {
@@ -42,20 +37,6 @@ class _GeneDetailPageState extends State<GeneDetailPage> {
     genotype = widget.genotype;
     phenotype = widget.phenotype;
     medicationGuidance = widget.medicationGuidance;
-    fullReportPath = widget.fullReportPath;
-  }
-
-  Future<void> _pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf'],
-    );
-    if (result != null && result.files.single.path != null) {
-      setState(() {
-        pickedFile = File(result.files.single.path!);
-        fullReportPath = null; // Will be updated after successful upload
-      });
-    }
   }
 
   void _editDetailsModal() {
@@ -133,43 +114,6 @@ class _GeneDetailPageState extends State<GeneDetailPage> {
                       ),
                       maxLines: 3,
                     ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            pickedFile != null
-                                ? pickedFile!.path.split('/').last
-                                : fullReportPath != null
-                                    ? fullReportPath!.split('/').last
-                                    : 'Choose PDF file',
-                          ),
-                        ),
-                        ElevatedButton(
-                          onPressed: () async {
-                            FilePickerResult? result =
-                                await FilePicker.platform.pickFiles(
-                              type: FileType.custom,
-                              allowedExtensions: ['pdf'],
-                            );
-                            if (result != null &&
-                                result.files.single.path != null) {
-                              setModalState(() {
-                                pickedFile = File(result.files.single.path!);
-                                fullReportPath = null;
-                              });
-                            }
-                          },
-                          child: const Text('Choose File'),
-                        ),
-                        if (pickedFile != null)
-                          IconButton(
-                            icon: const Icon(Icons.clear),
-                            onPressed: () =>
-                                setModalState(() => pickedFile = null),
-                          ),
-                      ],
-                    ),
                     const SizedBox(height: 16),
                     SizedBox(
                       width: double.infinity,
@@ -190,7 +134,6 @@ class _GeneDetailPageState extends State<GeneDetailPage> {
                                 genotypeController.text,
                                 phenotypeController.text,
                                 guidanceController.text,
-                                pickedFile ?? File(''),
                               );
                           setState(() {
                             gene = geneController.text;
@@ -213,18 +156,6 @@ class _GeneDetailPageState extends State<GeneDetailPage> {
         );
       },
     );
-  }
-
-  Future<void> _openPdf() async {
-    if (fullReportPath == null || fullReportPath!.isEmpty) return;
-    final uri = Uri.parse(fullReportPath!);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not open PDF file')),
-      );
-    }
   }
 
   void _deleteDetails() {
@@ -284,6 +215,7 @@ class _GeneDetailPageState extends State<GeneDetailPage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
+              clipBehavior: Clip.antiAlias,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -310,17 +242,6 @@ class _GeneDetailPageState extends State<GeneDetailPage> {
                           medicationGuidance,
                           style: const TextStyle(fontSize: 14),
                         ),
-                        const SizedBox(height: 8),
-                        if (fullReportPath != null &&
-                            fullReportPath!.isNotEmpty)
-                          ElevatedButton.icon(
-                            icon: const Icon(Icons.picture_as_pdf),
-                            label: const Text('View PDF'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue,
-                            ),
-                            onPressed: _openPdf,
-                          ),
                       ],
                     ),
                   ),
@@ -333,11 +254,10 @@ class _GeneDetailPageState extends State<GeneDetailPage> {
                             height: 50,
                             decoration: BoxDecoration(
                               color: Colors.green.shade50,
-                              borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Row(
+                            child: const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
+                              children: [
                                 Icon(Icons.edit, color: Colors.green),
                                 SizedBox(width: 8),
                                 Text(
@@ -352,7 +272,6 @@ class _GeneDetailPageState extends State<GeneDetailPage> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 16),
                       Expanded(
                         child: GestureDetector(
                           onTap: _deleteDetails,
@@ -360,11 +279,10 @@ class _GeneDetailPageState extends State<GeneDetailPage> {
                             height: 50,
                             decoration: BoxDecoration(
                               color: Colors.red.shade50,
-                              borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Row(
+                            child: const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
+                              children: [
                                 Icon(Icons.delete, color: Colors.red),
                                 SizedBox(width: 8),
                                 Text(
