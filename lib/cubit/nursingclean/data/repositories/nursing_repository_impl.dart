@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import 'package:m2health/core/error/failures.dart';
 import 'package:m2health/cubit/nursingclean/data/datasources/nursing_remote_datasource.dart';
 import 'package:m2health/cubit/nursingclean/data/mappers/nursing_case_mapper.dart';
@@ -27,6 +28,11 @@ class NursingRepositoryImpl implements NursingRepository {
           await remoteDataSource.getNursingPersonalCases();
       final nursingCaseEntity = mapper.mapModelsToEntity(nursingCaseModels);
       return Right(nursingCaseEntity);
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        return const Left(UnauthorizedFailure("User is not authenticated"));
+      }
+      return Left(Failure(e.message ?? 'A network error occurred'));
     } on Exception catch (e) {
       return Left(Failure(e.toString()));
     }

@@ -8,3 +8,7 @@ class Failure extends Equatable {
   @override
   List<Object?> get props => [message];
 }
+
+class UnauthorizedFailure extends Failure {
+  const UnauthorizedFailure(super.message);
+}

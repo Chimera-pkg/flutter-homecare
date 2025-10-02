@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:m2health/cubit/nursingclean/domain/entities/add_on_service.dart';
 import 'package:m2health/cubit/nursingclean/domain/entities/nursing_case.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/add_on_services_state.dart';
 
@@ -10,9 +9,17 @@ abstract class NursingCaseState extends Equatable {
   List<Object> get props => [];
 }
 
-class NursingCaseInitial extends NursingCaseState {}
+class NursingCaseInitial extends NursingCaseState {
+  const NursingCaseInitial();
+}
 
-class NursingCaseLoading extends NursingCaseState {}
+class NursingCaseLoading extends NursingCaseState {
+  const NursingCaseLoading();
+}
+
+class NursingCaseUnauthenticated extends NursingCaseState {
+  const NursingCaseUnauthenticated();
+}
 
 class NursingCaseLoaded extends NursingCaseState {
   final NursingCase nursingCase;

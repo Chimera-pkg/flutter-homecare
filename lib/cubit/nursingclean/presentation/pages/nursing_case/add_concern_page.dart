@@ -19,11 +19,12 @@ class AddConcernPage extends StatefulWidget {
 class _AddConcernPageState extends State<AddConcernPage> {
   TextEditingController _issueTitleController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
-  List<File> _images = [];
 
-  void _addImage(File image) {
+  final List<File?> _images = List.filled(3, null); // To hold up to 3 images
+
+  Future<void> setImageAt(int index, File? image) async {
     setState(() {
-      _images.add(image);
+      _images[index] = image;
     });
   }
 
@@ -44,7 +45,7 @@ class _AddConcernPageState extends State<AddConcernPage> {
     final newIssue = NursingIssue(
       title: issueTitle,
       description: description,
-      images: _images,
+      images: _images.whereType<File>().toList(),
     );
 
     context.read<NursingCaseBloc>().add(AddNursingIssueEvent(newIssue));
@@ -130,14 +131,14 @@ class _AddConcernPageState extends State<AddConcernPage> {
             Padding(
               padding: const EdgeInsets.only(left: 12.0),
               child: Column(
+                spacing: 30,
                 children: [
-                  const SizedBox(height: 30),
-                  ImagePreview(onImageSelected: _addImage),
-                  const SizedBox(height: 30),
-                  ImagePreview(onImageSelected: _addImage),
-                  const SizedBox(height: 30),
-                  ImagePreview(onImageSelected: _addImage),
-                  const SizedBox(height: 30),
+                  ...List.generate(_images.length, (index) {
+                    return ImagePreview(
+                      imageFile: _images[index],
+                      onChooseImage: (image) => setImageAt(index, image),
+                    );
+                  }),
                 ],
               ),
             ),

@@ -7,6 +7,7 @@ import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/nursi
 import 'package:m2health/cubit/nursingclean/presentation/pages/nursing_case/add_concern_page.dart';
 import 'package:m2health/cubit/nursingclean/presentation/pages/nursing_case/nursing_concern_detail_page.dart';
 import 'package:m2health/cubit/nursingclean/presentation/pages/nursing_case/nursing_health_status_page.dart';
+import 'package:m2health/widgets/auth_guard_dialog.dart';
 
 class NursingConcernsPage extends StatefulWidget {
   final String title;
@@ -27,7 +28,7 @@ class _NursingConcernsPageState extends State<NursingConcernsPage> {
   void initState() {
     super.initState();
     if (context.read<NursingCaseBloc>().state is! NursingCaseLoaded) {
-      context.read<NursingCaseBloc>().add(InitializeNursingCaseEvent());
+      context.read<NursingCaseBloc>().add(GetNursingCaseEvent());
     }
   }
 
@@ -71,7 +72,11 @@ class _NursingConcernsPageState extends State<NursingConcernsPage> {
               ],
             ),
             Expanded(
-              child: BlocBuilder<NursingCaseBloc, NursingCaseState>(
+              child: BlocConsumer<NursingCaseBloc, NursingCaseState>(
+                listener: (context, state) => {
+                  if (state is NursingCaseUnauthenticated)
+                    showAuthGuardDialog(context)
+                },
                 builder: (context, state) {
                   if (state is NursingCaseLoading) {
                     return const Center(child: CircularProgressIndicator());

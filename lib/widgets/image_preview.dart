@@ -1,28 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
-class ImagePreview extends StatefulWidget {
-  final Function(File) onImageSelected;
+import 'package:image_picker/image_picker.dart';
 
-  ImagePreview({required this.onImageSelected});
+class ImagePreview extends StatelessWidget {
+  final Function(File?) onChooseImage;
+  final File? imageFile;
 
-  @override
-  _ImagePreviewState createState() => _ImagePreviewState();
-}
-
-class _ImagePreviewState extends State<ImagePreview> {
-  File? _image;
+  const ImagePreview({
+    super.key,
+    required this.onChooseImage,
+    this.imageFile,
+  });
 
   Future<void> _chooseImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-      });
-      widget.onImageSelected(_image!);
+      final newImage = File(pickedFile.path);
+      onChooseImage(newImage);
     }
   }
 
@@ -36,26 +33,30 @@ class _ImagePreviewState extends State<ImagePreview> {
           decoration: BoxDecoration(
             color: Colors.grey.shade200,
             borderRadius: BorderRadius.circular(5),
+            border: Border.all(color: Colors.grey.shade300),
           ),
-          child: _image == null
-              ? Center(child: Image.asset('assets/icons/ic_preview.png'))
-              : Image.file(_image!, fit: BoxFit.cover),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: imageFile == null
+                ? Center(child: Image.asset('assets/icons/ic_preview.png'))
+                : Image.file(imageFile!, fit: BoxFit.cover),
+          ),
         ),
-        SizedBox(width: 10),
+        const SizedBox(width: 10),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Image less than 10MB',
               style: TextStyle(fontSize: 12),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             OutlinedButton(
-              onPressed: _chooseImage,
+              onPressed: _chooseImage, // Use the provided callback
               style: OutlinedButton.styleFrom(
-                side: BorderSide(color: Color(0xFF10B981)),
+                side: const BorderSide(color: Color(0xFF10B981)),
               ),
-              child: Text(
+              child: const Text(
                 'Choose File',
                 style: TextStyle(color: Color(0xFF10B981)),
               ),

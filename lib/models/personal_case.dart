@@ -37,7 +37,7 @@ class PersonalCase {
           ? Map<String, dynamic>.from(json['related_health_record'])
           : {},
       addOn: json['add_on'] ?? '',
-      estimatedBudget: (json['estimated_budget'] as num?)?.toDouble() ?? 0.0,
+      estimatedBudget: double.tryParse(json['estimated_budget']?.toString() ?? '') ?? 0.0,
     );
   }
 
