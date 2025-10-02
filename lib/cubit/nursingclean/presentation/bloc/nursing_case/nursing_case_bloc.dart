@@ -20,13 +20,19 @@ class NursingCaseBloc extends Bloc<NursingCaseEvent, NursingCaseState> {
     required this.getNursingCase,
     required this.createNursingCase,
     required this.getNursingAddOnServices,
-  }) : super(NursingCaseInitial()) {
+  }) : super(const NursingCaseInitial()) {
     on<GetNursingCaseEvent>((event, emit) async {
-      emit(NursingCaseLoading());
+      emit(const NursingCaseLoading());
       final failureOrNursingCase = await getNursingCase();
 
       failureOrNursingCase.fold(
-        (failure) => emit(NursingCaseError(_mapFailureToMessage(failure))),
+        (failure) {
+          if (failure is UnauthorizedFailure) {
+            emit(const NursingCaseUnauthenticated());
+          } else {
+            emit(NursingCaseError(_mapFailureToMessage(failure)));
+          }
+        },
         (nursingCase) => emit(NursingCaseLoaded(nursingCase: nursingCase)),
       );
     });
@@ -52,7 +58,7 @@ class NursingCaseBloc extends Bloc<NursingCaseEvent, NursingCaseState> {
     });
 
     on<CreateNursingCaseEvent>((event, emit) async {
-      emit(NursingCaseLoading());
+      emit(const NursingCaseLoading());
       final failureOrSuccess = await createNursingCase(event.nursingCase);
       failureOrSuccess.fold(
         (failure) => emit(NursingCaseError(_mapFailureToMessage(failure))),

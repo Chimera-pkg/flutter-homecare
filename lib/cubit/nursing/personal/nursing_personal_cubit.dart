@@ -62,13 +62,6 @@ class NursingPersonalCubit extends Cubit<NursingPersonalState> {
         print('Failed to load data: ${response.statusMessage}');
         emit(const NursingPersonalError('Failed to load data'));
       }
-    } on DioException catch (e) {
-      print(e.error);
-      if (e.response?.statusCode == 401) {
-        emit(NursingPersonalUnauthenticated());
-        return;
-      }
-      emit(NursingPersonalError('Failed to load data: ${e.message}'));
     } catch (e) {
       print('Error: $e');
       if (e is DioException && e.response?.statusCode == 401) {
