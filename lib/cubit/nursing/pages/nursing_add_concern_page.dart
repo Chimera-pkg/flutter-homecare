@@ -46,7 +46,7 @@ class _AddConcernPageState extends State<AddConcernPage> {
         "title": issueTitle,
         "description": description,
         "mobility_status": "wheel",
-        "related_health_record_id": 33, // Make it null to make it optional
+        "related_health_record_id": null, // Make it null to make it optional
         "add_on": "additional",
         "estimated_budget": 1000,
       });
@@ -172,7 +172,7 @@ class _AddConcernPageState extends State<AddConcernPage> {
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
-          icon: Icon(Icons.close),
+          icon: const Icon(Icons.close),
           onPressed: () {
             Navigator.pop(context);
           },

@@ -74,7 +74,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       TextButton(
                         child: const Text('OK'),
                         onPressed: () {
-                          context.go(AppRoutes.home);
+                          context.go(AppRoutes.signIn);
                         },
                       ),
                     ],

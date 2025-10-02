@@ -39,6 +39,10 @@ class PersonalCubit extends Cubit<PersonalState> {
 
       emit(PersonalLoaded(issues));
     } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        emit(PersonalUnauthenticated());
+        return;
+      }
       emit(PersonalError('Failed to load data: ${e.message}'));
     } catch (e) {
       print(e);
