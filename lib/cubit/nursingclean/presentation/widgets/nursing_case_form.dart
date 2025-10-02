@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:m2health/cubit/nursingclean/domain/entities/nursing_case.dart';
+import 'package:m2health/cubit/nursingclean/domain/entities/nursing_issue.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/nursing_case_bloc.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/nursing_case_event.dart';
 
@@ -44,16 +44,16 @@ class _NursingCaseFormState extends State<NursingCaseForm> {
           ),
           ElevatedButton(
             onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                final nursingCase = NursingCase(
-                  title: _titleController.text,
-                  description: _descriptionController.text,
-                  images: [],
-                );
-                context
-                    .read<NursingCaseBloc>()
-                    .add(CreateNursingCaseEvent(nursingCase));
-              }
+              // if (_formKey.currentState!.validate()) {
+              //   final nursingCase = NursingCase(
+              //     title: _titleController.text,
+              //     description: _descriptionController.text,
+              //     images: [],
+              //   );
+              //   context
+              //       .read<NursingCaseBloc>()
+              //       .add(CreateNursingCaseEvent(nursingCase));
+              // }
             },
             child: const Text('Submit'),
           ),

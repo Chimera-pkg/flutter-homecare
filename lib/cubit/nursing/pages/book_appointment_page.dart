@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:m2health/cubit/nursingclean/domain/entities/professional_entity.dart';
 import 'package:m2health/utils.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:m2health/cubit/nursingclean/presentation/pages/detail_appointment_page.dart';
+import 'package:m2health/cubit/nursing/pages/detail_appointment_page.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/widgets/time_slot_grid_view.dart';
 import 'package:m2health/services/appointment_service.dart';

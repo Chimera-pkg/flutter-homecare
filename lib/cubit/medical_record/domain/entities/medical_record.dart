@@ -27,24 +27,6 @@ class MedicalRecord extends Equatable {
     required this.updatedAt,
   });
 
-  factory MedicalRecord.fromJson(Map<String, dynamic> json) {
-    return MedicalRecord(
-      id: json['id'] ?? 0,
-      userId: json['user_id'] ?? 0,
-      title: json['title'] ?? '',
-      diseaseName: json['disease_name'] ?? '',
-      diseaseHistory: json['disease_history'],
-      symptoms: json['symptoms'],
-      specialConsideration: json['special_consideration'],
-      treatmentInfo: json['treatment_info'],
-      fileUrl: json['file_url'],
-      createdAt: DateTime.parse(
-          json['created_at'] ?? DateTime.now().toIso8601String()),
-      updatedAt: DateTime.parse(
-          json['updated_at'] ?? DateTime.now().toIso8601String()),
-    );
-  }
-
   @override
   List<Object?> get props => [
         id,

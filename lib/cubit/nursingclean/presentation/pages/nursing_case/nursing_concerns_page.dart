@@ -4,37 +4,49 @@ import 'package:m2health/const.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/nursing_case_bloc.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/nursing_case_event.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/nursing_case_state.dart';
-import 'package:m2health/cubit/nursingclean/presentation/pages/add_concern_page.dart';
-import 'package:m2health/cubit/nursingclean/presentation/pages/nursing_case_form_page.dart';
+import 'package:m2health/cubit/nursingclean/presentation/pages/nursing_case/add_concern_page.dart';
+import 'package:m2health/cubit/nursingclean/presentation/pages/nursing_case/nursing_concern_detail_page.dart';
+import 'package:m2health/cubit/nursingclean/presentation/pages/nursing_case/nursing_health_status_page.dart';
 
-class NursingConcernPage extends StatefulWidget {
+class NursingConcernsPage extends StatefulWidget {
   final String title;
   final String serviceType;
 
-  const NursingConcernPage({
+  const NursingConcernsPage({
     Key? key,
     required this.title,
     required this.serviceType,
   }) : super(key: key);
 
   @override
-  _NursingConcernPageState createState() => _NursingConcernPageState();
+  _NursingConcernsPageState createState() => _NursingConcernsPageState();
 }
 
-class _NursingConcernPageState extends State<NursingConcernPage> {
+class _NursingConcernsPageState extends State<NursingConcernsPage> {
   @override
   void initState() {
     super.initState();
-    context.read<NursingCaseBloc>().add(GetNursingCasesEvent());
+    if (context.read<NursingCaseBloc>().state is! NursingCaseLoaded) {
+      context.read<NursingCaseBloc>().add(InitializeNursingCaseEvent());
+    }
+  }
+
+  void _onClickNext(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const NursingHealthStatusPage(),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "Nurse Services Case",
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
       ),
       body: Padding(
@@ -55,7 +67,7 @@ class _NursingConcernPageState extends State<NursingConcernPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
               ],
             ),
             Expanded(
@@ -64,26 +76,33 @@ class _NursingConcernPageState extends State<NursingConcernPage> {
                   if (state is NursingCaseLoading) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (state is NursingCaseLoaded) {
-                    final issues = state.nursingCases;
-                    return RefreshIndicator(
-                      onRefresh: () async {
-                        context
-                            .read<NursingCaseBloc>()
-                            .add(GetNursingCasesEvent());
-                      },
-                      child: issues.isEmpty
-                          ? const Center(
-                              child: Text(
-                                'There are no issues added yet.\n Please add one or more issues so\nyou can proceed to the next step.',
-                                style: TextStyle(fontSize: 16),
-                                textAlign: TextAlign.center,
-                              ),
-                            )
-                          : ListView.builder(
-                              itemCount: issues.length,
-                              itemBuilder: (context, index) {
-                                final issue = issues[index];
-                                return Card(
+                    final issues = state.nursingCase.issues;
+                    debugPrint('Loaded issues: $issues');
+                    return issues.isEmpty
+                        ? const Center(
+                            child: Text(
+                              'There are no issues added yet.\n Please add one or more issues so\nyou can proceed to the next step.',
+                              style: TextStyle(fontSize: 16),
+                              textAlign: TextAlign.center,
+                            ),
+                          )
+                        : ListView.builder(
+                            itemCount: issues.length,
+                            itemBuilder: (context, index) {
+                              final issue = issues[index];
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          NursingConcernDetailPage(
+                                        issue: issue,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Card(
                                   margin:
                                       const EdgeInsets.symmetric(vertical: 8.0),
                                   child: Padding(
@@ -92,12 +111,29 @@ class _NursingConcernPageState extends State<NursingConcernPage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          issue.title,
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              issue.title,
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            IconButton(
+                                              icon: const Icon(Icons.delete,
+                                                  color: Colors.red),
+                                              onPressed: () {
+                                                context
+                                                    .read<NursingCaseBloc>()
+                                                    .add(
+                                                        DeleteNursingIssueEvent(
+                                                            issue));
+                                              },
+                                            ),
+                                          ],
                                         ),
                                         const SizedBox(height: 8),
                                         Text(issue.description),
@@ -127,10 +163,10 @@ class _NursingConcernPageState extends State<NursingConcernPage> {
                                       ],
                                     ),
                                   ),
-                                );
-                              },
-                            ),
-                    );
+                                ),
+                              );
+                            },
+                          );
                   } else if (state is NursingCaseError) {
                     return Center(
                         child: Text('Failed to load issues: ${state.message}'));
@@ -142,8 +178,8 @@ class _NursingConcernPageState extends State<NursingConcernPage> {
             ),
             BlocBuilder<NursingCaseBloc, NursingCaseState>(
               builder: (context, state) {
-                final bool hasIssues =
-                    state is NursingCaseLoaded && state.nursingCases.isNotEmpty;
+                final bool hasIssues = state is NursingCaseLoaded &&
+                    state.nursingCase.issues.isNotEmpty;
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -177,16 +213,8 @@ class _NursingConcernPageState extends State<NursingConcernPage> {
                       width: 352,
                       height: 58,
                       child: ElevatedButton(
-                        onPressed: hasIssues
-                            ? () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => NursingCaseFormPage(),
-                                  ),
-                                );
-                              }
-                            : null,
+                        onPressed:
+                            hasIssues ? () => _onClickNext(context) : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor:
                               hasIssues ? Const.tosca : const Color(0xFFB2B9C4),
