@@ -56,16 +56,16 @@ class SignUpCubit extends Cubit<SignUpState> {
     String mUrl;
     switch (role.toLowerCase()) {
       case 'pharmacist':
-        mUrl = '${Const.API_REGISTER}pharmacist';
+        mUrl = '${Const.API_REGISTER}/pharmacist';
         break;
       case 'radiologist':
-        mUrl = '${Const.API_REGISTER}radiologist';
+        mUrl = '${Const.API_REGISTER}/radiologist';
         break;
       case 'patient':
-        mUrl = '${Const.API_REGISTER}patient';
+        mUrl = '${Const.API_REGISTER}/patient';
         break;
       case 'nurse':
-        mUrl = '${Const.API_REGISTER}nurse';
+        mUrl = '${Const.API_REGISTER}/nurse';
         break;
       default:
         emit(SignUpFailure(
@@ -91,6 +91,7 @@ class SignUpCubit extends Cubit<SignUpState> {
       print('Response Data: ${response.data}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+        _sendVerificationEmail(email); // Not awaited, fire-and-forget
         emit(SignUpSuccess());
       } else if (response.statusCode == 422) {
         // Validation errors
@@ -129,6 +130,20 @@ class SignUpCubit extends Cubit<SignUpState> {
       print('Error: $e');
       emit(SignUpFailure(
           'Network error. Please check your connection and try again.'));
+    }
+  }
+
+  Future<void> _sendVerificationEmail(String email) async {
+    try {
+      print('=== SENDING VERIFICATION EMAIL ===');
+      await _dio.post(
+        '${Const.API_REGISTER}/send-email-verification',
+        data: {"email": email},
+      );
+      print('Verification email request sent successfully.');
+    } catch (e) {
+      print('=== FAILED TO SEND VERIFICATION EMAIL ===');
+      print('Error: $e');
     }
   }
 

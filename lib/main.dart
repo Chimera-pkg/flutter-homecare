@@ -1,5 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:m2health/cubit/medical_record/domain/usecases/get_medical_records.dart';
+import 'package:m2health/cubit/medical_record/presentation/bloc/medical_record_bloc.dart';
+import 'package:m2health/cubit/nursingclean/domain/repositories/nursing_appointment_repository.dart';
+import 'package:m2health/cubit/nursingclean/domain/usecases/get_nursing_add_on_services.dart';
+import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_appointment_form/nursing_appointment_form_bloc.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_services/nursing_services_bloc.dart';
 import 'package:m2health/cubit/personal/personal_cubit.dart';
 import 'package:m2health/cubit/nursing/personal/nursing_personal_cubit.dart';
@@ -13,8 +18,7 @@ import 'package:m2health/cubit/precision/precision_cubit.dart';
 import 'package:m2health/cubit/profiles/profile_cubit.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:m2health/route/app_router.dart';
-// import 'package:m2health/views/dashboard.dart';
-// import 'package:m2health/views/favourites.dart';
+import 'package:m2health/service_locator.dart';
 import 'package:m2health/cubit/appointment/appointment_cubit.dart';
 import 'package:m2health/cubit/appointment/provider_appointment_cubit.dart';
 import 'package:dio/dio.dart';
@@ -31,14 +35,9 @@ import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 
 // nursing module
-import 'package:m2health/cubit/nursingclean/data/datasources/nursing_remote_datasource.dart';
-import 'package:m2health/cubit/nursingclean/data/repositories/nursing_repository_impl.dart';
-import 'package:m2health/cubit/nursingclean/domain/repositories/nursing_repository.dart';
 import 'package:m2health/cubit/nursingclean/domain/usecases/create_nursing_case.dart';
-import 'package:m2health/cubit/nursingclean/domain/usecases/get_nursing_cases.dart';
+import 'package:m2health/cubit/nursingclean/domain/usecases/get_nursing_case.dart';
 import 'package:m2health/cubit/nursingclean/domain/usecases/get_nursing_services.dart';
-import 'package:m2health/cubit/nursingclean/domain/usecases/get_medical_records.dart';
-import 'package:m2health/cubit/nursingclean/domain/usecases/update_nursing_case.dart';
 import 'package:m2health/cubit/nursingclean/domain/usecases/get_professionals.dart';
 import 'package:m2health/cubit/nursingclean/domain/usecases/toggle_favorite.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/nursing_case_bloc.dart';
@@ -46,32 +45,33 @@ import 'package:m2health/cubit/nursingclean/presentation/bloc/professional/profe
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await setupLocator();
   AppLanguage appLanguage = AppLanguage();
   await appLanguage.fetchLocale();
   runApp(
     MultiBlocProvider(
       providers: [
         Provider<Dio>(
-          create: (context) => Dio(),
+          create: (context) => sl<Dio>(),
         ),
         BlocProvider<PrecisionCubit>(
           create: (context) => PrecisionCubit(),
         ),
-        BlocProvider(create: (context) => AppointmentCubit(Dio())),
-        BlocProvider(create: (context) => ProviderAppointmentCubit(Dio())),
+        BlocProvider(create: (context) => AppointmentCubit(sl<Dio>())),
+        BlocProvider(create: (context) => ProviderAppointmentCubit(sl<Dio>())),
         BlocProvider(
             create: (context) => PersonalCubit()..loadPersonalDetails()),
         BlocProvider(
             create: (context) => NursingPersonalCubit()..loadPersonalDetails()),
-        BlocProvider(create: (context) => ProfileCubit(Dio())),
+        BlocProvider(create: (context) => ProfileCubit(sl<Dio>())),
         BlocProvider(
-          create: (context) => ProfileCubit(context.read<Dio>()),
+          create: (context) => ProfileCubit(sl<Dio>()),
         ),
         // Pharmacogenomics Module Dependencies
         Provider<PharmacogenomicsRepository>(
           create: (context) => PharmacogenomicsRepositoryImpl(
             remoteDataSource: PharmacogenomicsRemoteDataSourceImpl(
-              dio: context.read<Dio>(),
+              dio: sl<Dio>(),
             ),
           ),
         ),
@@ -104,59 +104,34 @@ void main() async {
           ),
         ),
         // Nursing Module Dependencies
-        RepositoryProvider<NursingRepository>(
-          create: (context) => NursingRepositoryImpl(
-            remoteDataSource:
-                NursingRemoteDataSourceImpl(dio: context.read<Dio>()),
-          ),
-        ),
-        Provider<GetNursingServices>(
-          create: (context) =>
-              GetNursingServices(context.read<NursingRepository>()),
-        ),
-        Provider<GetNursingCases>(
-          create: (context) =>
-              GetNursingCases(context.read<NursingRepository>()),
-        ),
-        Provider<CreateNursingCase>(
-          create: (context) =>
-              CreateNursingCase(context.read<NursingRepository>()),
-        ),
-        Provider<GetMedicalRecords>(
-          create: (context) =>
-              GetMedicalRecords(context.read<NursingRepository>()),
-        ),
-        Provider<UpdateNursingCase>(
-          create: (context) =>
-              UpdateNursingCase(context.read<NursingRepository>()),
-        ),
         BlocProvider(
           create: (context) => NursingServicesBloc(
-            getNursingServices: context.read<GetNursingServices>(),
+            getNursingServices: sl<GetNursingServices>(),
           ),
         ),
         BlocProvider(
           create: (context) => NursingCaseBloc(
-            getNursingCases: context.read<GetNursingCases>(),
-            createNursingCase: context.read<CreateNursingCase>(),
-            getMedicalRecords: context.read<GetMedicalRecords>(),
-            updateNursingCase: context.read<UpdateNursingCase>(),
+            getNursingCase: sl<GetNursingCase>(),
+            createNursingCase: sl<CreateNursingCase>(),
+            getNursingAddOnServices: sl<GetNursingAddOnServices>(),
           ),
-        ),
-        Provider<GetProfessionals>(
-          create: (context) =>
-              GetProfessionals(context.read<NursingRepository>()),
-        ),
-        Provider<ToggleFavorite>(
-          create: (context) =>
-              ToggleFavorite(context.read<NursingRepository>()),
         ),
         BlocProvider(
           create: (context) => ProfessionalBloc(
-            getProfessionals: context.read<GetProfessionals>(),
-            toggleFavorite: context.read<ToggleFavorite>(),
+            getProfessionals: sl<GetProfessionals>(),
+            toggleFavorite: sl<ToggleFavorite>(),
           ),
         ),
+        BlocProvider(
+          create: (context) => NursingAppointmentFormBloc(
+            appointmentRepository: sl<NursingAppointmentRepository>(),
+            createNursingCase: sl<CreateNursingCase>(),
+          ),
+        ),
+        // Medical Record Module
+        BlocProvider(
+            create: (context) =>
+                MedicalRecordBloc(getMedicalRecords: sl<GetMedicalRecords>()))
       ],
       child: ChangeNotifierProvider(
         create: (context) => AppLanguage(),
@@ -239,7 +214,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => AppointmentCubit(Dio())),
+        BlocProvider(create: (context) => AppointmentCubit(sl<Dio>())),
         BlocProvider(
             create: (context) => PersonalCubit()..loadPersonalDetails()),
       ],

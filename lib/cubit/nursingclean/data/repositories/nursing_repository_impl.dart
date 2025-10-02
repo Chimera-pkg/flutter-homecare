@@ -1,5 +1,8 @@
+import 'package:dartz/dartz.dart';
+import 'package:m2health/core/error/failures.dart';
 import 'package:m2health/cubit/nursingclean/data/datasources/nursing_remote_datasource.dart';
-import 'package:m2health/cubit/nursingclean/data/models/nursing_case.dart';
+import 'package:m2health/cubit/nursingclean/data/mappers/nursing_case_mapper.dart';
+import 'package:m2health/cubit/nursingclean/domain/entities/add_on_service.dart';
 import 'package:m2health/cubit/nursingclean/domain/entities/nursing_case.dart';
 import 'package:m2health/cubit/nursingclean/domain/entities/nursing_service_entity.dart';
 import 'package:m2health/cubit/nursingclean/domain/entities/professional_entity.dart';
@@ -7,8 +10,9 @@ import 'package:m2health/cubit/nursingclean/domain/repositories/nursing_reposito
 
 class NursingRepositoryImpl implements NursingRepository {
   final NursingRemoteDataSource remoteDataSource;
+  final NursingCaseMapper mapper;
 
-  NursingRepositoryImpl({required this.remoteDataSource});
+  NursingRepositoryImpl({required this.remoteDataSource, required this.mapper});
 
   @override
   Future<List<NursingServiceEntity>> getNursingServices() async {
@@ -17,19 +21,31 @@ class NursingRepositoryImpl implements NursingRepository {
   }
 
   @override
-  Future<List<NursingCase>> getNursingCases() async {
-    final nursingCaseModels = await remoteDataSource.getNursingCases();
-    return nursingCaseModels;
+  Future<Either<Failure, NursingCase>> getNursingCase() async {
+    try {
+      final nursingCaseModels =
+          await remoteDataSource.getNursingPersonalCases();
+      final nursingCaseEntity = mapper.mapModelsToEntity(nursingCaseModels);
+      return Right(nursingCaseEntity);
+    } on Exception catch (e) {
+      return Left(Failure(e.toString()));
+    }
   }
 
   @override
-  Future<void> createNursingCase(NursingCase nursingCase) async {
-    final nursingCaseModel = NursingCaseModel(
-      title: nursingCase.title,
-      description: nursingCase.description,
-      images: nursingCase.images,
-    );
-    await remoteDataSource.createNursingCase(nursingCaseModel);
+  Future<Either<Failure, Unit>> createNursingCase(
+      NursingCase nursingCase) async {
+    try {
+      final nursingCaseModels = mapper.mapEntityToModels(nursingCase);
+
+      // NOTE: This is suboptimal. The API should ideally support batch creation.
+      for (final model in nursingCaseModels) {
+        await remoteDataSource.createNursingCase(model);
+      }
+      return const Right(unit);
+    } on Exception catch (e) {
+      return Left(Failure(e.toString()));
+    }
   }
 
   @override
@@ -72,5 +88,15 @@ class NursingRepositoryImpl implements NursingRepository {
   @override
   Future<void> toggleFavorite(int professionalId, bool isFavorite) async {
     await remoteDataSource.toggleFavorite(professionalId, isFavorite);
+  }
+
+  @override
+  Future<Either<Failure, List<AddOnService>>> getNursingAddOnServices() async {
+    try {
+      final addOnServices = await remoteDataSource.getAddOnServices();
+      return Right(addOnServices);
+    } on Exception catch (e) {
+      return Left(Failure(e.toString()));
+    }
   }
 }

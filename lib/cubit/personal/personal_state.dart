@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:equatable/equatable.dart';
-import 'package:m2health/cubit/profiles/domain/entities/medical_record.dart';
+import 'package:m2health/cubit/medical_record/data/model/medical_record_model.dart';
+import 'package:m2health/cubit/medical_record/domain/entities/medical_record.dart';
 
 class Issue extends Equatable {
   final int id;
@@ -71,7 +72,7 @@ class Issue extends Equatable {
       images: _parseImages(json['images']),
       mobilityStatus: json['mobility_status'] ?? '',
       relatedHealthRecord: json['related_health_record'] != null
-          ? MedicalRecord.fromJson(json['related_health_record'])
+          ? MedicalRecordModel.fromJson(json['related_health_record'])
           : null,
       addOn: json['add_on'] ?? '',
       estimatedBudget:

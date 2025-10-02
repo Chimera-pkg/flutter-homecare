@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
+import 'package:m2health/cubit/nursingclean/domain/entities/add_on_service.dart';
 import 'package:m2health/cubit/nursingclean/domain/entities/nursing_case.dart';
+import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/add_on_services_state.dart';
 
 abstract class NursingCaseState extends Equatable {
   const NursingCaseState();
@@ -13,38 +15,31 @@ class NursingCaseInitial extends NursingCaseState {}
 class NursingCaseLoading extends NursingCaseState {}
 
 class NursingCaseLoaded extends NursingCaseState {
-  final List<NursingCase> nursingCases;
+  final NursingCase nursingCase;
+  final AddOnServicesState addOnServicesState;
 
-  const NursingCaseLoaded(this.nursingCases);
+  const NursingCaseLoaded(
+      {required this.nursingCase,
+      this.addOnServicesState = const AddOnServicesInitial()});
+
+  NursingCaseLoaded copyWith({
+    NursingCase? nursingCase,
+    AddOnServicesState? addOnServicesState,
+  }) {
+    return NursingCaseLoaded(
+      nursingCase: nursingCase ?? this.nursingCase,
+      addOnServicesState: addOnServicesState ?? this.addOnServicesState,
+    );
+  }
 
   @override
-  List<Object> get props => [nursingCases];
+  List<Object> get props => [nursingCase, addOnServicesState];
 }
 
 class NursingCaseError extends NursingCaseState {
   final String message;
 
   const NursingCaseError(this.message);
-
-  @override
-  List<Object> get props => [message];
-}
-
-class MedicalRecordsLoading extends NursingCaseState {}
-
-class MedicalRecordsLoaded extends NursingCaseState {
-  final List<Map<String, dynamic>> medicalRecords;
-
-  const MedicalRecordsLoaded(this.medicalRecords);
-
-  @override
-  List<Object> get props => [medicalRecords];
-}
-
-class MedicalRecordsError extends NursingCaseState {
-  final String message;
-
-  const MedicalRecordsError(this.message);
 
   @override
   List<Object> get props => [message];

@@ -2,10 +2,11 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/const.dart';
+import 'package:m2health/cubit/medical_record/domain/entities/medical_record.dart';
+import 'package:m2health/cubit/medical_record/presentation/bloc/medical_record_bloc.dart';
+import 'package:m2health/cubit/medical_record/presentation/bloc/medical_record_event.dart';
+import 'package:m2health/cubit/medical_record/presentation/bloc/medical_record_state.dart';
 import 'package:m2health/cubit/nursing/pages/details/nursing_add_on.dart';
-import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/nursing_case_bloc.dart';
-import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/nursing_case_event.dart';
-import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/nursing_case_state.dart';
 import 'package:m2health/cubit/nursing/personal/nursing_personal_state.dart';
 import 'package:m2health/utils.dart';
 
@@ -23,14 +24,14 @@ class NursingAddIssuePage extends StatefulWidget {
 
 class _AddIssuePageState extends State<NursingAddIssuePage> {
   late String _mobilityStatus;
-  String? _selectedStatus;
-  List<Map<String, dynamic>> _medicalRecords = [];
+  MedicalRecord? _selectedRecord;
+  List<MedicalRecord> _medicalRecords = [];
 
   @override
   void initState() {
     super.initState();
     _mobilityStatus = 'bedbound';
-    context.read<NursingCaseBloc>().add(GetMedicalRecordsEvent());
+    context.read<MedicalRecordBloc>().add(FetchMedicalRecords());
   }
 
   Future<void> _submitData() async {
@@ -38,15 +39,15 @@ class _AddIssuePageState extends State<NursingAddIssuePage> {
     if (issue == null) return;
 
     print('Mobility Status: $_mobilityStatus');
-    print('Related Health Record: $_selectedStatus');
+    print('Related Health Record: $_selectedRecord');
 
     try {
       final token = await Utils.getSpString(Const.TOKEN);
 
       // Find the selected record and extract just its ID
-      final selectedRecord = _medicalRecords
-          .firstWhere((record) => record['title'] == _selectedStatus);
-      final int recordId = selectedRecord['id'];
+      final selectedRecord =
+          _medicalRecords.firstWhere((record) => record == _selectedRecord);
+      final int recordId = selectedRecord.id;
 
       final data = {
         'mobility_status': _mobilityStatus,
@@ -97,41 +98,12 @@ class _AddIssuePageState extends State<NursingAddIssuePage> {
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
-      body: BlocConsumer<NursingCaseBloc, NursingCaseState>(
-        listener: (context, state) {
-          if (state is NursingCaseLoaded) {
-            // This is a temporary solution. The AddOn page should be refactored
-            // to use the NursingCaseBloc.
-            final tempIssue = NursingIssue(
-              id: 0,
-              title: '',
-              description: '',
-              images: [],
-              mobilityStatus: '',
-              relatedHealthRecord: {},
-              addOn: '',
-              estimatedBudget: 0.0,
-              userId: 0,
-              createdAt: DateTime.now(),
-              updatedAt: DateTime.now(),
-            );
-
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AddOn(
-                  issue: tempIssue,
-                  serviceType: widget.serviceType,
-                ),
-              ),
-            );
-          }
-        },
+      body: BlocBuilder<MedicalRecordBloc, MedicalRecordState>(
         builder: (context, state) {
-          if (state is MedicalRecordsLoaded) {
+          if (state is MedicalRecordLoaded) {
             _medicalRecords = state.medicalRecords;
-            if (_medicalRecords.isNotEmpty && _selectedStatus == null) {
-              _selectedStatus = _medicalRecords.first['title'];
+            if (_medicalRecords.isNotEmpty && _selectedRecord == null) {
+              _selectedRecord = _medicalRecords.first;
             }
           }
 
@@ -202,9 +174,9 @@ class _AddIssuePageState extends State<NursingAddIssuePage> {
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10.0),
-                    if (state is MedicalRecordsLoading)
+                    if (state is MedicalRecordLoading)
                       const Center(child: CircularProgressIndicator())
-                    else if (state is MedicalRecordsError)
+                    else if (state is MedicalRecordError)
                       Text('Error: ${state.message}')
                     else if (_medicalRecords.isEmpty)
                       const Text('No medical records available')
@@ -217,17 +189,17 @@ class _AddIssuePageState extends State<NursingAddIssuePage> {
                         ),
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
                         child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: _selectedStatus,
+                          child: DropdownButton<MedicalRecord>(
+                            value: _selectedRecord,
                             items: _medicalRecords.map((record) {
-                              return DropdownMenuItem<String>(
-                                value: record['title'],
-                                child: Text(record['title']),
+                              return DropdownMenuItem<MedicalRecord>(
+                                value: record,
+                                child: Text(record.title),
                               );
                             }).toList(),
                             onChanged: (newValue) {
                               setState(() {
-                                _selectedStatus = newValue!;
+                                _selectedRecord = newValue!;
                               });
                             },
                             isExpanded: true,
@@ -262,13 +234,6 @@ class _AddIssuePageState extends State<NursingAddIssuePage> {
                   ],
                 ),
               ),
-              if (state is NursingCaseLoading)
-                Container(
-                  color: Colors.black.withOpacity(0.5),
-                  child: const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                ),
             ],
           );
         },

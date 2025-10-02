@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/cubit/personal/personal_case_detail_page.dart';
-import 'package:m2health/utils.dart'; // Import the utils file
 import 'package:m2health/widgets/add_concern_page.dart';
 import 'package:m2health/widgets/auth_guard_dialog.dart';
 import 'personal_cubit.dart';
@@ -62,11 +61,15 @@ class _PersonalPageState extends State<PersonalPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
               ],
             ),
             Expanded(
-              child: BlocBuilder<PersonalCubit, PersonalState>(
+              child: BlocConsumer<PersonalCubit, PersonalState>(
+                listener: (context, state) => {
+                  if (state is PersonalUnauthenticated)
+                    showAuthGuardDialog(context)
+                },
                 builder: (context, state) {
                   if (state is PersonalLoading) {
                     return const Center(child: CircularProgressIndicator());
@@ -184,11 +187,7 @@ class _PersonalPageState extends State<PersonalPage> {
                 },
               ),
             ),
-            BlocConsumer<PersonalCubit, PersonalState>(
-              listener: (context, state) => {
-                if (state is PersonalUnauthenticated)
-                  showAuthGuardDialog(context)
-              },
+            BlocBuilder<PersonalCubit, PersonalState>(
               builder: (context, state) {
                 final bool hasIssues =
                     state is PersonalLoaded && state.issues.isNotEmpty;

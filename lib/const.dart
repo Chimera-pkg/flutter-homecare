@@ -9,7 +9,7 @@ class Const {
   static const String API_SERVICE_REQUESTS = URL_API + '/service-requests';
   static const String API_PRODUCTS = URL_API + '/products/';
   static const String API_LOGIN = URL_API + '/auth/login';
-  static const String API_REGISTER = URL_API + '/auth/register/';
+  static const String API_REGISTER = URL_API + '/auth/register';
   static const String API_APPOINTMENT = URL_API + '/appointments';
   static const String API_PROFILE = URL_API + '/profiles';
   static const String API_MEDICAL_RECORDS = URL_API + '/medical-records';
@@ -70,7 +70,7 @@ class Const {
   static const String submenu_privacy = 'assets/icons/submenu_privacy.png';
   static const String submenu_service = 'assets/icons/submenu_report.png';
   static const String submenu_partnership = 'assets/icons/submenu_event.png';
-  static const String banner = 'assets/icons/medmapCare_banner.png';
+  static const String banner = 'assets/icons/medmap_care_banner.svg';
   static const String svgLogo = 'assets/icons/medmap_logo.svg';
   static const String imgMenuTenders = 'assets/images/menu_tenders.png';
   static const String imgMenuDistributors =
