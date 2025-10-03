@@ -1,11 +1,13 @@
+import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:m2health/cubit/pharmacogenomics/data/models/pharmacogenomics_model.dart';
 
 abstract class PharmacogenomicsRemoteDataSource {
   Future<List<PharmacogenomicsModel>> getPharmacogenomics();
-  Future<PharmacogenomicsModel> getPharmacogenomicById(int id);
-  Future<void> createPharmacogenomic(String gene, String genotype,
-      String phenotype, String medicationGuidance);
-  Future<void> updatePharmacogenomic(int id, String gene, String genotype,
-      String phenotype, String medicationGuidance);
+  Future<void> storePharmacogenomics({
+    PharmacogenomicsModel? data,
+    File? fullReportFile,
+    ProgressCallback? onSendProgress,
+  });
   Future<void> deletePharmacogenomic(int id);
 }

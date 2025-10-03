@@ -8,12 +8,10 @@ import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_appointmen
 import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_services/nursing_services_bloc.dart';
 import 'package:m2health/cubit/personal/personal_cubit.dart';
 import 'package:m2health/cubit/nursing/personal/nursing_personal_cubit.dart';
+import 'package:m2health/cubit/pharmacogenomics/domain/usecases/delete_pharmacogenomics.dart';
 import 'package:m2health/cubit/pharmacogenomics/presentation/bloc/pharmacogenomics_cubit.dart';
-import 'package:m2health/cubit/pharmacogenomics/domain/repositories/pharmacogenomics_repository.dart';
-import 'package:m2health/cubit/pharmacogenomics/data/repositories/pharmacogenomics_repository_impl.dart';
-import 'package:m2health/cubit/pharmacogenomics/data/datasources/pharmacogenomics_remote_datasource_impl.dart';
 import 'package:m2health/cubit/pharmacogenomics/domain/usecases/get_pharmacogenomics.dart';
-import 'package:m2health/cubit/pharmacogenomics/domain/usecases/crud_pharmacogenomics.dart';
+import 'package:m2health/cubit/pharmacogenomics/domain/usecases/store_pharmacogenomics.dart';
 import 'package:m2health/cubit/precision/precision_cubit.dart';
 import 'package:m2health/cubit/profiles/profile_cubit.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -67,40 +65,11 @@ void main() async {
         BlocProvider(
           create: (context) => ProfileCubit(sl<Dio>()),
         ),
-        // Pharmacogenomics Module Dependencies
-        Provider<PharmacogenomicsRepository>(
-          create: (context) => PharmacogenomicsRepositoryImpl(
-            remoteDataSource: PharmacogenomicsRemoteDataSourceImpl(
-              dio: sl<Dio>(),
-            ),
-          ),
-        ),
-        Provider<GetPharmacogenomics>(
-          create: (context) => GetPharmacogenomics(
-            context.read<PharmacogenomicsRepository>(),
-          ),
-        ),
-        Provider<CreatePharmacogenomic>(
-          create: (context) => CreatePharmacogenomic(
-            context.read<PharmacogenomicsRepository>(),
-          ),
-        ),
-        Provider<UpdatePharmacogenomic>(
-          create: (context) => UpdatePharmacogenomic(
-            context.read<PharmacogenomicsRepository>(),
-          ),
-        ),
-        Provider<DeletePharmacogenomic>(
-          create: (context) => DeletePharmacogenomic(
-            context.read<PharmacogenomicsRepository>(),
-          ),
-        ),
         BlocProvider(
           create: (context) => PharmacogenomicsCubit(
-            getPharmacogenomics: context.read<GetPharmacogenomics>(),
-            createPharmacogenomic: context.read<CreatePharmacogenomic>(),
-            updatePharmacogenomic: context.read<UpdatePharmacogenomic>(),
-            deletePharmacogenomic: context.read<DeletePharmacogenomic>(),
+            getPharmacogenomics: sl<GetPharmacogenomics>(),
+            storePharmacogenomics: sl<StorePharmacogenomics>(),
+            deletePharmacogenomic: sl<DeletePharmacogenomic>(),
           ),
         ),
         // Nursing Module Dependencies
