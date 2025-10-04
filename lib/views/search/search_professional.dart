@@ -119,7 +119,7 @@ class _SearchPageState extends State<SearchPage> {
             return {
               'id': professional['id'] ?? 0, // Ensure ID is included
               'name': professional['name'] ?? 'Unknown Provider',
-              'avatar': getImageUrl(professional['avatar'] ?? ''),
+              'avatar': professional['avatar'] ?? '',
               'experience': professional['experience'] ?? 0,
               'rating': (professional['rating'] ?? 0.0).toDouble(),
               'about': professional['about'] ?? 'No description available',

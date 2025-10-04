@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:m2health/cubit/nursingclean/domain/entities/nursing_case.dart';
+import 'package:m2health/cubit/nursingclean/domain/entities/nursing_issue.dart';
 
-class NursingPersonalCaseDetailPage extends StatelessWidget {
-  final NursingCase nursingCase;
+class NursingConcernDetailPage extends StatelessWidget {
+  final NursingIssue issue;
 
-  const NursingPersonalCaseDetailPage({Key? key, required this.nursingCase})
+  const NursingConcernDetailPage({Key? key, required this.issue})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(nursingCase.title),
+        title: Text(issue.title),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -23,14 +23,14 @@ class NursingPersonalCaseDetailPage extends StatelessWidget {
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
-            Text(nursingCase.description),
+            Text(issue.description),
             const SizedBox(height: 16),
             Text(
               'Images:',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
-            if (nursingCase.images.isNotEmpty)
+            if (issue.images.isNotEmpty)
               Expanded(
                 child: GridView.builder(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -38,10 +38,10 @@ class NursingPersonalCaseDetailPage extends StatelessWidget {
                     crossAxisSpacing: 8,
                     mainAxisSpacing: 8,
                   ),
-                  itemCount: nursingCase.images.length,
+                  itemCount: issue.images.length,
                   itemBuilder: (context, index) {
                     return Image.file(
-                      nursingCase.images[index],
+                      issue.images[index],
                       fit: BoxFit.cover,
                     );
                   },

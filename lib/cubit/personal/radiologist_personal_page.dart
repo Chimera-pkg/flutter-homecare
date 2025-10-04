@@ -282,11 +282,12 @@ class _RadiologistAddConcernPageState extends State<RadiologistAddConcernPage> {
   TextEditingController _issueTitleController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   TextEditingController _symptomsController = TextEditingController();
-  List<File> _images = [];
 
-  void _addImage(File image) {
+  final List<File?> _images = List.filled(1, null);
+
+  Future<void> setImageAt(int index, File? image) async {
     setState(() {
-      _images.add(image);
+      _images[index] = image;
     });
   }
 
@@ -322,12 +323,12 @@ class _RadiologistAddConcernPageState extends State<RadiologistAddConcernPage> {
       });
 
       // Add medical images to FormData
-      for (File image in _images) {
+      for (final image in _images.where((img) => img != null)) {
         formData.files.add(
           MapEntry(
             "images[]",
             await MultipartFile.fromFile(
-              image.path,
+              image!.path,
               filename: image.path.split('/').last,
             ),
           ),
@@ -492,7 +493,10 @@ class _RadiologistAddConcernPageState extends State<RadiologistAddConcernPage> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  ImagePreview(onImageSelected: _addImage),
+                  ImagePreview(
+                    imageFile: _images[0],
+                    onChooseImage: (image) => setImageAt(0, image),
+                  ),
                 ],
               ),
             ),

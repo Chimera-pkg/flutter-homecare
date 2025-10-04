@@ -394,13 +394,13 @@ class EmailValidator implements StringValidator {
 //   return imageUrl;
 // }
 
-String getImageUrl(String imageUrl) {
-  if (imageUrl.contains('localhost:3334')) {
-    return imageUrl.replaceFirst(
-        'http://localhost:3334', 'https://homecare-api.med-map.org');
-  } else if (imageUrl.contains('localhost:3333')) {
-    return imageUrl.replaceFirst(
-        'http://localhost:3333', 'https://homecare-api.med-map.org');
-  }
-  return imageUrl;
-}
+// String getImageUrl(String imageUrl) {
+//   if (imageUrl.contains('localhost:3334')) {
+//     return imageUrl.replaceFirst(
+//         'http://localhost:3334', 'https://homecare-api.med-map.org');
+//   } else if (imageUrl.contains('localhost:3333')) {
+//     return imageUrl.replaceFirst(
+//         'http://localhost:3333', 'https://homecare-api.med-map.org');
+//   }
+//   return imageUrl;
+// }

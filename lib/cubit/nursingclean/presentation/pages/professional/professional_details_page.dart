@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:m2health/cubit/nursingclean/domain/entities/professional_entity.dart';
-import 'package:m2health/views/book_appointment.dart';
+import 'package:m2health/cubit/nursingclean/presentation/pages/appointment/book_appointment_page.dart';
 import 'package:m2health/const.dart';
 
 class ProfessionalDetailsPage extends StatelessWidget {
@@ -77,7 +77,7 @@ class ProfessionalDetailsPage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Card(
+                const Card(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
@@ -90,7 +90,7 @@ class ProfessionalDetailsPage extends StatelessWidget {
                             color: Const.tosca,
                           ),
                         ),
-                        const Text('Patients'),
+                        Text('Patients'),
                       ],
                     ),
                   ),
@@ -102,7 +102,7 @@ class ProfessionalDetailsPage extends StatelessWidget {
                       children: [
                         Text(
                           '${professional.experience} Y++',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                             color: Const.tosca,
@@ -122,7 +122,7 @@ class ProfessionalDetailsPage extends StatelessWidget {
                           children: [
                             Text(
                               professional.rating.toString(),
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                                 color: Const.tosca,
@@ -307,27 +307,11 @@ class ProfessionalDetailsPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: ElevatedButton(
           onPressed: () {
-            final providerData = {
-              'id': professional.id,
-              'name': professional.name,
-              'avatar': professional.avatar,
-              'role': professional.role.toLowerCase(),
-              'provider_type': professional.providerType.toLowerCase(),
-              'experience': professional.experience,
-              'rating': professional.rating,
-              'about': professional.about,
-              'working_information': professional.workingInformation,
-              'days_hour': professional.daysHour,
-              'maps_location': professional.mapsLocation,
-              'certification': professional.certification,
-              'user_id': professional.userId,
-            };
-
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => BookAppointmentPage(
-                  data: BookAppointmentPageData(pharmacist: providerData),
+                  professional: professional,
                 ),
               ),
             );
@@ -341,10 +325,10 @@ class ProfessionalDetailsPage extends StatelessWidget {
             ),
           ),
           child: const Text(
-            'Book Appointment',
+            'Schedule Appointment',
             style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),

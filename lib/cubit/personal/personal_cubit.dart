@@ -38,15 +38,13 @@ class PersonalCubit extends Cubit<PersonalState> {
       issues.forEach((issue) => issue.updateImageUrls());
 
       emit(PersonalLoaded(issues));
-    } on DioException catch (e) {
-      if (e.response?.statusCode == 401) {
-        emit(PersonalUnauthenticated());
-        return;
-      }
-      emit(PersonalError('Failed to load data: ${e.message}'));
     } catch (e) {
       print(e);
-      emit(PersonalError(e.toString()));
+      if (e is DioException && e.response?.statusCode == 401) {
+        emit(const PersonalUnauthenticated());
+      } else {
+        emit(const PersonalError('Failed to load data'));
+      }
     }
   }
 

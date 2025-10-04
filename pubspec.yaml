@@ -71,6 +71,10 @@ dependencies:
   file_picker: ^8.1.7
   syncfusion_flutter_pdfviewer: ^28.2.9
   bloc: ^8.1.4
+  get_it: ^8.2.0
+  dartz: ^0.10.1
+  collection: ^1.19.1
+  intl: ^0.20.2
 
   # Social Sign-In
   # google_sign_in: ^6.2.1

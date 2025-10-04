@@ -1,17 +1,17 @@
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 
-class NursingPaymentPage extends StatelessWidget {
-  const NursingPaymentPage({super.key});
+// class NursingPaymentPage extends StatelessWidget {
+//   const NursingPaymentPage({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Payment'),
-      ),
-      body: const Center(
-        child: Text('Payment page for nursing services'),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Payment'),
+//       ),
+//       body: const Center(
+//         child: Text('Payment page for nursing services'),
+//       ),
+//     );
+//   }
+// }

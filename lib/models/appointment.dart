@@ -74,7 +74,7 @@ class Appointment {
       date: json['date'] ?? '',
       hour: json['hour'] ?? '',
       summary: json['summary'] ?? '',
-      payTotal: (json['pay_total'] as num?)?.toDouble() ?? 0.0,
+      payTotal: double.tryParse(json['pay_total']?.toString() ?? '') ?? 0.0,
       userId: json['user_id'] ?? 0,
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',

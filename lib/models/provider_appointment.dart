@@ -73,7 +73,7 @@ class ProviderAppointment {
       date: json['date'] ?? '',
       hour: json['hour'] ?? '',
       summary: json['summary'] ?? '',
-      payTotal: (json['pay_total'] as num?)?.toDouble() ?? 0.0,
+      payTotal: double.tryParse(json['pay_total']?.toString() ?? '') ?? 0.0,
       providerType: json['provider_type'] ?? '',
       patientData: patientData,
       profileServiceData: json['profile_services_data'] ?? {},
