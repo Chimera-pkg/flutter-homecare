@@ -6,11 +6,13 @@ import 'package:image_picker/image_picker.dart';
 class ImagePreview extends StatelessWidget {
   final Function(File?) onChooseImage;
   final File? imageFile;
+  final String helperText;
 
   const ImagePreview({
     super.key,
     required this.onChooseImage,
     this.imageFile,
+    this.helperText = 'Image less than 10MB',
   });
 
   Future<void> _chooseImage() async {
@@ -26,6 +28,7 @@ class ImagePreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
           width: 100,
@@ -43,25 +46,27 @@ class ImagePreview extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 10),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Image less than 10MB',
-              style: TextStyle(fontSize: 12),
-            ),
-            const SizedBox(height: 10),
-            OutlinedButton(
-              onPressed: _chooseImage, // Use the provided callback
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Color(0xFF10B981)),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                helperText,
+                style: const TextStyle(fontSize: 12),
               ),
-              child: const Text(
-                'Choose File',
-                style: TextStyle(color: Color(0xFF10B981)),
+              const SizedBox(height: 10),
+              OutlinedButton(
+                onPressed: _chooseImage,
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Color(0xFF10B981)),
+                ),
+                child: const Text(
+                  'Choose File',
+                  style: TextStyle(color: Color(0xFF10B981)),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
