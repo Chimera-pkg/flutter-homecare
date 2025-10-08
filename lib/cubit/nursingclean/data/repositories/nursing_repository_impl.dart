@@ -32,9 +32,9 @@ class NursingRepositoryImpl implements NursingRepository {
       if (e.response?.statusCode == 401) {
         return const Left(UnauthorizedFailure("User is not authenticated"));
       }
-      return Left(Failure(e.message ?? 'A network error occurred'));
+      return Left(ServerFailure(e.message ?? 'A network error occurred'));
     } on Exception catch (e) {
-      return Left(Failure(e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -50,7 +50,7 @@ class NursingRepositoryImpl implements NursingRepository {
       }
       return const Right(unit);
     } on Exception catch (e) {
-      return Left(Failure(e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -102,7 +102,7 @@ class NursingRepositoryImpl implements NursingRepository {
       final addOnServices = await remoteDataSource.getAddOnServices();
       return Right(addOnServices);
     } on Exception catch (e) {
-      return Left(Failure(e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 }
