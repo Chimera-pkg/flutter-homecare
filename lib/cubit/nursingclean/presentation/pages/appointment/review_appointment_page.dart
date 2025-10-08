@@ -7,9 +7,9 @@ import 'package:m2health/cubit/nursingclean/domain/entities/appointment_entity.d
 import 'package:m2health/cubit/nursingclean/domain/entities/nursing_case.dart';
 import 'package:m2health/cubit/nursingclean/domain/entities/professional_entity.dart';
 import 'package:m2health/cubit/nursingclean/presentation/pages/payment/payment_page.dart';
-import 'package:m2health/cubit/profiles/profile_cubit.dart';
-import 'package:m2health/cubit/profiles/profile_state.dart';
-import 'package:m2health/models/profile.dart';
+import 'package:m2health/cubit/profiles/domain/entities/profile.dart';
+import 'package:m2health/cubit/profiles/presentation/bloc/profile_cubit.dart';
+import 'package:m2health/cubit/profiles/presentation/bloc/profile_state.dart';
 
 class ReviewAppointmentPage extends StatelessWidget {
   final AppointmentEntity appointment;
@@ -270,10 +270,10 @@ class ReviewAppointmentPage extends StatelessWidget {
     return Column(
       children: [
         _buildPatientInfoRow('Full Name', patientProfile.username),
-        _buildPatientInfoRow('Age', patientProfile.age.toString()),
-        _buildPatientInfoRow('Gender', patientProfile.gender),
+        _buildPatientInfoRow('Age', patientProfile.age?.toString() ?? 'N/A'),
+        _buildPatientInfoRow('Gender', patientProfile.gender ?? 'N/A'),
         _buildPatientInfoRow('Problem', problem),
-        _buildPatientInfoRow('Address', patientProfile.homeAddress),
+        _buildPatientInfoRow('Address', patientProfile.homeAddress ?? 'N/A'),
       ],
     );
   }

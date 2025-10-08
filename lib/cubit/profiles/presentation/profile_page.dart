@@ -1,114 +1,99 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/const.dart';
-import 'package:m2health/cubit/pharmacogenomics/presentation/pharmagenomical_pages.dart';
 import 'package:m2health/cubit/profiles/ServicesEdit_admin.dart';
-import 'package:m2health/cubit/profiles/profile_cubit.dart';
-import 'package:m2health/cubit/profiles/profile_details/edit_profile.dart';
-import 'package:m2health/cubit/profiles/profile_state.dart';
-import 'package:m2health/cubit/profiles/profile_details/medical_record/medical_record.dart';
+import 'package:m2health/cubit/profiles/domain/entities/profile.dart';
+import 'package:m2health/cubit/profiles/presentation/bloc/profile_cubit.dart';
+import 'package:m2health/cubit/profiles/presentation/bloc/profile_state.dart';
 import 'package:m2health/route/app_routes.dart';
 import 'package:m2health/utils.dart';
-import 'package:m2health/views/appointment/appointment_detail_page.dart';
 import 'package:go_router/go_router.dart';
-import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
+import 'package:m2health/widgets/auth_guard_dialog.dart';
 
-class ProfilePage extends StatelessWidget {
-// Add this helper method to format the date
-  String formatDateTime(String dateTimeString) {
+class ProfilePage extends StatefulWidget {
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  String formatDateTime(DateTime? dateTime) {
+    if (dateTime == null) return 'N/A';
     try {
-      DateTime dateTime = DateTime.parse(dateTimeString);
       return DateFormat('MMM dd, yyyy • HH:mm').format(dateTime);
     } catch (e) {
-      // If parsing fails, return the original string
-      return dateTimeString;
+      return 'Invalid Date';
     }
   }
 
   @override
+  void initState() {
+    super.initState();
+    context.read<ProfileCubit>().loadProfile();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ProfileCubit(Dio())..fetchProfile(),
-      child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          title: const Text(
-            'My Health Profile',
-            style: TextStyle(fontWeight: FontWeight.bold),
+    return FutureBuilder(
+      future: Utils.getSpString(Const.ROLE),
+      builder: (context, asyncSnapshot) {
+        final String? role = asyncSnapshot.data;
+        final bool isPatient = role == 'patient';
+        final bool isProfessional =
+            ['nurse', 'pharmacist', 'radiologist'].contains(role);
+        final bool isAdmin = role == 'admin';
+
+        if (asyncSnapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        return Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            title: Text(
+              isPatient ? 'My Health Profile' : 'My Profile',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
-        ),
-        body: BlocListener<ProfileCubit, ProfileState>(
-          listener: (context, state) {
-            if (state is ProfileUnauthenticated) {
-              // Show dialog to inform user they need to login
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (BuildContext dialogContext) {
-                  return AlertDialog(
-                    title: const Text('Authentication Required'),
-                    content: const Text(
-                      'Your session has expired or you are not logged in. Please sign in to continue.',
-                    ),
-                    actions: <Widget>[
-                      TextButton(
-                        child: const Text('Sign In'),
-                        onPressed: () {
-                          // Close dialog and navigate to sign-in page
-                          Navigator.of(dialogContext).pop();
-                          GoRouter.of(context).go(AppRoutes.signIn);
-                        },
-                      ),
-                    ],
-                  );
-                },
-              );
-            }
-          },
-          child: BlocBuilder<ProfileCubit, ProfileState>(
+          body: BlocConsumer<ProfileCubit, ProfileState>(
+            listener: (context, state) {
+              if (state is ProfileUnauthenticated) {
+                showAuthGuardDialog(context);
+              }
+            },
             builder: (context, state) {
               if (state is ProfileLoading) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (state is ProfileUnauthenticated) {
-                // Already handled in listener, show a message while redirecting
-                return const Center(
-                  child: Text(
-                    'Authentication required. Redirecting to sign-in...',
-                    style: TextStyle(color: Colors.red),
-                  ),
-                );
               } else if (state is ProfileLoaded) {
-                final isAdmin = Utils.getSpString(Const.ROLE) == 'admin';
+                final Profile profile = state.profile;
                 return RefreshIndicator(
                   onRefresh: () async {
-                    context.read<ProfileCubit>().fetchProfile();
+                    context.read<ProfileCubit>().loadProfile();
                   },
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
+                        // --- Header Section ---
                         Row(
                           children: [
                             GestureDetector(
                               onTap: () async {
                                 await context.push(
                                   AppRoutes.editProfile,
-                                  extra: EditProfilePageArgs(
-                                    profileCubit: context.read<ProfileCubit>(),
-                                    profile: state.profile,
-                                  ),
+                                  extra: state.profile,
                                 );
                                 if (context.mounted) {
-                                  context.read<ProfileCubit>().fetchProfile();
+                                  context.read<ProfileCubit>().loadProfile();
                                 }
                               },
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(10.0),
                                 child: Image.network(
-                                  state.profile.avatar,
+                                  state.profile.avatar ?? '',
                                   width: 100,
                                   height: 100,
                                   fit: BoxFit.cover,
@@ -173,99 +158,15 @@ class ProfilePage extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        Card(
-                          elevation: 4,
-                          shadowColor: Colors.grey,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Health Records',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                ListTile(
-                                  leading: const Icon(
-                                    Icons.medical_services,
-                                    color: Color(0xFF35C5CF),
-                                  ),
-                                  title: const Text('Medical Records'),
-                                  trailing: const Icon(
-                                    Icons.arrow_forward_ios,
-                                  ),
-                                  onTap: () {
-                                    context.push(AppRoutes.medicalRecord);
-                                  },
-                                ),
-                                // ListTile(
-                                //   leading: const Icon(Icons.upload_file_outlined,
-                                //       color: Color(0xFF35C5CF)),
-                                //   title: const Text('Upload Report'),
-                                //   trailing: const Icon(Icons.arrow_forward_ios),
-                                //   onTap: () {
-                                //     Navigator.push(
-                                //       context,
-                                //       MaterialPageRoute(
-                                //           builder: (context) => UploadPDFPage()),
-                                //     );
-                                //   },
-                                // ),
-                                ListTile(
-                                  leading: const Icon(Icons.local_pharmacy,
-                                      color: Color(0xFF35C5CF)),
-                                  title: const Text('Pharmagenomics Profile'),
-                                  trailing: const Icon(Icons.arrow_forward_ios),
-                                  onTap: () {
-                                    context.push(AppRoutes.pharmagenomics);
-                                  },
-                                ),
-                                ListTile(
-                                  leading: const Icon(Icons.local_pharmacy,
-                                      color: Color(0xFF35C5CF)),
-                                  title:
-                                      const Text('Wellness Genomics Profile'),
-                                  trailing: const Icon(Icons.arrow_forward_ios),
-                                  onTap: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => AlertDialog(
-                                        title: const Text('Coming Soon'),
-                                        content: const Text(
-                                            'This feature is under development.'),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () =>
-                                                Navigator.pop(context),
-                                            child: const Text('OK'),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
-                                if (isAdmin)
-                                  ListTile(
-                                    leading: const Icon(Icons.edit_note,
-                                        color: Color(0xFF35C5CF)),
-                                    title: const Text(
-                                        'Edit Service Titles (admin)'),
-                                    trailing:
-                                        const Icon(Icons.arrow_forward_ios),
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              ServiceTitlesEditPage(),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ),
+                        if (isPatient)
+                          _buildHealthRecordsSection(context)
+                        else if (isProfessional)
+                          _buildProfessionalProfileSection(
+                            context,
+                            profile: profile,
+                          )
+                        else if (isAdmin)
+                          _buildAdminSection(context),
                         const SizedBox(height: 16),
                         Card(
                           elevation: 4,
@@ -306,13 +207,10 @@ class ProfilePage extends StatelessWidget {
                               onPressed: () async {
                                 await context.push(
                                   AppRoutes.editProfile,
-                                  extra: EditProfilePageArgs(
-                                    profileCubit: context.read<ProfileCubit>(),
-                                    profile: state.profile,
-                                  ),
+                                  extra: state.profile,
                                 );
                                 if (context.mounted) {
-                                  context.read<ProfileCubit>().fetchProfile();
+                                  context.read<ProfileCubit>().loadProfile();
                                 }
                               },
                             ),
@@ -367,6 +265,133 @@ class ProfilePage extends StatelessWidget {
               }
             },
           ),
+        );
+      },
+    );
+  }
+
+  Widget _buildProfessionalProfileSection(BuildContext context,
+      {required Profile profile}) {
+    return Card(
+      elevation: 4,
+      shadowColor: Colors.grey,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Professional Profile',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.assignment_ind,
+                color: Color(0xFF35C5CF),
+              ),
+              title: const Text('Edit Professional Profile'),
+              trailing: const Icon(
+                Icons.arrow_forward_ios,
+              ),
+              onTap: () {
+                context.push(AppRoutes.editProfessionalProfile, extra: profile);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHealthRecordsSection(BuildContext context) {
+    return Card(
+      elevation: 4,
+      shadowColor: Colors.grey,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Health Records',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.medical_services,
+                color: Color(0xFF35C5CF),
+              ),
+              title: const Text('Medical Records'),
+              trailing: const Icon(
+                Icons.arrow_forward_ios,
+              ),
+              onTap: () {
+                context.push(AppRoutes.medicalRecord);
+              },
+            ),
+            ListTile(
+              leading:
+                  const Icon(Icons.local_pharmacy, color: Color(0xFF35C5CF)),
+              title: const Text('Pharmagenomics Profile'),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              onTap: () {
+                context.push(AppRoutes.pharmagenomics);
+              },
+            ),
+            ListTile(
+              leading:
+                  const Icon(Icons.local_pharmacy, color: Color(0xFF35C5CF)),
+              title: const Text('Wellness Genomics Profile'),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Coming Soon'),
+                    content: const Text('This feature is under development.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAdminSection(BuildContext context) {
+    return Card(
+      elevation: 4,
+      shadowColor: Colors.grey,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Admin Panel',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            ListTile(
+              leading: const Icon(Icons.edit_note, color: Color(0xFF35C5CF)),
+              title: const Text('Edit Service Titles (admin)'),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ServiceTitlesEditPage(),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
