@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-class Failure extends Equatable {
+sealed class Failure with EquatableMixin implements Exception {
   final String message;
 
   const Failure(this.message);
@@ -11,4 +11,12 @@ class Failure extends Equatable {
 
 class UnauthorizedFailure extends Failure {
   const UnauthorizedFailure(super.message);
+}
+
+class ServerFailure extends Failure {
+  const ServerFailure(super.message);
+}
+
+class NetworkFailure extends Failure {
+  const NetworkFailure(super.message);
 }

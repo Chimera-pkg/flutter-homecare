@@ -15,7 +15,9 @@ import 'package:m2health/cubit/pharmacogenomics/data/datasources/pharmacogenomic
 import 'package:m2health/cubit/pharmacogenomics/domain/usecases/get_pharmacogenomics.dart';
 import 'package:m2health/cubit/pharmacogenomics/domain/usecases/crud_pharmacogenomics.dart';
 import 'package:m2health/cubit/precision/precision_cubit.dart';
-import 'package:m2health/cubit/profiles/profile_cubit.dart';
+import 'package:m2health/cubit/profiles/domain/usecases/index.dart';
+import 'package:m2health/cubit/profiles/presentation/bloc/certificate_cubit.dart';
+import 'package:m2health/cubit/profiles/presentation/bloc/profile_cubit.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:m2health/route/app_router.dart';
 import 'package:m2health/service_locator.dart';
@@ -63,9 +65,17 @@ void main() async {
             create: (context) => PersonalCubit()..loadPersonalDetails()),
         BlocProvider(
             create: (context) => NursingPersonalCubit()..loadPersonalDetails()),
-        BlocProvider(create: (context) => ProfileCubit(sl<Dio>())),
         BlocProvider(
-          create: (context) => ProfileCubit(sl<Dio>()),
+            create: (context) => ProfileCubit(
+                  getProfileUseCase: sl<GetProfile>(),
+                  updateProfileUseCase: sl<UpdateProfile>(),
+                )),
+        BlocProvider(
+          create: (context) => CertificateCubit(
+            createCertificateUseCase: sl<CreateCertificate>(),
+            updateCertificateUseCase: sl<UpdateCertificate>(),
+            deleteCertificateUseCase: sl<DeleteCertificate>(),
+          ),
         ),
         // Pharmacogenomics Module Dependencies
         Provider<PharmacogenomicsRepository>(
@@ -235,6 +245,33 @@ class _MyAppState extends State<MyApp> {
               cardTheme: const CardThemeData(
                 color: Colors.white,
                 surfaceTintColor: Colors.transparent,
+              ),
+              textSelectionTheme: TextSelectionThemeData(
+                cursorColor: Const.tosca,
+                selectionColor: Const.tosca.withValues(alpha: 0.4),
+              ),
+              inputDecorationTheme: InputDecorationTheme(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                  borderSide: const BorderSide(
+                    color: Colors.grey,
+                    width: 1.0,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                  borderSide: const BorderSide(
+                    color: Colors.grey,
+                    width: 1.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                  borderSide: const BorderSide(
+                    color: Const.tosca,
+                    width: 1.5,
+                  ),
+                ),
               ),
               textTheme: const TextTheme(
                 displayLarge: TextStyle(fontFamily: 'Poppins'),

@@ -1,25 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:m2health/models/profile.dart';
-import 'package:m2health/cubit/profiles/profile_cubit.dart';
-import 'package:m2health/cubit/profiles/profile_state.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-
-class EditProfilePageArgs {
-  final ProfileCubit profileCubit;
-  final Profile profile;
-
-  EditProfilePageArgs({
-    required this.profileCubit,
-    required this.profile,
-  });
-}
+import 'package:m2health/cubit/profiles/domain/entities/profile.dart';
+import 'package:m2health/cubit/profiles/domain/usecases/update_profile.dart';
+import 'package:m2health/cubit/profiles/presentation/bloc/profile_cubit.dart';
+import 'package:m2health/cubit/profiles/presentation/bloc/profile_state.dart';
 
 class EditProfilePage extends StatefulWidget {
   final Profile profile;
 
-  EditProfilePage({required this.profile});
+  const EditProfilePage({super.key, required this.profile});
 
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
@@ -27,34 +18,47 @@ class EditProfilePage extends StatefulWidget {
 
 class _EditProfilePageState extends State<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
-  final ImagePicker _picker = ImagePicker();
   File? _selectedImage;
-  late String _gender;
-  late int _age;
-  late double _weight;
-  late double _height;
-  late String _contactNumber;
-  late String _homeAddress;
-  bool _isUpdating = false;
+
+  late TextEditingController _usernameController;
+  late TextEditingController _ageController;
+  late TextEditingController _weightController;
+  late TextEditingController _heightController;
+  late TextEditingController _phoneController;
+  late TextEditingController _addressController;
+  String? _selectedGender;
+
+  final List<String> genderItems = ['Male', 'Female'];
+
+  @override
+  void initState() {
+    super.initState();
+    final p = widget.profile;
+    _usernameController = TextEditingController(text: p.username);
+    _ageController = TextEditingController(text: p.age?.toString() ?? '');
+    _weightController = TextEditingController(text: p.weight?.toString() ?? '');
+    _heightController = TextEditingController(text: p.height?.toString() ?? '');
+    _phoneController = TextEditingController(text: p.phoneNumber ?? '');
+    _addressController = TextEditingController(text: p.homeAddress ?? '');
+    _selectedGender = genderItems.contains(p.gender) ? p.gender : null;
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _ageController.dispose();
+    _weightController.dispose();
+    _heightController.dispose();
+    _phoneController.dispose();
+    _addressController.dispose();
+    super.dispose();
+  }
 
   Future<void> _pickImage() async {
-    try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.gallery,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        imageQuality: 85,
-      );
-
-      if (image != null) {
-        setState(() {
-          _selectedImage = File(image.path);
-        });
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error picking image: $e')),
-      );
+    final XFile? image = await ImagePicker()
+        .pickImage(source: ImageSource.gallery, imageQuality: 85);
+    if (image != null) {
+      setState(() => _selectedImage = File(image.path));
     }
   }
 
@@ -64,47 +68,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _gender =
-        (widget.profile.gender == 'Male' || widget.profile.gender == 'Female')
-            ? widget.profile.gender
-            : 'Male';
-    _age = widget.profile.age;
-    _weight = widget.profile.weight;
-    _height = widget.profile.height;
-    _contactNumber = widget.profile.phoneNumber;
-    _homeAddress = widget.profile.homeAddress;
-  }
-
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-
-      setState(() {
-        _isUpdating = true;
-      });
-
-      final updatedProfile = Profile(
-        id: widget.profile.id,
-        userId: widget.profile.userId,
-        email: widget.profile.email,
-        username: widget.profile.username,
-        age: _age,
-        weight: _weight,
-        height: _height,
-        phoneNumber: _contactNumber,
-        homeAddress: _homeAddress,
-        gender: _gender,
-        avatar: widget.profile.avatar,
-        createdAt: widget.profile.createdAt,
-        updatedAt: DateTime.now().toString(),
+      final params = UpdateProfileParams(
+        username: _usernameController.text,
+        age: int.tryParse(_ageController.text),
+        weight: double.tryParse(_weightController.text),
+        height: double.tryParse(_heightController.text),
+        phoneNumber: _phoneController.text,
+        homeAddress: _addressController.text,
+        gender: _selectedGender,
+        avatar: _selectedImage,
       );
-
-      context
-          .read<ProfileCubit>()
-          .updateProfileWithImage(updatedProfile, _selectedImage);
+      context.read<ProfileCubit>().updateProfile(params);
     }
   }
 
@@ -112,22 +89,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget build(BuildContext context) {
     return BlocListener<ProfileCubit, ProfileState>(
       listener: (context, state) {
-        if (state is ProfileUpdateSuccess) {
-          setState(() {
-            _isUpdating = false;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Profile updated successfully!')),
-          );
+        if (state is ProfileSuccess) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(SnackBar(
+                content: Text(state.message), backgroundColor: Colors.green));
           Navigator.pop(context);
         } else if (state is ProfileError) {
-          setState(() {
-            _isUpdating = false;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text('Failed to update profile: ${state.message}')),
-          );
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(SnackBar(
+                content: Text(state.message), backgroundColor: Colors.red));
         }
       },
       child: Scaffold(
@@ -169,9 +141,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                   _selectedImage!,
                                   fit: BoxFit.cover,
                                 )
-                              : widget.profile.avatar.isNotEmpty
+                              : widget.profile.avatar != null
                                   ? Image.network(
-                                      widget.profile.avatar,
+                                      widget.profile.avatar!,
                                       fit: BoxFit.cover,
                                       errorBuilder:
                                           (context, error, stackTrace) {
@@ -231,7 +203,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   ),
                 const SizedBox(height: 30),
                 TextFormField(
-                  initialValue: _age.toString(),
+                  controller: _ageController,
                   decoration: InputDecoration(
                     labelText: 'Age',
                     border: OutlineInputBorder(
@@ -239,34 +211,31 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                   ),
                   keyboardType: TextInputType.number,
-                  onSaved: (value) {
-                    _age = int.tryParse(value ?? '') ?? _age;
-                  },
                 ),
                 const SizedBox(height: 20),
-                DropdownButtonFormField<String>(
-                  value: _gender,
+                DropdownButtonFormField<String?>(
+                  initialValue: _selectedGender,
                   decoration: InputDecoration(
                     labelText: 'Gender',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  items: ['Male', 'Female'].map((String value) {
-                    return DropdownMenuItem<String>(
+                  items: genderItems.map((String value) {
+                    return DropdownMenuItem<String?>(
                       value: value,
                       child: Text(value),
                     );
                   }).toList(),
                   onChanged: (newValue) {
                     setState(() {
-                      _gender = newValue!;
+                      _selectedGender = newValue;
                     });
                   },
                 ),
                 const SizedBox(height: 20),
                 TextFormField(
-                  initialValue: _weight.toString(),
+                  controller: _weightController,
                   decoration: InputDecoration(
                     labelText: 'Weight (KG)',
                     border: OutlineInputBorder(
@@ -274,13 +243,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                   ),
                   keyboardType: TextInputType.number,
-                  onSaved: (value) {
-                    _weight = double.tryParse(value ?? '') ?? _weight;
-                  },
                 ),
                 const SizedBox(height: 20),
                 TextFormField(
-                  initialValue: _height.toString(),
+                  controller: _heightController,
                   decoration: InputDecoration(
                     labelText: 'Height (CM)',
                     border: OutlineInputBorder(
@@ -288,13 +254,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                   ),
                   keyboardType: TextInputType.number,
-                  onSaved: (value) {
-                    _height = double.tryParse(value ?? '') ?? _height;
-                  },
                 ),
                 const SizedBox(height: 20),
                 TextFormField(
-                  initialValue: _contactNumber,
+                  controller: _phoneController,
                   decoration: InputDecoration(
                     labelText: 'Contact Number',
                     border: OutlineInputBorder(
@@ -302,22 +265,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                   ),
                   keyboardType: TextInputType.phone,
-                  onSaved: (value) {
-                    _contactNumber = value ?? '';
-                  },
                 ),
                 const SizedBox(height: 20),
                 TextFormField(
-                  initialValue: _homeAddress,
+                  controller: _addressController,
                   decoration: InputDecoration(
                     labelText: 'Home Address',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  onSaved: (value) {
-                    _homeAddress = value ?? '';
-                  },
                 ),
                 const SizedBox(height: 36),
               ],
@@ -326,29 +283,33 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ),
         bottomNavigationBar: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: ElevatedButton(
-            onPressed: _isUpdating ? null : _submitForm,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF40E0D0),
-              minimumSize: const Size(double.infinity, 50),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+          child: BlocBuilder<ProfileCubit, ProfileState>(
+              builder: (context, state) {
+            final isUpdating = state is ProfileSaving;
+            return ElevatedButton(
+              onPressed: isUpdating ? null : _submitForm,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF40E0D0),
+                minimumSize: const Size(double.infinity, 50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
-            ),
-            child: _isUpdating
-                ? const SizedBox(
-                    height: 24,
-                    width: 24,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 3,
+              child: isUpdating
+                  ? const SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 3,
+                      ),
+                    )
+                  : const Text(
+                      'Save',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
-                  )
-                : const Text(
-                    'Save',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-          ),
+            );
+          }),
         ),
       ),
     );

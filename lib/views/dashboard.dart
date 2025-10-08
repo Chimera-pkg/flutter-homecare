@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:m2health/cubit/profiles/presentation/bloc/profile_cubit.dart';
+import 'package:m2health/cubit/profiles/presentation/bloc/profile_state.dart';
 import 'package:m2health/route/app_routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../const.dart';
 import '../AppLanguage.dart';
 import '../app_localzations.dart';
 import 'package:provider/provider.dart';
-import 'package:m2health/cubit/profiles/profile_cubit.dart';
-import 'package:m2health/cubit/profiles/profile_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class Dashboard extends StatefulWidget {
@@ -32,7 +32,7 @@ class _DashboardState extends State<Dashboard> {
   void initState() {
     super.initState();
     _loadUserName();
-    context.read<ProfileCubit>().fetchProfile();
+    context.read<ProfileCubit>().loadProfile();
     _scrollController = ScrollController()
       ..addListener(() {
         if (_scrollController.position.pixels ==
@@ -113,7 +113,7 @@ class _DashboardState extends State<Dashboard> {
                         ? state.profile.username
                         : userName ?? 'User';
                     avatarWidget = Image.network(
-                      state.profile.avatar,
+                      state.profile.avatar ?? '',
                       width: 56,
                       height: 56,
                       fit: BoxFit.cover,
@@ -251,6 +251,8 @@ class _DashboardState extends State<Dashboard> {
                                   hintStyle: TextStyle(
                                       color: Color(0xFF8A96BC), fontSize: 11),
                                   border: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
                                 ),
                               ),
                             ),

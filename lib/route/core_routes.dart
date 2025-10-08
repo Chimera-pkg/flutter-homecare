@@ -6,7 +6,7 @@ import 'package:m2health/route/app_routes.dart';
 import 'package:m2health/views/dashboard.dart';
 import 'package:m2health/views/favourites.dart';
 import 'package:m2health/views/medical_store.dart';
-import 'package:m2health/cubit/profiles/profile_page.dart';
+import 'package:m2health/cubit/profiles/presentation/profile_page.dart';
 
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
