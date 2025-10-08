@@ -135,25 +135,27 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                             ),
                             const SizedBox(width: 16),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  state.profile.username,
-                                  style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(height: 4),
-                                const Text(
-                                  'Last updated:',
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-                                Text(
-                                  formatDateTime(state.profile.updatedAt),
-                                  style: const TextStyle(color: Colors.black),
-                                ),
-                              ],
+                            Flexible(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    state.profile.username,
+                                    style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  const Text(
+                                    'Last updated:',
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
+                                  Text(
+                                    formatDateTime(state.profile.updatedAt),
+                                    style: const TextStyle(color: Colors.black),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
