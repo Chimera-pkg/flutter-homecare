@@ -8,13 +8,13 @@ import 'dart:io';
 import 'package:m2health/widgets/image_preview.dart';
 
 class AddEditCertificateDialog extends StatefulWidget {
-  final Certificate? certification;
-  final Function(String title, String regNum, String issuedOn, File file)
+  final Certificate? certificate;
+  final Function(String title, String regNum, String issuedOn, File? file)
       onSave;
 
   const AddEditCertificateDialog({
     super.key,
-    this.certification,
+    this.certificate,
     required this.onSave,
   });
 
@@ -23,28 +23,33 @@ class AddEditCertificateDialog extends StatefulWidget {
       _AddEditCertificateDialogState();
 }
 
-class _AddEditCertificateDialogState
-    extends State<AddEditCertificateDialog> {
+class _AddEditCertificateDialogState extends State<AddEditCertificateDialog> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _titleController;
   late TextEditingController _registrationNumberController;
   late TextEditingController _issuedOnController;
   File? _selectedFile;
-  String? _fileName;
+
+  Certificate? get certificate => widget.certificate;
+  bool get isEditing => certificate != null;
 
   @override
   void initState() {
     super.initState();
-    _titleController =
-        TextEditingController(text: widget.certification?.title ?? '');
-    _registrationNumberController = TextEditingController(
-        text: widget.certification?.registrationNumber ?? '');
-    _issuedOnController =
-        TextEditingController(text: widget.certification?.issuedOn ?? '');
-    if (widget.certification?.fileURL != null &&
-        widget.certification!.fileURL.isNotEmpty) {
-      _fileName = 'Existing File';
+    _titleController = TextEditingController(text: certificate?.title ?? '');
+    _registrationNumberController =
+        TextEditingController(text: certificate?.registrationNumber ?? '');
+
+    String issuedOn = '';
+    if (certificate != null && certificate!.issuedOn.isNotEmpty) {
+      try {
+        final dateTime = DateTime.parse(certificate!.issuedOn);
+        issuedOn = DateFormat('yyyy-MM-dd').format(dateTime);
+      } catch (e) {
+        issuedOn = certificate!.issuedOn.split('T').first;
+      }
     }
+    _issuedOnController = TextEditingController(text: issuedOn);
   }
 
   @override
@@ -87,23 +92,9 @@ class _AddEditCertificateDialogState
     }
   }
 
-  Future<void> _pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png'],
-    );
-
-    if (result != null) {
-      setState(() {
-        _selectedFile = File(result.files.single.path!);
-        _fileName = result.files.single.name;
-      });
-    }
-  }
-
   void _handleSave() {
     if (_formKey.currentState!.validate()) {
-      if (_selectedFile == null && widget.certification == null) {
+      if (!isEditing && _selectedFile == null) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("Please select a file."),
           backgroundColor: Colors.red,
@@ -115,7 +106,7 @@ class _AddEditCertificateDialogState
         _titleController.text,
         _registrationNumberController.text,
         _issuedOnController.text,
-        _selectedFile ?? File('dummy.pdf'),
+        _selectedFile,
       );
       Navigator.of(context).pop();
     }
@@ -125,9 +116,7 @@ class _AddEditCertificateDialogState
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(
-        widget.certification == null
-            ? 'Add New Certificate'
-            : 'Edit Certificate',
+        certificate == null ? 'Add New Certificate' : 'Edit Certificate',
         textAlign: TextAlign.center,
         style: const TextStyle(
           fontSize: 16,
@@ -173,7 +162,6 @@ class _AddEditCertificateDialogState
               ),
               TextFormField(
                 controller: _issuedOnController,
-                readOnly: true,
                 onTap: () => _selectDate(context),
                 decoration: const InputDecoration(
                   hintText: 'Issued On',
@@ -182,11 +170,18 @@ class _AddEditCertificateDialogState
                   if (value == null || value.isEmpty) {
                     return 'Please select an issue date';
                   }
+                  try {
+                    DateFormat('yyyy-MM-dd').parseStrict(value);
+                  } catch (e) {
+                    return 'Please use YYYY-MM-DD format';
+                  }
                   return null;
                 },
               ),
               const SizedBox(height: 16),
               ImagePreview(
+                  initialImageUrl: certificate?.fileURL,
+                  imageFile: _selectedFile,
                   helperText: "Certificate (less than 10 MB)",
                   onChooseImage: (File? file) {
                     setState(() {
@@ -216,7 +211,7 @@ class _AddEditCertificateDialogState
             textStyle:
                 const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-          child: const Text('Add'),
+          child: Text(isEditing ? 'Save' : 'Add'),
         ),
       ],
     );

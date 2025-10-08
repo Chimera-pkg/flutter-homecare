@@ -1,8 +1,9 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/cubit/profiles/domain/entities/certificate.dart';
 import 'package:m2health/cubit/profiles/domain/entities/profile.dart';
@@ -218,7 +219,7 @@ class _EditProfessionalProfilePageState
             title: title,
             registrationNumber: regNum,
             issuedOn: issuedOn,
-            file: file,
+            file: file!,
           );
           context.read<CertificateCubit>().addCertificate(params);
         },
@@ -230,7 +231,7 @@ class _EditProfessionalProfilePageState
     showDialog(
       context: context,
       builder: (_) => AddEditCertificateDialog(
-        certification: cert,
+        certificate: cert,
         onSave: (title, regNum, issuedOn, file) {
           final params = UpdateCertificateParams(
             id: cert.id,
@@ -533,6 +534,16 @@ class CertificateCard extends StatelessWidget {
     required this.onRemove,
   });
 
+  String formatDate(String dateStr) {
+    try {
+      final date = DateTime.parse(dateStr);
+      return DateFormat('MMMM dd, yyyy').format(date);
+    } catch (e) {
+      log(e.toString());
+      return dateStr;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -578,7 +589,7 @@ class CertificateCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Issued on ${certification.issuedOn}',
+                  'Issued on ${formatDate(certification.issuedOn)}',
                   style: const TextStyle(
                     fontSize: 12,
                     fontStyle: FontStyle.italic,
