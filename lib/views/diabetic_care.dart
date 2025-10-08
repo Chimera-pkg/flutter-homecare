@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:m2health/app_localzations.dart';
 import 'package:m2health/route/app_routes.dart';
+import 'package:m2health/views/diabeticprofile/diabeticprofile.dart';
 
 import 'package:m2health/widgets/chat_pharma.dart';
 
@@ -140,17 +141,15 @@ class _PharmaState extends State<DiabeticCare> {
                       String route;
                       switch (index) {
                         case 0:
-                          // navbarVisibility(true);
-
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => PersonalPage(),
-                          //   ),
-                          // ).then((_) {
-                          //   // Show the bottom navigation bar when returning
-                          //   // navbarVisibility(false);
-                          // });
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DiabetesFormPage(),
+                            ),
+                          ).then((_) {
+                            // Show the bottom navigation bar when returning
+                            // navbarVisibility(false);
+                          });
                           return;
                         case 1:
                           // navbarVisibility(true);

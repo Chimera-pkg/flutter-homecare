@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class Const {
   // static const String BASE_URL = 'http://192.168.1.2:3333';
   static const String BASE_URL = 'https://homecare-api.med-map.org';
-  // static const String BASE_URL = 'http://192.168.0.114:3333';
   static const String URL_API = BASE_URL + '/v1';
   static const String URL_IMG_PLACEHOLDER = 'https://placehold.co/100x100';
   static const String API_SERVICE_REQUESTS = URL_API + '/service-requests';
