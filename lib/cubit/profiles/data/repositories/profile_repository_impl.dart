@@ -40,8 +40,8 @@ class ProfileRepositoryImpl extends ProfileRepository {
         'gender': params.gender,
         'job_title': params.jobTitle,
         'about_me': params.aboutMe,
-        'work_hours': params.workHours,
-        'work_place': params.workPlace,
+        'working_hours': params.workHours,
+        'workplace': params.workPlace,
       };
 
       await remoteDatasource.updateProfile(profileData, params.avatar);
