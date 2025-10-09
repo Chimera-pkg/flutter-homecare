@@ -2,8 +2,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:m2health/const.dart';
-import 'package:m2health/cubit/precision/screens/index.dart';
 import 'package:m2health/route/app_routes.dart';
 import '../widgets/precision_widgets.dart';
 import '../precision_cubit.dart';
@@ -59,15 +57,16 @@ class _BiomarkerUploadScreenState extends State<BiomarkerUploadScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => AlertDialog(
+        builder: (dialogContext) => AlertDialog(
           title: const Text('Success!'),
           content: const Text(
               'Your Precision Nutrition Assessment has been submitted successfully. Our experts will review your information and create a personalized plan for you.'),
           actions: [
             TextButton(
               onPressed: () {
+                Navigator.of(dialogContext).pop();
                 GoRouter.of(context)
-                    .go(AppRoutes.precisionNutritionAssessmentDetail);
+                    .goNamed(AppRoutes.precisionNutritionAssessmentDetail);
               },
               child: const Text('View Details'),
             ),

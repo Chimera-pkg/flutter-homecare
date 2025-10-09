@@ -48,7 +48,7 @@ class PrecisionNutritionPage extends StatelessWidget {
                           final path = state.isSubmitted
                               ? AppRoutes.precisionNutritionAssessmentDetail
                               : AppRoutes.precisionNutritionAssessmentForm;
-                          GoRouter.of(context).push(path);
+                          GoRouter.of(context).goNamed(path);
                         },
                       ),
 

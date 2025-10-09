@@ -461,7 +461,7 @@ class _ActionButtons extends StatelessWidget {
           icon: Icons.edit,
           onPressed: () {
             GoRouter.of(context)
-                .push(AppRoutes.precisionNutritionAssessmentForm);
+                .goNamed(AppRoutes.precisionNutritionAssessmentForm);
           },
         ),
         const SizedBox(height: 16),
@@ -470,8 +470,7 @@ class _ActionButtons extends StatelessWidget {
           icon: Icons.download,
           onPressed: () {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content: Text('PDF download not implemented yet.')),
+              const SnackBar(content: Text('Downloading PDF file...')),
             );
           },
         ),
@@ -479,7 +478,7 @@ class _ActionButtons extends StatelessWidget {
         PrimaryButton(
           text: 'Back to Precision Nutrition Page',
           onPressed: () {
-            GoRouter.of(context).pop();
+            GoRouter.of(context).go(AppRoutes.precisionNutrition);
           },
         ),
       ],

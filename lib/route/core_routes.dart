@@ -3,12 +3,12 @@ import 'package:go_router/go_router.dart';
 import 'package:m2health/cubit/appointment/appointment_module.dart';
 import 'package:m2health/main.dart';
 import 'package:m2health/route/app_routes.dart';
+import 'package:m2health/route/dashboard_routes.dart';
+import 'package:m2health/route/navigator_keys.dart';
 import 'package:m2health/views/dashboard.dart';
 import 'package:m2health/views/favourites.dart';
 import 'package:m2health/views/medical_store.dart';
 import 'package:m2health/cubit/profiles/presentation/profile_page.dart';
-
-final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 class CoreRoutes {
   static List<RouteBase> routes = [
@@ -18,11 +18,12 @@ class CoreRoutes {
       },
       branches: [
         StatefulShellBranch(
-          navigatorKey: _shellNavigatorKey,
+          navigatorKey: shellNavigatorKey,
           routes: [
             GoRoute(
               path: AppRoutes.dashboard,
-              builder: (context, state) => Dashboard(),
+              routes: DashboardRoutes.routes,
+              builder: (context, state) => const Dashboard(),
             ),
           ],
         ),
