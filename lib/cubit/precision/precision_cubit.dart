@@ -11,6 +11,7 @@ class PrecisionState extends Equatable {
   final List<String> uploadedFiles;
   final bool isLoading;
   final String? errorMessage;
+  final bool isSubmitted;
 
   const PrecisionState({
     this.mainConcern,
@@ -21,6 +22,7 @@ class PrecisionState extends Equatable {
     this.uploadedFiles = const [],
     this.isLoading = false,
     this.errorMessage,
+    this.isSubmitted = false,
   });
 
   PrecisionState copyWith({
@@ -32,6 +34,7 @@ class PrecisionState extends Equatable {
     List<String>? uploadedFiles,
     bool? isLoading,
     String? errorMessage,
+    bool? isSubmitted,
   }) {
     return PrecisionState(
       mainConcern: mainConcern ?? this.mainConcern,
@@ -42,6 +45,7 @@ class PrecisionState extends Equatable {
       uploadedFiles: uploadedFiles ?? this.uploadedFiles,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage ?? this.errorMessage,
+      isSubmitted: isSubmitted ?? this.isSubmitted,
     );
   }
 
@@ -55,6 +59,7 @@ class PrecisionState extends Equatable {
         uploadedFiles,
         isLoading,
         errorMessage,
+        isSubmitted,
       ];
 }
 
@@ -100,11 +105,12 @@ class PrecisionCubit extends Cubit<PrecisionState> {
       await Future.delayed(const Duration(seconds: 2));
       
       // Success - no error
-      emit(state.copyWith(isLoading: false));
+      emit(state.copyWith(isLoading: false, isSubmitted: true));
     } catch (e) {
       emit(state.copyWith(
         isLoading: false,
         errorMessage: 'Failed to submit assessment: ${e.toString()}',
+        isSubmitted: false,
       ));
     }
   }

@@ -55,7 +55,7 @@ class DashboardRoutes {
     GoRoute(
       path: AppRoutes.precisionNutrition,
       builder: (context, state) {
-        return PrecisionNutritionPage();
+        return const PrecisionNutritionPage();
       },
     ),
   ];

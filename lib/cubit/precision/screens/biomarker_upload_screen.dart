@@ -1,6 +1,10 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:m2health/const.dart';
+import 'package:m2health/cubit/precision/screens/index.dart';
+import 'package:m2health/route/app_routes.dart';
 import '../widgets/precision_widgets.dart';
 import '../precision_cubit.dart';
 
@@ -62,9 +66,15 @@ class _BiomarkerUploadScreenState extends State<BiomarkerUploadScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).popUntil((route) => route.isFirst);
+                GoRouter.of(context).go(AppRoutes.precisionNutrition);
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        const NutritionAssessmentDetailScreen(),
+                  ),
+                );
               },
-              child: const Text('OK'),
+              child: const Text('View Details'),
             ),
           ],
         ),
