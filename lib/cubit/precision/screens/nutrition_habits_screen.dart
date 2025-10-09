@@ -31,6 +31,20 @@ class _NutritionHabitsScreenState extends State<NutritionHabitsScreen> {
     super.dispose();
   }
 
+  @override
+  void initState() {
+    super.initState();
+    final nutritionHabits =
+        context.read<PrecisionCubit>().state.nutritionHabits;
+    if (nutritionHabits == null) return;
+    _mealFrequencyController.text = nutritionHabits.mealFrequency;
+    _foodSensitivitiesController.text = nutritionHabits.foodSensitivities;
+    _favoriteFoodsController.text = nutritionHabits.favoriteFoods;
+    _avoidedFoodsController.text = nutritionHabits.avoidedFoods;
+    _waterIntakeController.text = nutritionHabits.waterIntake;
+    _pastDietsController.text = nutritionHabits.pastDiets;
+  }
+
   void _onNextPressed() {
     if (_formKey.currentState!.validate()) {
       // Create NutritionHabits and update cubit
