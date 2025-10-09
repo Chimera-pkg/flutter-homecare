@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:m2health/route/app_routes.dart';
 import '../precision_cubit.dart';
 import '../widgets/precision_widgets.dart';
 
@@ -101,7 +103,7 @@ class _DetailItem extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 value,
-                style: const TextStyle(fontSize: 14, color: Colors.black54),
+                style: const TextStyle(fontSize: 14, color: Colors.black87),
               ),
             ],
           ),
@@ -115,12 +117,15 @@ class _BasicInfoCard extends StatelessWidget {
   final HealthProfile profile;
   const _BasicInfoCard({required this.profile});
 
+  final primaryColor = const Color(0xFF9AE1FF);
+
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFE8F3FF),
+        color: primaryColor.withValues(alpha: 0.1),
+        border: Border.all(color: primaryColor, width: 1.5),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -128,35 +133,24 @@ class _BasicInfoCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const CircleAvatar(
-                radius: 30,
-                backgroundImage:
-                    AssetImage('assets/illustration/avatar_placeholder.png'),
+              Expanded(
+                child: _DetailItem(
+                  label: 'Age',
+                  value: '${profile.age} years old',
+                ),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _DetailItem(
-                        label: 'Age',
-                        value: '${profile.age} years old',
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _DetailItem(
-                        label: 'Gender',
-                        value: profile.gender,
-                      ),
-                    ),
-                  ],
+                child: _DetailItem(
+                  label: 'Gender',
+                  value: profile.gender,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: _DetailItem(
@@ -177,6 +171,7 @@ class _BasicInfoCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: _DetailItem(
@@ -203,21 +198,26 @@ class _LifestyleHabitsCard extends StatelessWidget {
   final LifestyleHabits habits;
   const _LifestyleHabitsCard({required this.habits});
 
+  final Color primaryColor = const Color(0xFF10B981);
+
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFE8FFF3),
+        color: primaryColor.withValues(alpha: 0.1),
+        border: Border.all(color: primaryColor, width: 1.5),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: _DetailItem(
                   icon: Icons.nightlight_round,
+                  iconColor: primaryColor,
                   label: 'Sleep',
                   value: '${habits.sleepHours.toStringAsFixed(1)} hrs/night',
                 ),
@@ -226,6 +226,7 @@ class _LifestyleHabitsCard extends StatelessWidget {
               Expanded(
                 child: _DetailItem(
                   icon: Icons.fitness_center,
+                  iconColor: primaryColor,
                   label: 'Exercise',
                   value: habits.exerciseFrequency,
                 ),
@@ -234,10 +235,12 @@ class _LifestyleHabitsCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: _DetailItem(
                   icon: Icons.watch_later_outlined,
+                  iconColor: primaryColor,
                   label: 'Activity',
                   value: habits.activityLevel,
                 ),
@@ -246,6 +249,7 @@ class _LifestyleHabitsCard extends StatelessWidget {
               Expanded(
                 child: _DetailItem(
                   icon: Icons.sentiment_very_dissatisfied,
+                  iconColor: primaryColor,
                   label: 'Stress Levels',
                   value: habits.stressLevel,
                 ),
@@ -255,6 +259,7 @@ class _LifestyleHabitsCard extends StatelessWidget {
           const SizedBox(height: 16),
           _DetailItem(
             icon: Icons.smoking_rooms,
+            iconColor: primaryColor,
             label: 'Smoking/Alcohol',
             value: habits.smokingAlcoholHabits,
           ),
@@ -268,21 +273,26 @@ class _NutritionHabitsCard extends StatelessWidget {
   final NutritionHabits habits;
   const _NutritionHabitsCard({required this.habits});
 
+  final Color primaryColor = const Color(0xFFB393FF);
+
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8F0FF),
+        color: primaryColor.withValues(alpha: 0.1),
+        border: Border.all(color: primaryColor, width: 1.5),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: _DetailItem(
-                  icon: Icons.restaurant_menu,
+                  icon: Icons.fastfood,
+                  iconColor: primaryColor,
                   label: 'Meal Frequency',
                   value: habits.mealFrequency,
                 ),
@@ -291,6 +301,7 @@ class _NutritionHabitsCard extends StatelessWidget {
               Expanded(
                 child: _DetailItem(
                   icon: Icons.no_food,
+                  iconColor: primaryColor,
                   label: 'Allergies',
                   value: habits.foodSensitivities,
                 ),
@@ -299,10 +310,12 @@ class _NutritionHabitsCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: _DetailItem(
                   icon: Icons.favorite_border,
+                  iconColor: primaryColor,
                   label: 'Favorite Foods',
                   value: habits.favoriteFoods,
                 ),
@@ -311,6 +324,7 @@ class _NutritionHabitsCard extends StatelessWidget {
               Expanded(
                 child: _DetailItem(
                   icon: Icons.do_not_disturb_on_outlined,
+                  iconColor: primaryColor,
                   label: 'Avoided Foods',
                   value: habits.avoidedFoods,
                 ),
@@ -319,10 +333,12 @@ class _NutritionHabitsCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: _DetailItem(
                   icon: Icons.water_drop_outlined,
+                  iconColor: primaryColor,
                   label: 'Water Intake',
                   value: habits.waterIntake,
                 ),
@@ -331,6 +347,7 @@ class _NutritionHabitsCard extends StatelessWidget {
               Expanded(
                 child: _DetailItem(
                   icon: Icons.history,
+                  iconColor: primaryColor,
                   label: 'Past Diets',
                   value: habits.pastDiets,
                 ),
@@ -346,6 +363,8 @@ class _NutritionHabitsCard extends StatelessWidget {
 class _SelfRatedHealthCard extends StatelessWidget {
   final double rating;
   const _SelfRatedHealthCard({required this.rating});
+
+  final Color primaryColor = const Color(0xFFF79E1B);
 
   String _getEmoji(double rating) {
     if (rating <= 1.5) return '😰';
@@ -368,15 +387,19 @@ class _SelfRatedHealthCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.yellow.shade50,
+        color: primaryColor.withValues(alpha: 0.1),
+        border: Border.all(color: primaryColor, width: 1.5),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _DetailItem(
-            label: 'Status',
-            value: _getHealthRatingText(rating),
+          Expanded(
+            child: _DetailItem(
+              label: 'Status',
+              value: _getHealthRatingText(rating),
+            ),
           ),
           Text(
             _getEmoji(rating),
@@ -392,19 +415,22 @@ class _BiomarkerUploadCard extends StatelessWidget {
   final List<String> uploadedFiles;
   const _BiomarkerUploadCard({required this.uploadedFiles});
 
+  final Color primaryColor = const Color(0xFFFF9A9A);
+
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.red.shade50,
+        color: primaryColor.withValues(alpha: 0.1),
+        border: Border.all(color: primaryColor, width: 1.5),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         children: [
           _DetailItem(
             icon: Icons.description_outlined,
-            iconColor: Colors.red.shade400,
+            iconColor: primaryColor,
             label: 'Medical Report',
             value: uploadedFiles.isNotEmpty
                 ? 'Uploaded (${uploadedFiles.join(", ")})'
@@ -413,7 +439,7 @@ class _BiomarkerUploadCard extends StatelessWidget {
           const SizedBox(height: 16),
           _DetailItem(
             icon: Icons.watch,
-            iconColor: Colors.red.shade400,
+            iconColor: primaryColor,
             label: 'Connected Device',
             value: 'No',
           ),
@@ -430,36 +456,31 @@ class _ActionButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: SecondaryButton(
-                text: 'Edit Information',
-                icon: Icons.edit,
-                onPressed: () {
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                },
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: SecondaryButton(
-                text: 'Download (PDF)',
-                icon: Icons.download,
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('PDF download not implemented yet.')),
-                  );
-                },
-              ),
-            ),
-          ],
+        SecondaryButton(
+          text: 'Edit Information',
+          icon: Icons.edit,
+          onPressed: () {
+            GoRouter.of(context)
+                .push(AppRoutes.precisionNutritionAssessmentForm);
+          },
+        ),
+        const SizedBox(height: 16),
+        SecondaryButton(
+          text: 'Download (PDF)',
+          icon: Icons.download,
+          onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                  content: Text('PDF download not implemented yet.')),
+            );
+          },
         ),
         const SizedBox(height: 16),
         PrimaryButton(
           text: 'Back to Precision Nutrition Page',
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            GoRouter.of(context).pop();
+          },
         ),
       ],
     );

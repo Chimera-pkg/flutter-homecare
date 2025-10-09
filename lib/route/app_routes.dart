@@ -40,6 +40,12 @@ class AppRoutes {
   static const String nursing = '/nursing';
   static const String submenu = '/submenu';
 
+  // Precision Nutrition Module
+  static const String precisionNutritionAssessmentForm =
+      '$precisionNutrition/assessment/form';
+  static const String precisionNutritionAssessmentDetail =
+      '$precisionNutrition/assessment/detail';
+
   // static const String home = '/';
   // static const String submenu = 'submenu';
   // static const String dashboard= 'dashboard';

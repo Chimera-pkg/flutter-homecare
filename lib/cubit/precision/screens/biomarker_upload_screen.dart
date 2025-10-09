@@ -66,13 +66,8 @@ class _BiomarkerUploadScreenState extends State<BiomarkerUploadScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                GoRouter.of(context).go(AppRoutes.precisionNutrition);
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        const NutritionAssessmentDetailScreen(),
-                  ),
-                );
+                GoRouter.of(context)
+                    .go(AppRoutes.precisionNutritionAssessmentDetail);
               },
               child: const Text('View Details'),
             ),
