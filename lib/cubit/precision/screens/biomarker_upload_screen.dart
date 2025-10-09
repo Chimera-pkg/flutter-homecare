@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../widgets/precision_widgets.dart';
@@ -13,9 +14,17 @@ class BiomarkerUploadScreen extends StatefulWidget {
 class _BiomarkerUploadScreenState extends State<BiomarkerUploadScreen> {
   final List<String> _uploadedFiles = [];
 
-  void _addDummyFile() {
+  void _pickFiles() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
+    );
+
+    if (result == null) return;
+
     setState(() {
-      final fileName = 'medical_record_${_uploadedFiles.length + 1}.pdf';
+      // final fileName = 'medical_record_${_uploadedFiles.length + 1}.pdf';
+      final fileName = result.files.single.name;
       _uploadedFiles.add(fileName);
       context.read<PrecisionCubit>().addUploadedFile(fileName);
     });
@@ -136,7 +145,7 @@ class _BiomarkerUploadScreenState extends State<BiomarkerUploadScreen> {
                               SecondaryButton(
                                 text: 'Choose File',
                                 icon: Icons.file_upload,
-                                onPressed: _addDummyFile,
+                                onPressed: _pickFiles,
                               ),
                             ],
                           ),
