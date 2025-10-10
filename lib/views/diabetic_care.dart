@@ -144,7 +144,7 @@ class _PharmaState extends State<DiabeticCare> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => DiabetesFormPage(),
+                              builder: (context) => const DiabetesFormPage(),
                             ),
                           ).then((_) {
                             // Show the bottom navigation bar when returning

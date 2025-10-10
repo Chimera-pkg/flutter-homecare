@@ -1,28 +1,5 @@
 import 'package:flutter/material.dart';
 
-// Untuk menjalankan file ini secara mandiri
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Diabetes Form',
-      theme: ThemeData(
-        primarySwatch: Colors.cyan,
-        scaffoldBackgroundColor:
-            const Color(0xFFF5F5F5), // Background abu-abu muda
-        fontFamily: 'Roboto', // Ganti dengan font yang Anda inginkan
-      ),
-      home: const DiabetesFormPage(),
-    );
-  }
-}
-
 class DiabetesFormPage extends StatefulWidget {
   const DiabetesFormPage({super.key});
 
@@ -49,17 +26,50 @@ class _DiabetesFormPageState extends State<DiabetesFormPage> {
       TextEditingController();
 
   // State Halaman 2
-  final List<String> riskFactorItems = [
-    'Hypertension',
-    'Dyslipidemia',
-    'Cardiovascular\nDisease',
-    'Neuropathy',
-    'Eye Disease\n(Retinopathy)',
-    'Kidney Disease',
-    'Family History\nof Diabetes',
-  ];
+  final yesNoOptions = ['Yes', 'No'];
+  List<Map<String, dynamic>> get riskFactorItems => [
+        {
+          "name": 'Hypertension',
+          "icon": "assets/icons/ic_hypertension.png",
+          "options": yesNoOptions,
+        },
+        {
+          "name": 'Dyslipidemia',
+          "icon": "assets/icons/ic_fat.png",
+          "options": yesNoOptions,
+        },
+        {
+          "name": 'Cardiovascular\nDisease',
+          "icon": "assets/icons/ic_cardiovascular.png",
+          "options": yesNoOptions,
+        },
+        {
+          "name": 'Neuropathy',
+          "icon": "assets/icons/ic_neuropathy.png",
+          "options": yesNoOptions,
+        },
+        {
+          "name": 'Eye Disease\n(Retinopathy)',
+          "icon": "assets/icons/ic_eyes.png",
+          "options": yesNoOptions,
+        },
+        {
+          "name": 'Kidney Disease',
+          "icon": "assets/icons/ic_kidney.png",
+          "options": yesNoOptions,
+        },
+        {
+          "name": 'Family History\nof Diabetes',
+          "icon": "assets/icons/ic_family.png",
+          "options": yesNoOptions,
+        },
+        {
+          "name": 'Smoking',
+          "icon": "assets/icons/ic_smoking.png",
+          "options": ['Current', 'Former', 'Never'],
+        },
+      ];
   Map<String, String?> riskFactors = {};
-  String? smokingStatus;
 
   // State Halaman 3
   String? hypoglycemia;
@@ -121,13 +131,22 @@ class _DiabetesFormPageState extends State<DiabetesFormPage> {
     );
   }
 
-  Widget _buildSubHeader(String title, {IconData? icon}) {
+  Widget _buildSubHeader(String title, {IconData? icon, String? iconPath}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (icon != null) ...[
             Icon(icon, color: Colors.red.shade400, size: 20),
+            const SizedBox(width: 8)
+          ],
+          if (iconPath != null) ...[
+            Image.asset(
+              iconPath,
+              width: 24,
+              height: 24,
+            ),
             const SizedBox(width: 8)
           ],
           Text(
@@ -171,8 +190,10 @@ class _DiabetesFormPageState extends State<DiabetesFormPage> {
           _buildSectionHeader('Diabetes History'),
 
           // --- Bagian Tipe Diabetes ---
-          _buildSubHeader('Type of Diabetes:',
-              icon: Icons.bloodtype), // Ganti ikon sesuai kebutuhan
+          _buildSubHeader(
+            'Type of Diabetes:',
+            iconPath: "assets/icons/ic_diabetes_type.png",
+          ), // Ganti ikon sesuai kebutuhan
           Wrap(
             spacing: 0.0,
             runSpacing: -10.0, // Mengurangi jarak vertikal antar baris Wrap
@@ -214,7 +235,7 @@ class _DiabetesFormPageState extends State<DiabetesFormPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildSubHeader('Year of Diagnosis:',
-                        icon: Icons.calendar_today_outlined),
+                        iconPath: "assets/icons/ic_calendar.png"),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: yearDiagnosisController,
@@ -232,7 +253,7 @@ class _DiabetesFormPageState extends State<DiabetesFormPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildSubHeader('Last HbA1c:',
-                        icon: Icons.opacity_outlined),
+                        iconPath: "assets/icons/ic_blood_measurement.png"),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: lastHbA1cController,
@@ -249,7 +270,10 @@ class _DiabetesFormPageState extends State<DiabetesFormPage> {
           const SizedBox(height: 24),
 
           // --- Bagian Current Treatment ---
-          _buildSubHeader('Current Treatment:', icon: Icons.list_alt_rounded),
+          _buildSubHeader(
+            'Current Treatment:',
+            iconPath: "assets/icons/ic_medical_checklist.png",
+          ),
           // Opsi Diet & Exercise
           Row(children: [
             Checkbox(
@@ -319,54 +343,34 @@ class _DiabetesFormPageState extends State<DiabetesFormPage> {
               crossAxisCount: 2,
               crossAxisSpacing: 16,
               mainAxisSpacing: 10,
-              childAspectRatio: 1.8, // Disesuaikan agar pas
+              mainAxisExtent: 160,
             ),
             itemBuilder: (context, index) {
-              final key = riskFactorItems[index];
+              final key = riskFactorItems[index]['name'];
+              final iconPath = riskFactorItems[index]['icon'];
+              final options = riskFactorItems[index]['options'] as List<String>;
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  _buildSubHeader(key,
-                      icon: Icons.circle), // Menggunakan ikon circle merah
-                  Row(
-                    children: ['Yes', 'No'].map((value) {
-                      return Expanded(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Radio<String>(
-                                value: value,
-                                groupValue: riskFactors[key],
-                                onChanged: (v) =>
-                                    setState(() => riskFactors[key] = v),
-                                activeColor: primaryColor),
-                            Text(value),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  ),
+                  _buildSubHeader(key, iconPath: iconPath),
+                  ...options.map((value) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Radio<String>(
+                            value: value,
+                            groupValue: riskFactors[key],
+                            onChanged: (v) =>
+                                setState(() => riskFactors[key] = v),
+                            activeColor: primaryColor),
+                        Text(value),
+                      ],
+                    );
+                  }),
                 ],
               );
             },
-          ),
-          const SizedBox(height: 16),
-          _buildSubHeader('Smoking:', icon: Icons.smoking_rooms),
-          Row(
-            children: ['Current', 'Former', 'Never'].map((status) {
-              return Expanded(
-                child: Row(
-                  children: [
-                    Radio<String>(
-                        value: status,
-                        groupValue: smokingStatus,
-                        onChanged: (v) => setState(() => smokingStatus = v),
-                        activeColor: primaryColor),
-                    Text(status),
-                  ],
-                ),
-              );
-            }).toList(),
           ),
         ],
       ),
@@ -457,7 +461,7 @@ class _DiabetesFormPageState extends State<DiabetesFormPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildSectionHeader('Physical Signs (If Have)'),
-          _buildSubHeader('Eyes:', icon: Icons.visibility),
+          _buildSubHeader('Eyes:', iconPath: "assets/icons/ic_eyes.png"),
           TextFormField(
               controller: eyesExamDateController,
               decoration: _inputDecoration('Last Exam Date')),
@@ -466,7 +470,7 @@ class _DiabetesFormPageState extends State<DiabetesFormPage> {
               controller: eyesFindingsController,
               decoration: _inputDecoration('Findings')),
           const SizedBox(height: 24),
-          _buildSubHeader('Kidneys:', icon: Icons.water_drop),
+          _buildSubHeader('Kidneys:', iconPath: "assets/icons/ic_kidney.png"),
           Row(
             children: [
               Expanded(
@@ -481,7 +485,7 @@ class _DiabetesFormPageState extends State<DiabetesFormPage> {
             ],
           ),
           const SizedBox(height: 24),
-          _buildSubHeader('Feet:', icon: Icons.forward_to_inbox_rounded),
+          _buildSubHeader('Feet:', iconPath: "assets/icons/ic_feet.png"),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
