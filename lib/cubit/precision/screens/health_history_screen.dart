@@ -30,12 +30,31 @@ class _HealthHistoryScreenState extends State<HealthHistoryScreen> {
 
   final Map<String, bool> _selectedConsiderations = {};
 
+  final _availableGenders = ['Male', 'Female', 'Other'];
+
   @override
   void initState() {
     super.initState();
     // Initialize all considerations as false
     for (String consideration in _specialConsiderations) {
       _selectedConsiderations[consideration] = false;
+    }
+
+    // Initialize all fields based on existing state if available
+    final healthProfile = context.read<PrecisionCubit>().state.healthProfile;
+    if (healthProfile == null) return;
+
+    _ageController.text = healthProfile.age.toString();
+    _selectedGender = _availableGenders.contains(healthProfile.gender)
+        ? healthProfile.gender
+        : null;
+    _conditionController.text = healthProfile.knownCondition ?? '';
+    _medicationController.text = healthProfile.medicationHistory ?? '';
+    _familyHistoryController.text = healthProfile.familyHistory ?? '';
+    for (String consideration in healthProfile.specialConsiderations) {
+      if (_selectedConsiderations.containsKey(consideration)) {
+        _selectedConsiderations[consideration] = true;
+      }
     }
   }
 
@@ -126,7 +145,7 @@ class _HealthHistoryScreenState extends State<HealthHistoryScreen> {
                       CustomDropdown(
                         label: 'Gender',
                         value: _selectedGender,
-                        items: ['Male', 'Female', 'Other'],
+                        items: _availableGenders,
                         onChanged: (value) {
                           setState(() {
                             _selectedGender = value;

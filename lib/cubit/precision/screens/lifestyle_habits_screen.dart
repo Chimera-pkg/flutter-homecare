@@ -28,6 +28,19 @@ class _LifestyleHabitsScreenState extends State<LifestyleHabitsScreen> {
     super.dispose();
   }
 
+  @override
+  void initState() {
+    super.initState();
+    final lifestyleHabits =
+        context.read<PrecisionCubit>().state.lifestyleHabits;
+    if (lifestyleHabits == null) return;
+    _sleepHours = lifestyleHabits.sleepHours;
+    _activityLevelController.text = lifestyleHabits.activityLevel;
+    _exerciseFrequencyController.text = lifestyleHabits.exerciseFrequency;
+    _stressLevelController.text = lifestyleHabits.stressLevel;
+    _smokingAlcoholController.text = lifestyleHabits.smokingAlcoholHabits;
+  }
+
   void _onNextPressed() {
     if (_formKey.currentState!.validate()) {
       // Create LifestyleHabits and update cubit

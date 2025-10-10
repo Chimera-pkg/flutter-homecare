@@ -82,9 +82,9 @@ class SelfRatedHealthScreen extends StatelessWidget {
                       ),
 
                       // Slider Labels
-                      Row(
+                      const Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
+                        children: [
                           Text(
                             'Terrible',
                             style: TextStyle(

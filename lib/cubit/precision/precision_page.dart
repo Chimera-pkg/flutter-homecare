@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:m2health/route/app_routes.dart';
 import 'precision_cubit.dart';
-import 'screens/main_concern_screen.dart';
 
 class PrecisionNutritionPage extends StatelessWidget {
+  const PrecisionNutritionPage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => PrecisionCubit(),
-      child: Scaffold(
+    return BlocBuilder<PrecisionCubit, PrecisionState>(
+        builder: (context, state) {
+      return Scaffold(
         appBar: AppBar(
           title: const Text('Precision Nutrition'),
           backgroundColor: Colors.white,
@@ -38,14 +41,15 @@ class PrecisionNutritionPage extends StatelessWidget {
                         title: "Precision Nutrition Assessment",
                         description:
                             "Start your journey with a deep analysis of your genes, metabolism and lifestyle to understand your body's unique needs.",
-                        buttonText: "Start Now",
+                        buttonText: state.isSubmitted ? "View" : "Start Now",
                         imagePath: "assets/illustration/foodies.png",
                         backgroundColor: const Color(0xFFE8F3FF),
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const MainConcernScreen()),
-                        ),
+                        onTap: () {
+                          final path = state.isSubmitted
+                              ? AppRoutes.precisionNutritionAssessmentDetail
+                              : AppRoutes.precisionNutritionAssessmentForm;
+                          GoRouter.of(context).goNamed(path);
+                        },
                       ),
 
                       const SizedBox(height: 16),
@@ -82,8 +86,8 @@ class PrecisionNutritionPage extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   void _showComingSoonDialog(BuildContext context) {
