@@ -1,13 +1,87 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:m2health/const.dart';
-import 'package:m2health/cubit/diabetes/diabetes_form_state.dart';
+import 'package:m2health/cubit/diabetes/bloc/diabetes_form_state.dart';
 import 'package:m2health/utils.dart';
 
 class DiabetesFormCubit extends Cubit<DiabetesFormState> {
-  final _dio = Dio();
+  final Dio _dio;
 
-  DiabetesFormCubit() : super(const DiabetesFormState());
+  DiabetesFormCubit(this._dio) : super(const DiabetesFormState());
+
+  Future<void> loadForm() async {
+    emit(state.copyWith(isLoading: true, errorMessage: null));
+
+    try {
+      const url = Const.API_DIABETES_PROFILE;
+      final token = await Utils.getSpString(Const.TOKEN);
+
+      final response = await _dio.get(
+        url,
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      final data = response.data['data'];
+      final loadedHistory = DiabetesHistory(
+        diabetesType: data['diabetes_type'],
+        yearOfDiagnosis: data['year_of_diagnosis'],
+        lastHbA1c: data['last_hba1c'] != null
+            ? double.tryParse(data['last_hba1c'].toString())
+            : null,
+        hasTreatmentDiet: data['treatment_diet_exercise'] != null,
+        hasTreatmentOral: data['treatment_oral_meds'] != null,
+        oralMedication: data['treatment_oral_meds'],
+        hasTreatmentInsulin: data['treatment_insulin'] != null,
+        insulinTypeDose: data['treatment_insulin'],
+      );
+
+      final loadedRiskFactors = RiskFactors(
+        hasHypertension: data['has_hypertension'] == 1,
+        hasDyslipidemia: data['has_dyslipidemia'] == 1,
+        hasCardiovascularDisease: data['has_cardiovascular_disease'] == 1,
+        hasNeuropathy: data['has_neuropathy'] == 1,
+        hasEyeDisease: data['has_eye_disease'] == 1,
+        hasKidneyDisease: data['has_kidney_disease'] == 1,
+        hasFamilyHistory: data['has_family_history'] == 1,
+        smokingStatus: data['smoking_status'],
+      );
+
+      final loadedLifestyleSelfCare = LifestyleSelfCare(
+        recentHypoglycemia: data['recent_hypoglycemia'],
+        physicalActivity: data['physical_activity'],
+        dietQuality: data['diet_quality'],
+      );
+
+      final loadedPhysicalSigns = PhysicalSigns(
+        eyesLastExamDate: data['eyes_last_exam_date']?.toString(),
+        eyesFindings: data['eyes_findings'],
+        kidneysEgfr: data['kidneys_egfr'],
+        kidneysUrineAcr: data['kidneys_urine_acr'],
+        feetSkinStatus: data['feet_skin_status'],
+        feetDeformityStatus: data['feet_deformity_status'],
+      );
+
+      emit(state.copyWith(
+        diabetesHistory: loadedHistory,
+        riskFactors: loadedRiskFactors,
+        lifestyleSelfCare: loadedLifestyleSelfCare,
+        physicalSigns: loadedPhysicalSigns,
+        isSubmitted: true,
+        isLoading: false,
+      ));
+    } catch (e, s) {
+      log('Error checking form status: $e',
+          name: 'DiabetesFormCubit', stackTrace: s);
+
+      emit(state.copyWith(
+        isSubmitted: false,
+        errorMessage: 'Failed to check your profile. Please try again.',
+        isLoading: false,
+      ));
+    }
+  }
 
   void updateDiabetesHistory(DiabetesHistory history) {
     emit(state.copyWith(diabetesHistory: history));
@@ -63,7 +137,7 @@ class DiabetesFormCubit extends Cubit<DiabetesFormState> {
         'feet_deformity_status': physicalSigns.feetDeformityStatus,
       };
 
-      const url = '${Const.BASE_URL}/diabetes-profiles';
+      const url = Const.API_DIABETES_PROFILE;
       final token = await Utils.getSpString(Const.TOKEN);
 
       final response = await _dio.post(

@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+
 class DiabetesFormState extends Equatable {
   final DiabetesHistory diabetesHistory;
   final RiskFactors riskFactors;
@@ -7,6 +8,7 @@ class DiabetesFormState extends Equatable {
   final PhysicalSigns physicalSigns;
   final bool isLoading;
   final String? errorMessage;
+  final bool isSubmitted; 
 
   const DiabetesFormState({
     this.diabetesHistory = const DiabetesHistory(),
@@ -15,6 +17,7 @@ class DiabetesFormState extends Equatable {
     this.physicalSigns = const PhysicalSigns(),
     this.isLoading = false,
     this.errorMessage,
+    this.isSubmitted = false,
   });
 
   DiabetesFormState copyWith({
@@ -24,6 +27,7 @@ class DiabetesFormState extends Equatable {
     PhysicalSigns? physicalSigns,
     bool? isLoading,
     String? errorMessage,
+    bool? isSubmitted,
   }) {
     return DiabetesFormState(
       diabetesHistory: diabetesHistory ?? this.diabetesHistory,
@@ -32,6 +36,7 @@ class DiabetesFormState extends Equatable {
       physicalSigns: physicalSigns ?? this.physicalSigns,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage ?? this.errorMessage,
+      isSubmitted: isSubmitted ?? this.isSubmitted,
     );
   }
 
@@ -43,6 +48,7 @@ class DiabetesFormState extends Equatable {
         physicalSigns,
         isLoading,
         errorMessage,
+        isSubmitted,
       ];
 }
 

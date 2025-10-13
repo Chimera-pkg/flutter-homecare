@@ -1,29 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:m2health/cubit/diabetes/diabetes_form_cubit.dart';
-import 'package:m2health/cubit/diabetes/pages/index.dart';
+import 'package:m2health/cubit/diabetes/bloc/diabetes_form_cubit.dart';
+import 'package:m2health/cubit/diabetes/pages/form/index.dart';
 import 'package:m2health/cubit/diabetes/widgets/diabetes_form_widget.dart';
 
-class DiabetesFormPage extends StatelessWidget {
+class DiabetesFormPage extends StatefulWidget {
   const DiabetesFormPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => DiabetesFormCubit(),
-      child: const DiabetesFormView(),
-    );
-  }
+  State<DiabetesFormPage> createState() => _DiabetesFormPageState();
 }
 
-class DiabetesFormView extends StatefulWidget {
-  const DiabetesFormView({super.key});
-
-  @override
-  State<DiabetesFormView> createState() => _DiabetesFormViewState();
-}
-
-class _DiabetesFormViewState extends State<DiabetesFormView> {
+class _DiabetesFormPageState extends State<DiabetesFormPage> {
   final _pageController = PageController();
   int _currentPage = 0;
 
@@ -86,14 +74,8 @@ class _DiabetesFormViewState extends State<DiabetesFormView> {
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: primaryColor,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25)), // Tombol lebih bulat
-            elevation: 0,
-          ),
+        child: PrimaryButton(
+          text: _currentPage == 3 ? 'Submit Form' : 'Next',
           onPressed: () {
             if (_currentPage == 3) {
               context.read<DiabetesFormCubit>().submitForm();
@@ -101,10 +83,6 @@ class _DiabetesFormViewState extends State<DiabetesFormView> {
               _nextPage();
             }
           },
-          child: Text(
-            _currentPage == 3 ? 'Submit Form' : 'Next',
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
         ),
       ),
     );

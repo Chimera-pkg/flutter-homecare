@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:m2health/cubit/diabetes/diabetes_form_cubit.dart';
-import 'package:m2health/cubit/diabetes/diabetes_form_state.dart';
+import 'package:m2health/cubit/diabetes/bloc/diabetes_form_cubit.dart';
+import 'package:m2health/cubit/diabetes/bloc/diabetes_form_state.dart';
 import 'package:m2health/cubit/diabetes/widgets/diabetes_form_widget.dart';
 
 class DiabetesHistoryPage extends StatefulWidget {
