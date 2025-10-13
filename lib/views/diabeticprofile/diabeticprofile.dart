@@ -1,4 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:m2health/const.dart';
+import 'package:m2health/utils.dart';
 
 class DiabetesFormPage extends StatefulWidget {
   const DiabetesFormPage({super.key});
@@ -112,10 +115,66 @@ class _DiabetesFormPageState extends State<DiabetesFormPage> {
     }
   }
 
-  void _submitForm() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Form submitted! Check console for data.')),
-    );
+  void _submitForm() async {
+    final formData = {
+      'diabetes_type': diabetesType,
+      'year_of_diagnosis': int.tryParse(yearDiagnosisController.text),
+      'last_hba1c': double.tryParse(lastHbA1cController.text),
+      'treatment_diet_exercise': treatmentDiet ? 'yes' : 'no',
+      'treatment_oral_meds':
+          treatmentOral ? oralMedicationsController.text : null,
+      'treatment_insulin':
+          treatmentInsulin ? insulinTypeDoseController.text : null,
+      'has_hypertension': riskFactors['Hypertension'] == 'Yes',
+      'has_dyslipidemia': riskFactors['Dyslipidemia'] == 'Yes',
+      'has_cardiovascular_disease':
+          riskFactors['Cardiovascular\nDisease'] == 'Yes',
+      'has_neuropathy': riskFactors['Neuropathy'] == 'Yes',
+      'has_eye_disease': riskFactors['Eye Disease\n(Retinopathy)'] == 'Yes',
+      'has_kidney_disease': riskFactors['Kidney Disease'] == 'Yes',
+      'has_family_history': riskFactors['Family History\nof Diabetes'] == 'Yes',
+      'smoking_status': riskFactors['Smoking'],
+      'recent_hypoglycemia': hypoglycemia,
+      'physical_activity': physicalActivity,
+      'diet_quality': dietQuality,
+      'eyes_last_exam_date': eyesExamDateController.text,
+      'eyes_findings': eyesFindingsController.text,
+      'kidneys_egfr': kidneyEgfrController.text,
+      'kidneys_urine_acr': kidneyAcrController.text,
+      'feet_skin_status': feetSkin,
+      'feet_deformity_status': feetDeformity,
+    };
+
+    try {
+      final dio = Dio();
+      const url = '${Const.BASE_URL}/diabetes-profiles';
+      final token = Utils.getSpString(Const.TOKEN);
+
+      final response = await dio.post(
+        url,
+        data: formData,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response.data['message'])),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${response.data['message']}')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred: $e')),
+      );
+    }
   }
 
   // --- Widget Builders ---
