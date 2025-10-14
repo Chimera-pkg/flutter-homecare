@@ -14,6 +14,7 @@ class DiabetesFormPage extends StatefulWidget {
 class _DiabetesFormPageState extends State<DiabetesFormPage> {
   final _pageController = PageController();
   int _currentPage = 0;
+  bool _canPop = false;
 
   @override
   void dispose() {
@@ -27,6 +28,56 @@ class _DiabetesFormPageState extends State<DiabetesFormPage> {
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
+    }
+  }
+
+  Future<bool> _showDiscardDialog() async {
+    final bool? shouldDiscard = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Discard Progress?'),
+          content: const Text(
+              'Are you sure you want to leave? Any unsaved changes will be lost.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(false); // Don't discard
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red,
+              ),
+              onPressed: () {
+                Navigator.of(dialogContext).pop(true); // Discard
+              },
+              child: const Text('Discard'),
+            ),
+          ],
+        );
+      },
+    );
+    return shouldDiscard ?? false;
+  }
+
+  void _handlePop() async {
+    if (_currentPage != 0) {
+      _pageController.previousPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+      return;
+    }
+
+    final bool didConfirm = await _showDiscardDialog();
+
+    if (didConfirm && mounted) {
+      setState(() {
+        _canPop = true;
+      });
+      Navigator.of(context).pop();
     }
   }
 
@@ -45,32 +96,32 @@ class _DiabetesFormPageState extends State<DiabetesFormPage> {
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            if (_currentPage == 0) {
-              Navigator.of(context).pop();
-            } else {
-              _pageController.previousPage(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-              );
-            }
-          },
+          onPressed: _handlePop,
         ),
       ),
-      body: PageView(
-        controller: _pageController,
-        physics: const NeverScrollableScrollPhysics(),
-        onPageChanged: (index) {
-          setState(() {
-            _currentPage = index;
-          });
+      body: PopScope(
+        canPop: _canPop,
+        onPopInvokedWithResult: (bool didPop, Object? result) {
+          if (didPop) {
+            return;
+          }
+          _handlePop();
         },
-        children: const [
-          DiabetesHistoryPage(),
-          RiskFactorsPage(),
-          LifestyleSelfCarePage(),
-          PhysicalSignsPage(),
-        ],
+        child: PageView(
+          controller: _pageController,
+          physics: const NeverScrollableScrollPhysics(),
+          onPageChanged: (index) {
+            setState(() {
+              _currentPage = index;
+            });
+          },
+          children: const [
+            DiabetesHistoryPage(),
+            RiskFactorsPage(),
+            LifestyleSelfCarePage(),
+            PhysicalSignsPage(),
+          ],
+        ),
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),

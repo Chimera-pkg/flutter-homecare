@@ -24,6 +24,8 @@ class DiabetesFormCubit extends Cubit<DiabetesFormState> {
       );
 
       final data = response.data['data'];
+      final bool hasBeenSubmitted = data['diabetes_type'] != null;
+
       final loadedHistory = DiabetesHistory(
         diabetesType: data['diabetes_type'],
         yearOfDiagnosis: data['year_of_diagnosis'],
@@ -68,10 +70,10 @@ class DiabetesFormCubit extends Cubit<DiabetesFormState> {
         riskFactors: loadedRiskFactors,
         lifestyleSelfCare: loadedLifestyleSelfCare,
         physicalSigns: loadedPhysicalSigns,
-        isSubmitted: true,
+        isSubmitted: hasBeenSubmitted,
         isLoading: false,
       ));
-      return true;
+      return hasBeenSubmitted;
     } catch (e, s) {
       log('Error checking form status: $e',
           name: 'DiabetesFormCubit', stackTrace: s);
