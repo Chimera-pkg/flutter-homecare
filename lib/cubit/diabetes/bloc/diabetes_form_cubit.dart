@@ -11,7 +11,7 @@ class DiabetesFormCubit extends Cubit<DiabetesFormState> {
 
   DiabetesFormCubit(this._dio) : super(const DiabetesFormState());
 
-  Future<void> loadForm() async {
+  Future<bool> loadForm() async {
     emit(state.copyWith(isLoading: true, errorMessage: null));
 
     try {
@@ -71,6 +71,7 @@ class DiabetesFormCubit extends Cubit<DiabetesFormState> {
         isSubmitted: true,
         isLoading: false,
       ));
+      return true;
     } catch (e, s) {
       log('Error checking form status: $e',
           name: 'DiabetesFormCubit', stackTrace: s);
@@ -80,6 +81,8 @@ class DiabetesFormCubit extends Cubit<DiabetesFormState> {
         errorMessage: 'Failed to check your profile. Please try again.',
         isLoading: false,
       ));
+
+      return false;
     }
   }
 

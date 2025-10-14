@@ -31,61 +31,51 @@ class DiabeticCare extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<DiabetesFormCubit, DiabetesFormState>(
-      listener: (context, state) {
-        if (state.isSubmitted) {
-          GoRouter.of(context).goNamed(AppRoutes.diabeticProfileSummary);
-        } else {
-          GoRouter.of(context).goNamed(AppRoutes.diabeticProfileForm);
-        }
-        // if (state.errorMessage != null) {
-        //   ScaffoldMessenger.of(context).showSnackBar(
-        //     const SnackBar(
-        //       content: Text(
-        //         'Failed to fetch last form submission',
-        //         style: TextStyle(color: Colors.black),
-        //       ),
-        //       backgroundColor: Colors.amber,
-        //     ),
-        //   );
-        // }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(AppLocalizations.of(context)!.translate('diabetic_care2'),
-              style:
-                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        ),
-        body: Container(
-          margin: const EdgeInsets.fromLTRB(0, 0, 0, 60.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  itemCount: diabeticCareMenus.length,
-                  itemBuilder: (context, index) {
-                    final menu = diabeticCareMenus[index];
-                    return BlocBuilder<DiabetesFormCubit, DiabetesFormState>(
-                      builder: (context, state) {
-                        return DiabeticCard(
-                          pharma: menu,
-                          isLoading: state.isLoading,
-                          onTap: () =>
-                              context.read<DiabetesFormCubit>().loadForm(),
-                          color: Color(int.parse('0xFF${menu['color']}'))
-                              .withValues(
-                                  alpha: menu['opacity'] != null
-                                      ? double.parse(menu['opacity']!)
-                                      : 1.0),
-                        );
-                      },
-                    );
-                  },
-                ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context)!.translate('diabetic_care2'),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+      ),
+      body: Container(
+        margin: const EdgeInsets.fromLTRB(0, 0, 0, 60.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: diabeticCareMenus.length,
+                itemBuilder: (context, index) {
+                  final menu = diabeticCareMenus[index];
+                  return BlocBuilder<DiabetesFormCubit, DiabetesFormState>(
+                    builder: (context, state) {
+                      return DiabeticCard(
+                        pharma: menu,
+                        isLoading: state.isLoading,
+                        onTap: () async {
+                          final bool hasForm = await context
+                              .read<DiabetesFormCubit>()
+                              .loadForm();
+                          if (!context.mounted) return;
+                          if (hasForm) {
+                            GoRouter.of(context)
+                                .goNamed(AppRoutes.diabeticProfileSummary);
+                          } else {
+                            GoRouter.of(context)
+                                .goNamed(AppRoutes.diabeticProfileForm);
+                          }
+                        },
+                        color: Color(int.parse('0xFF${menu['color']}'))
+                            .withValues(
+                                alpha: menu['opacity'] != null
+                                    ? double.parse(menu['opacity']!)
+                                    : 1.0),
+                      );
+                    },
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
