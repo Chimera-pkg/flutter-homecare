@@ -399,8 +399,12 @@ class _ActionButtons extends StatelessWidget {
         PrimaryButton(
           text: 'Edit Information',
           icon: Icons.edit,
-          onPressed: () {
-            GoRouter.of(context).pushNamed(AppRoutes.diabeticProfileForm);
+          onPressed: () async {
+            await GoRouter.of(context).pushNamed(AppRoutes.diabeticProfileForm);
+
+            // Force a refresh to discard any unsaved changes and get the latest data from the server.
+            if (!context.mounted) return;
+            await context.read<DiabetesFormCubit>().loadForm();
           },
         )
       ],
