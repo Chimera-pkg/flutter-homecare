@@ -26,44 +26,51 @@ class DiabetesFormCubit extends Cubit<DiabetesFormState> {
       final data = response.data['data'];
       final bool hasBeenSubmitted = data['diabetes_type'] != null;
 
-      final loadedHistory = DiabetesHistory(
-        diabetesType: data['diabetes_type'],
-        yearOfDiagnosis: data['year_of_diagnosis'],
-        lastHbA1c: data['last_hba1c'] != null
-            ? double.tryParse(data['last_hba1c'].toString())
-            : null,
-        hasTreatmentDiet: data['treatment_diet_exercise'] != null,
-        hasTreatmentOral: data['treatment_oral_meds'] != null,
-        oralMedication: data['treatment_oral_meds'],
-        hasTreatmentInsulin: data['treatment_insulin'] != null,
-        insulinTypeDose: data['treatment_insulin'],
-      );
+      DiabetesHistory loadedHistory = const DiabetesHistory();
+      RiskFactors loadedRiskFactors = const RiskFactors();
+      LifestyleSelfCare loadedLifestyleSelfCare = const LifestyleSelfCare();
+      PhysicalSigns loadedPhysicalSigns = const PhysicalSigns();
 
-      final loadedRiskFactors = RiskFactors(
-        hasHypertension: data['has_hypertension'] == 1,
-        hasDyslipidemia: data['has_dyslipidemia'] == 1,
-        hasCardiovascularDisease: data['has_cardiovascular_disease'] == 1,
-        hasNeuropathy: data['has_neuropathy'] == 1,
-        hasEyeDisease: data['has_eye_disease'] == 1,
-        hasKidneyDisease: data['has_kidney_disease'] == 1,
-        hasFamilyHistory: data['has_family_history'] == 1,
-        smokingStatus: data['smoking_status'],
-      );
+      if (hasBeenSubmitted) {
+        loadedHistory = DiabetesHistory(
+          diabetesType: data['diabetes_type'],
+          yearOfDiagnosis: data['year_of_diagnosis'],
+          lastHbA1c: data['last_hba1c'] != null
+              ? double.tryParse(data['last_hba1c'].toString())
+              : null,
+          hasTreatmentDiet: data['treatment_diet_exercise'] != null,
+          hasTreatmentOral: data['treatment_oral_meds'] != null,
+          oralMedication: data['treatment_oral_meds'],
+          hasTreatmentInsulin: data['treatment_insulin'] != null,
+          insulinTypeDose: data['treatment_insulin'],
+        );
 
-      final loadedLifestyleSelfCare = LifestyleSelfCare(
-        recentHypoglycemia: data['recent_hypoglycemia'],
-        physicalActivity: data['physical_activity'],
-        dietQuality: data['diet_quality'],
-      );
+        loadedRiskFactors = RiskFactors(
+          hasHypertension: data['has_hypertension'] == 1,
+          hasDyslipidemia: data['has_dyslipidemia'] == 1,
+          hasCardiovascularDisease: data['has_cardiovascular_disease'] == 1,
+          hasNeuropathy: data['has_neuropathy'] == 1,
+          hasEyeDisease: data['has_eye_disease'] == 1,
+          hasKidneyDisease: data['has_kidney_disease'] == 1,
+          hasFamilyHistory: data['has_family_history'] == 1,
+          smokingStatus: data['smoking_status'],
+        );
 
-      final loadedPhysicalSigns = PhysicalSigns(
-        eyesLastExamDate: data['eyes_last_exam_date']?.toString(),
-        eyesFindings: data['eyes_findings'],
-        kidneysEgfr: data['kidneys_egfr'],
-        kidneysUrineAcr: data['kidneys_urine_acr'],
-        feetSkinStatus: data['feet_skin_status'],
-        feetDeformityStatus: data['feet_deformity_status'],
-      );
+        loadedLifestyleSelfCare = LifestyleSelfCare(
+          recentHypoglycemia: data['recent_hypoglycemia'],
+          physicalActivity: data['physical_activity'],
+          dietQuality: data['diet_quality'],
+        );
+
+        loadedPhysicalSigns = PhysicalSigns(
+          eyesLastExamDate: data['eyes_last_exam_date']?.toString(),
+          eyesFindings: data['eyes_findings'],
+          kidneysEgfr: data['kidneys_egfr'],
+          kidneysUrineAcr: data['kidneys_urine_acr'],
+          feetSkinStatus: data['feet_skin_status'],
+          feetDeformityStatus: data['feet_deformity_status'],
+        );
+      }
 
       emit(state.copyWith(
         diabetesHistory: loadedHistory,
@@ -104,7 +111,7 @@ class DiabetesFormCubit extends Cubit<DiabetesFormState> {
     emit(state.copyWith(physicalSigns: signs));
   }
 
-  Future<void> submitForm() async {
+  Future<bool> submitForm() async {
     emit(state.copyWith(isLoading: true, errorMessage: null));
 
     final diabetesHistory = state.diabetesHistory;
@@ -112,7 +119,7 @@ class DiabetesFormCubit extends Cubit<DiabetesFormState> {
     final lifestyle = state.lifestyleSelfCare;
     final physicalSigns = state.physicalSigns;
     try {
-      final formData = {
+      final formData = FormData.fromMap({
         'diabetesType': diabetesHistory.diabetesType,
         'yearOfDiagnosis': diabetesHistory.yearOfDiagnosis,
         'lastHba1c': diabetesHistory.lastHbA1c,
@@ -140,7 +147,7 @@ class DiabetesFormCubit extends Cubit<DiabetesFormState> {
         'kidneysUrineAcr': physicalSigns.kidneysUrineAcr,
         'feetSkinStatus': physicalSigns.feetSkinStatus,
         'feetDeformityStatus': physicalSigns.feetDeformityStatus,
-      };
+      });
 
       const url = Const.API_DIABETES_PROFILE;
       final token = await Utils.getSpString(Const.TOKEN);
@@ -156,19 +163,37 @@ class DiabetesFormCubit extends Cubit<DiabetesFormState> {
         ),
       );
 
-      if (response.statusCode == 200) {
-        emit(state.copyWith(isLoading: false));
-      } else {
-        emit(state.copyWith(
-          isLoading: false,
-          errorMessage: 'Error: ${response.data['message']}',
-        ));
-      }
-    } catch (e) {
       emit(state.copyWith(
         isLoading: false,
-        errorMessage: 'An error occurred: $e',
+        isSubmitted: true,
       ));
+      return true;
+    } on DioException catch (dioError, s) {
+      final errorMessage =
+          dioError.response?.data['message'] ?? 'An error occurred';
+      log(
+        'Dio error submitting form: $errorMessage',
+        name: 'DiabetesFormCubit',
+        error: dioError,
+        stackTrace: s,
+      );
+      emit(state.copyWith(
+        isLoading: false,
+        errorMessage: 'An error occured.',
+      ));
+      return false;
+    } catch (e, s) {
+      log(
+        'Error submitting form: $e',
+        name: 'DiabetesFormCubit',
+        error: e,
+        stackTrace: s,
+      );
+      emit(state.copyWith(
+        isLoading: false,
+        errorMessage: 'An error occurred.',
+      ));
+      return false;
     }
   }
 }

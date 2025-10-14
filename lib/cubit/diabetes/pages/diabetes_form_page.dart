@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:m2health/cubit/diabetes/bloc/diabetes_form_cubit.dart';
+import 'package:m2health/cubit/diabetes/bloc/diabetes_form_state.dart';
 import 'package:m2health/cubit/diabetes/pages/form/index.dart';
 import 'package:m2health/cubit/diabetes/widgets/diabetes_form_widget.dart';
+import 'package:m2health/route/app_routes.dart';
 
 class DiabetesFormPage extends StatefulWidget {
   const DiabetesFormPage({super.key});
@@ -29,6 +32,40 @@ class _DiabetesFormPageState extends State<DiabetesFormPage> {
         curve: Curves.easeInOut,
       );
     }
+  }
+
+  void _submitFormAndShowDialog() async {
+    final success = await context.read<DiabetesFormCubit>().submitForm();
+    if (!mounted) return;
+    if (!success) {
+      final errorMessage =
+          context.read<DiabetesFormCubit>().state.errorMessage ??
+              'An unknown error occurred.';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Success!'),
+        content: const Text(
+            'Your Diabetes Profile has been submitted successfully.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              GoRouter.of(context).goNamed(AppRoutes.diabeticProfileSummary);
+            },
+            child: const Text('View Details'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<bool> _showDiscardDialog() async {
@@ -125,14 +162,19 @@ class _DiabetesFormPageState extends State<DiabetesFormPage> {
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: PrimaryButton(
-          text: _currentPage == 3 ? 'Submit Form' : 'Next',
-          onPressed: () {
-            if (_currentPage == 3) {
-              context.read<DiabetesFormCubit>().submitForm();
-            } else {
-              _nextPage();
-            }
+        child: BlocBuilder<DiabetesFormCubit, DiabetesFormState>(
+          builder: (context, state) {
+            return PrimaryButton(
+              text: _currentPage == 3 ? 'Submit Form' : 'Next',
+              isLoading: state.isLoading,
+              onPressed: () {
+                if (_currentPage == 3) {
+                  _submitFormAndShowDialog();
+                } else {
+                  _nextPage();
+                }
+              },
+            );
           },
         ),
       ),
