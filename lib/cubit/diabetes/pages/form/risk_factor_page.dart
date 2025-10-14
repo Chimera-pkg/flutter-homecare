@@ -4,8 +4,28 @@ import 'package:m2health/cubit/diabetes/bloc/diabetes_form_cubit.dart';
 import 'package:m2health/cubit/diabetes/bloc/diabetes_form_state.dart';
 import 'package:m2health/cubit/diabetes/widgets/diabetes_form_widget.dart';
 
-class RiskFactorsPage extends StatelessWidget {
+class RiskFactorsPage extends StatefulWidget {
   const RiskFactorsPage({super.key});
+
+  @override
+  State<RiskFactorsPage> createState() => RiskFactorsPageState();
+}
+
+class RiskFactorsPageState extends State<RiskFactorsPage> {
+  String? validate() {
+    final factors = context.read<DiabetesFormCubit>().state.riskFactors;
+    if (factors.hasHypertension == null ||
+        factors.hasDyslipidemia == null ||
+        factors.hasCardiovascularDisease == null ||
+        factors.hasNeuropathy == null ||
+        factors.hasEyeDisease == null ||
+        factors.hasKidneyDisease == null ||
+        factors.hasFamilyHistory == null ||
+        factors.smokingStatus == null) {
+      return 'Please answer all questions on this page.';
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {

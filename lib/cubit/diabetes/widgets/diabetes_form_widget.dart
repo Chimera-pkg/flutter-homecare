@@ -68,6 +68,7 @@ class FormInputDecoration extends InputDecoration {
       : super(
           fillColor: Colors.white,
           filled: true,
+          hintStyle: const TextStyle(color: Colors.grey),
           border: const OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(8.0)),
             borderSide: BorderSide(color: Colors.grey),
