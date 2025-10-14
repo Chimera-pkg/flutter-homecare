@@ -14,6 +14,7 @@ class Const {
   static const String API_MEDICAL_RECORDS = URL_API + '/medical-records';
   static const String API_PERSONAL_CASES = URL_API + '/personal-cases';
   static const String API_CERTIFICATES = URL_API + '/certificates';
+  static const String API_DIABETES_PROFILE = '$URL_API/diabetes-profile';
 
   // Personal Cases
   static const String API_NURSING_PERSONAL_CASES =

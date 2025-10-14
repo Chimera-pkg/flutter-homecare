@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:m2health/cubit/diabetes/bloc/diabetes_form_cubit.dart';
 import 'package:m2health/cubit/medical_record/domain/usecases/get_medical_records.dart';
 import 'package:m2health/cubit/medical_record/presentation/bloc/medical_record_bloc.dart';
 import 'package:m2health/cubit/nursingclean/domain/repositories/nursing_appointment_repository.dart';
@@ -141,7 +142,8 @@ void main() async {
         // Medical Record Module
         BlocProvider(
             create: (context) =>
-                MedicalRecordBloc(getMedicalRecords: sl<GetMedicalRecords>()))
+                MedicalRecordBloc(getMedicalRecords: sl<GetMedicalRecords>())),
+        BlocProvider(create: (context) => DiabetesFormCubit(sl<Dio>())),
       ],
       child: ChangeNotifierProvider(
         create: (context) => AppLanguage(),
