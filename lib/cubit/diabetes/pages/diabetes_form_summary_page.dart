@@ -9,6 +9,10 @@ import 'package:m2health/route/app_routes.dart';
 class DiabetesFormSummaryPage extends StatelessWidget {
   const DiabetesFormSummaryPage({super.key});
 
+  Future<void> _refreshData(BuildContext context) async {
+    await context.read<DiabetesFormCubit>().loadForm();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,26 +29,29 @@ class DiabetesFormSummaryPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: BlocBuilder<DiabetesFormCubit, DiabetesFormState>(
-        builder: (context, state) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _DiabetesHistorySection(state: state),
-                const SizedBox(height: 24),
-                _RiskFactorsSection(state: state),
-                const SizedBox(height: 24),
-                _LifestyleSection(state: state),
-                const SizedBox(height: 24),
-                _PhysicalSignsSection(state: state),
-                const SizedBox(height: 32),
-                const _ActionButtons(),
-              ],
-            ),
-          );
-        },
+      body: RefreshIndicator(
+        onRefresh: () => _refreshData(context),
+        child: BlocBuilder<DiabetesFormCubit, DiabetesFormState>(
+          builder: (context, state) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _DiabetesHistorySection(state: state),
+                  const SizedBox(height: 24),
+                  _RiskFactorsSection(state: state),
+                  const SizedBox(height: 24),
+                  _LifestyleSection(state: state),
+                  const SizedBox(height: 24),
+                  _PhysicalSignsSection(state: state),
+                  const SizedBox(height: 32),
+                  const _ActionButtons(),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
