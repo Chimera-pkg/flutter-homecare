@@ -145,10 +145,11 @@ class _DiabetesHistorySection extends StatelessWidget {
       treatments.add('Diet & Exercise');
     }
     if (history.hasTreatmentOral) {
-      treatments.add('Oral Medications: ${history.oralMedication ?? '-'}');
+      treatments
+          .add('Oral Medications: ${_getValueText(history.oralMedication)}');
     }
     if (history.hasTreatmentInsulin) {
-      treatments.add('Insulin: ${history.insulinTypeDose ?? '-'}');
+      treatments.add('Insulin: ${_getValueText(history.insulinTypeDose)}');
     }
     return treatments.isEmpty ? 'None' : treatments.join('\n');
   }
@@ -178,7 +179,7 @@ class _DiabetesHistorySection extends StatelessWidget {
                     child: _SummaryItem(
                       iconPath: 'assets/icons/ic_calendar.png',
                       label: 'Year of Diagnosis',
-                      value: history.yearOfDiagnosis?.toString() ?? '-',
+                      value: _getValueText(history.yearOfDiagnosis?.toString()),
                     ),
                   ),
                   Expanded(
@@ -273,7 +274,7 @@ class _RiskFactorsSection extends StatelessWidget {
               _SummaryItem(
                 iconPath: 'assets/icons/ic_smoking.png',
                 label: 'Smoking',
-                value: factors.smokingStatus ?? '-',
+                value: _getValueText(factors.smokingStatus),
               ),
             ],
           ),
@@ -303,19 +304,19 @@ class _LifestyleSection extends StatelessWidget {
               _SummaryItem(
                 icon: Icons.bloodtype,
                 label: 'Recent Hypoglycemia',
-                value: lifestyle.recentHypoglycemia ?? '-',
+                value: _getValueText(lifestyle.recentHypoglycemia),
               ),
               const SizedBox(height: 16),
               _SummaryItem(
                 icon: Icons.directions_run,
                 label: 'Physical Activity',
-                value: lifestyle.physicalActivity ?? '-',
+                value: _getValueText(lifestyle.physicalActivity),
               ),
               const SizedBox(height: 16),
               _SummaryItem(
                 icon: Icons.restaurant,
                 label: 'Diet Quality',
-                value: lifestyle.dietQuality ?? '-',
+                value: _getValueText(lifestyle.dietQuality),
               ),
             ],
           ),
@@ -354,32 +355,32 @@ class _PhysicalSignsSection extends StatelessWidget {
               _SummaryItem(
                 iconPath: 'assets/icons/ic_eyes.png',
                 label: 'Eyes (Last Exam)',
-                value: signs.eyesLastExamDate ?? '-',
+                value: _getValueText(signs.eyesLastExamDate),
               ),
               _SummaryItem(
                 iconPath: 'assets/icons/ic_eyes.png',
                 label: 'Eyes (Findings)',
-                value: signs.eyesFindings ?? '-',
+                value: _getValueText(signs.eyesFindings),
               ),
               _SummaryItem(
                 iconPath: 'assets/icons/ic_kidney.png',
                 label: 'Kidneys (eGFR)',
-                value: signs.kidneysEgfr ?? '-',
+                value: _getValueText(signs.kidneysEgfr),
               ),
               _SummaryItem(
                 iconPath: 'assets/icons/ic_kidney.png',
                 label: 'Kidneys (Urine ACR)',
-                value: signs.kidneysUrineAcr ?? '-',
+                value: _getValueText(signs.kidneysUrineAcr),
               ),
               _SummaryItem(
                 iconPath: 'assets/icons/ic_feet.png',
                 label: 'Feet (Skin)',
-                value: signs.feetSkinStatus ?? '-',
+                value: _getValueText(signs.feetSkinStatus),
               ),
               _SummaryItem(
                 iconPath: 'assets/icons/ic_feet.png',
                 label: 'Feet (Deformity)',
-                value: signs.feetDeformityStatus ?? '-',
+                value: _getValueText(signs.feetDeformityStatus),
               ),
             ],
           ),
@@ -410,4 +411,11 @@ class _ActionButtons extends StatelessWidget {
       ],
     );
   }
+}
+
+String _getValueText(String? value) {
+  if (value == null || value.trim().isEmpty) {
+    return '-';
+  }
+  return value;
 }

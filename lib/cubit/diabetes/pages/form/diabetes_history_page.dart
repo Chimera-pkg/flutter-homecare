@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/cubit/diabetes/bloc/diabetes_form_cubit.dart';
 import 'package:m2health/cubit/diabetes/bloc/diabetes_form_state.dart';
@@ -8,27 +9,46 @@ class DiabetesHistoryPage extends StatefulWidget {
   const DiabetesHistoryPage({super.key});
 
   @override
-  State<DiabetesHistoryPage> createState() => _DiabetesHistoryPageState();
+  State<DiabetesHistoryPage> createState() => DiabetesHistoryPageState();
 }
 
-class _DiabetesHistoryPageState extends State<DiabetesHistoryPage> {
+class DiabetesHistoryPageState extends State<DiabetesHistoryPage> {
+  final _formKey = GlobalKey<FormState>();
   final _otherDiabetesTypeController = TextEditingController();
   final _yearDiagnosisController = TextEditingController();
   final _lastHbA1cController = TextEditingController();
   final _oralMedicationsController = TextEditingController();
   final _insulinTypeDoseController = TextEditingController();
 
+  static const List<String> _predefinedDiabetesTypes = [
+    'Type 1',
+    'Type 2',
+    'Gestational'
+  ];
+  String? _selectedRadioOption;
+
+  bool validate() {
+    return _formKey.currentState?.validate() ?? true;
+  }
+
   @override
   void initState() {
     super.initState();
     // Initialize controllers from the cubit's state
     final history = context.read<DiabetesFormCubit>().state.diabetesHistory;
-    _otherDiabetesTypeController.text =
-        history.hasOtherDiabetesType ? history.diabetesType ?? '' : '';
     _yearDiagnosisController.text = history.yearOfDiagnosis?.toString() ?? '';
     _lastHbA1cController.text = history.lastHbA1c?.toString() ?? '';
     _oralMedicationsController.text = history.oralMedication ?? '';
     _insulinTypeDoseController.text = history.insulinTypeDose ?? '';
+
+    if (history.diabetesType != null) {
+      if (_predefinedDiabetesTypes.contains(history.diabetesType)) {
+        _selectedRadioOption = history.diabetesType;
+      } else {
+        _selectedRadioOption = 'Other';
+        _otherDiabetesTypeController.text = history.diabetesType!;
+      }
+    }
   }
 
   @override
@@ -43,8 +63,17 @@ class _DiabetesHistoryPageState extends State<DiabetesHistoryPage> {
 
   void _updateState() {
     final oldHistory = context.read<DiabetesFormCubit>().state.diabetesHistory;
+
+    String? newDiabetesType;
+    if (_selectedRadioOption == 'Other') {
+      newDiabetesType = _otherDiabetesTypeController.text;
+    } else {
+      newDiabetesType = _selectedRadioOption;
+    }
+
     context.read<DiabetesFormCubit>().updateDiabetesHistory(
           oldHistory.copyWith(
+            diabetesType: newDiabetesType,
             yearOfDiagnosis: int.tryParse(_yearDiagnosisController.text),
             lastHbA1c: double.tryParse(_lastHbA1cController.text),
             oralMedication: _oralMedicationsController.text,
@@ -55,143 +84,245 @@ class _DiabetesHistoryPageState extends State<DiabetesHistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    const diabetesTypes = ['Type 1', 'Type 2', 'Gestational'];
+    const diabetesRadioOptions = [..._predefinedDiabetesTypes, 'Other'];
 
-    return BlocBuilder<DiabetesFormCubit, DiabetesFormState>(
+    return BlocConsumer<DiabetesFormCubit, DiabetesFormState>(
+      listener: (context, state) {
+        // final newType = state.diabetesHistory.diabetesType;
+        // if (newType == null) {
+        //   _selectedRadioOption = null;
+        //   return;
+        // }
+        // if (_predefinedDiabetesTypes.contains(newType)) {
+        //   _selectedRadioOption = newType;
+        //   return;
+        // }
+        // _selectedRadioOption = 'Other';
+        // if (_otherDiabetesTypeController.text != newType) {
+        //   _otherDiabetesTypeController.text = newType;
+        // }
+      },
       builder: (context, state) {
         final history = state.diabetesHistory;
         return SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const FormSectionHeader('Diabetes History'),
-              const FormSubHeader('Type of Diabetes:',
-                  iconPath: "assets/icons/ic_diabetes_type.png"),
-              Wrap(
-                spacing: 0.0,
-                runSpacing: -10.0,
-                children: diabetesTypes.map((type) {
-                  return Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Radio<String>(
-                        value: type,
-                        activeColor: primaryColor,
-                        groupValue: history.diabetesType,
-                        onChanged: (v) {
-                          context
-                              .read<DiabetesFormCubit>()
-                              .updateDiabetesHistory(
-                                  history.copyWith(diabetesType: v));
-                        },
-                      ),
-                      Text(type),
-                    ],
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 8),
-              const Text('Other:'),
-              const SizedBox(height: 8),
-              TextFormField(
-                controller: _otherDiabetesTypeController,
-                onChanged: (_) => _updateState(),
-                decoration: const FormInputDecoration()
-                    .copyWith(hintText: 'Please enter your type of diabetes'),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const FormSectionHeader('Diabetes History'),
+                const FormSubHeader('Type of Diabetes:',
+                    iconPath: "assets/icons/ic_diabetes_type.png"),
+                FormField<String>(
+                  builder: (FormFieldState<String> field) {
+                    return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const FormSubHeader('Year of Diagnosis:',
-                            iconPath: "assets/icons/ic_calendar.png"),
-                        const SizedBox(height: 8),
-                        TextFormField(
-                          controller: _yearDiagnosisController,
-                          onChanged: (_) => _updateState(),
-                          decoration: const FormInputDecoration()
-                              .copyWith(hintText: 'e.g 2021'),
-                          keyboardType: TextInputType.number,
+                        Wrap(
+                          spacing: 10.0,
+                          runSpacing: -4.0,
+                          children: diabetesRadioOptions.map((type) {
+                            return Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Radio<String>(
+                                  value: type,
+                                  activeColor: primaryColor,
+                                  groupValue: _selectedRadioOption,
+                                  onChanged: (v) {
+                                    setState(() {
+                                      _selectedRadioOption = v;
+                                    });
+                                    if (v != 'Other') {
+                                      _otherDiabetesTypeController.clear();
+                                    }
+                                    _updateState();
+                                    field.didChange(v);
+                                  },
+                                ),
+                                Text(type),
+                              ],
+                            );
+                          }).toList(),
                         ),
+                        if (field.hasError)
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(left: 12.0, top: 5.0),
+                            child: Text(
+                              field.errorText!,
+                              style: TextStyle(
+                                  color: Theme.of(context).colorScheme.error,
+                                  fontSize: 12),
+                            ),
+                          ),
                       ],
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const FormSubHeader('Last HbA1c:',
-                            iconPath: "assets/icons/ic_blood_measurement.png"),
-                        const SizedBox(height: 8),
-                        TextFormField(
-                          controller: _lastHbA1cController,
-                          onChanged: (_) => _updateState(),
-                          decoration: const FormInputDecoration()
-                              .copyWith(hintText: 'E.g 5.0%'),
-                          keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true),
-                        ),
-                      ],
+                    );
+                  },
+                  validator: (value) {
+                    if (_selectedRadioOption == null) {
+                      return 'Please select an option.';
+                    }
+                    return null;
+                  },
+                ),
+                if (_selectedRadioOption == 'Other') ...[
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16.0),
+                    child: TextFormField(
+                      controller: _otherDiabetesTypeController,
+                      onChanged: (_) => _updateState(),
+                      decoration: const FormInputDecoration().copyWith(
+                          hintText: 'Please enter your type of diabetes'),
+                      validator: (value) {
+                        if (_selectedRadioOption != 'Other') return null;
+                        if (_otherDiabetesTypeController.text.trim().isEmpty) {
+                          return 'Please specify your type of diabetes.';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                 ],
-              ),
-              const SizedBox(height: 24),
-              const FormSubHeader('Current Treatment:',
-                  iconPath: "assets/icons/ic_medical_checklist.png"),
-              FormCheckbox(
-                title: 'Diet & Exercise',
-                value: history.hasTreatmentDiet,
-                onChanged: (v) {
-                  context.read<DiabetesFormCubit>().updateDiabetesHistory(
-                      history.copyWith(hasTreatmentDiet: v));
-                },
-              ),
-              FormCheckbox(
-                title: 'Oral Medications',
-                value: history.hasTreatmentOral,
-                onChanged: (v) {
-                  context.read<DiabetesFormCubit>().updateDiabetesHistory(
-                      history.copyWith(hasTreatmentOral: v));
-                },
-              ),
-              if (history.hasTreatmentOral)
-                Padding(
-                  padding: const EdgeInsets.only(
-                      left: 16.0, right: 8, top: 8, bottom: 8),
-                  child: TextFormField(
-                    controller: _oralMedicationsController,
-                    onChanged: (_) => _updateState(),
-                    decoration: const FormInputDecoration()
-                        .copyWith(hintText: 'List medications...'),
-                  ),
+                const SizedBox(height: 24),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const FormSubHeader('Year of Diagnosis:',
+                              iconPath: "assets/icons/ic_calendar.png"),
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            controller: _yearDiagnosisController,
+                            onChanged: (_) => _updateState(),
+                            decoration: const FormInputDecoration()
+                                .copyWith(hintText: 'e.g 2021'),
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(4),
+                            ],
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return null; // Not required, so no error if empty
+                              }
+                              if (value.length != 4 ||
+                                  int.tryParse(value) == null ||
+                                  int.parse(value) > DateTime.now().year) {
+                                return 'Invalid year.';
+                              }
+                              return null;
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const FormSubHeader('Last HbA1c:',
+                              iconPath:
+                                  "assets/icons/ic_blood_measurement.png"),
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            controller: _lastHbA1cController,
+                            onChanged: (_) => _updateState(),
+                            decoration: const FormInputDecoration()
+                                .copyWith(hintText: "5.0", suffixText: '%'),
+                            keyboardType: const TextInputType.numberWithOptions(
+                                decimal: true),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return null; // Not required
+                              }
+                              final hba1c = double.tryParse(value);
+                              if (hba1c == null || hba1c < 0 || hba1c > 100) {
+                                return 'Invalid value.';
+                              }
+                              return null;
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              FormCheckbox(
-                title: 'Insulin',
-                value: history.hasTreatmentInsulin,
-                onChanged: (v) {
-                  context.read<DiabetesFormCubit>().updateDiabetesHistory(
-                      history.copyWith(hasTreatmentInsulin: v));
-                },
-              ),
-              if (history.hasTreatmentInsulin)
-                Padding(
-                  padding: const EdgeInsets.only(
-                      left: 16.0, right: 8, top: 8, bottom: 8),
-                  child: TextFormField(
-                    controller: _insulinTypeDoseController,
-                    onChanged: (_) => _updateState(),
-                    decoration: const FormInputDecoration()
-                        .copyWith(hintText: 'Type & dose'),
-                  ),
+                const SizedBox(height: 24),
+                const FormSubHeader('Current Treatment:',
+                    iconPath: "assets/icons/ic_medical_checklist.png"),
+                FormCheckbox(
+                  title: 'Diet & Exercise',
+                  value: history.hasTreatmentDiet,
+                  onChanged: (v) {
+                    context.read<DiabetesFormCubit>().updateDiabetesHistory(
+                        history.copyWith(hasTreatmentDiet: v));
+                  },
                 ),
-            ],
+                FormCheckbox(
+                  title: 'Oral Medications',
+                  value: history.hasTreatmentOral,
+                  onChanged: (v) {
+                    context.read<DiabetesFormCubit>().updateDiabetesHistory(
+                        history.copyWith(hasTreatmentOral: v));
+                  },
+                ),
+                if (history.hasTreatmentOral)
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        left: 16.0, right: 8, top: 8, bottom: 8),
+                    child: TextFormField(
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                      controller: _oralMedicationsController,
+                      onChanged: (_) => _updateState(),
+                      decoration: const FormInputDecoration()
+                          .copyWith(hintText: 'List medications...'),
+                      validator: (value) {
+                        if (!history.hasTreatmentOral) return null;
+                        if (value == null || value.isEmpty) {
+                          return 'Please list your oral medications.';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                FormCheckbox(
+                  title: 'Insulin',
+                  value: history.hasTreatmentInsulin,
+                  onChanged: (v) {
+                    context.read<DiabetesFormCubit>().updateDiabetesHistory(
+                        history.copyWith(hasTreatmentInsulin: v));
+                  },
+                ),
+                if (history.hasTreatmentInsulin)
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        left: 16.0, right: 8, top: 8, bottom: 8),
+                    child: TextFormField(
+                      controller: _insulinTypeDoseController,
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                      onChanged: (_) => _updateState(),
+                      decoration: const FormInputDecoration()
+                          .copyWith(hintText: 'Type & dose'),
+                      validator: (value) {
+                        if (!history.hasTreatmentInsulin) return null;
+                        if (value == null || value.isEmpty) {
+                          return 'Please specify your insulin type & dose.';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+              ],
+            ),
           ),
         );
       },

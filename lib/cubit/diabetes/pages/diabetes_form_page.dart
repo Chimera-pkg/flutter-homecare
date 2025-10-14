@@ -19,19 +19,47 @@ class _DiabetesFormPageState extends State<DiabetesFormPage> {
   int _currentPage = 0;
   bool _canPop = false;
 
+  final _diabetesHistoryPageKey = GlobalKey<DiabetesHistoryPageState>();
+  final _riskFactorsPageKey = GlobalKey<RiskFactorsPageState>();
+  final _lifestylePageKey = GlobalKey<LifestyleSelfCarePageState>();
+  final _physicalSignPageKey = GlobalKey<PhysicalSignsPageState>();
+
   @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
   }
 
-  void _nextPage() {
-    if (_currentPage < 3) {
-      _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
+  bool _validatePage() {
+    String? error;
+    switch (_currentPage) {
+      case 0:
+        return _diabetesHistoryPageKey.currentState?.validate() ?? true;
+      case 1:
+        error = _riskFactorsPageKey.currentState?.validate();
+      case 2:
+        error = _lifestylePageKey.currentState?.validate();
+      case 3:
+        return _physicalSignPageKey.currentState?.validate() ?? true;
+      default:
+        return false;
     }
+
+    if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error), backgroundColor: Colors.red),
+      );
+      return false;
+    }
+    return true;
+  }
+
+  void _nextPage() {
+    if (_currentPage >= 3) return;
+    _pageController.nextPage(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
 
   void _submitFormAndShowDialog() async {
@@ -47,6 +75,7 @@ class _DiabetesFormPageState extends State<DiabetesFormPage> {
           backgroundColor: Colors.red,
         ),
       );
+      return;
     }
     showDialog(
       context: context,
@@ -152,11 +181,11 @@ class _DiabetesFormPageState extends State<DiabetesFormPage> {
               _currentPage = index;
             });
           },
-          children: const [
-            DiabetesHistoryPage(),
-            RiskFactorsPage(),
-            LifestyleSelfCarePage(),
-            PhysicalSignsPage(),
+          children: [
+            DiabetesHistoryPage(key: _diabetesHistoryPageKey),
+            RiskFactorsPage(key: _riskFactorsPageKey),
+            LifestyleSelfCarePage(key: _lifestylePageKey),
+            PhysicalSignsPage(key: _physicalSignPageKey),
           ],
         ),
       ),
@@ -168,6 +197,7 @@ class _DiabetesFormPageState extends State<DiabetesFormPage> {
               text: _currentPage == 3 ? 'Submit Form' : 'Next',
               isLoading: state.isLoading,
               onPressed: () {
+                if (!_validatePage()) return;
                 if (_currentPage == 3) {
                   _submitFormAndShowDialog();
                 } else {

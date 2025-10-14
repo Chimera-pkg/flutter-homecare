@@ -54,7 +54,6 @@ class DiabetesFormState extends Equatable {
 
 class DiabetesHistory extends Equatable {
   final String? diabetesType;
-  final bool hasOtherDiabetesType; // for checkbox
   final int? yearOfDiagnosis;
   final double? lastHbA1c;
   final bool hasTreatmentDiet;
@@ -65,7 +64,6 @@ class DiabetesHistory extends Equatable {
 
   const DiabetesHistory({
     this.diabetesType,
-    this.hasOtherDiabetesType = false,
     this.yearOfDiagnosis,
     this.lastHbA1c,
     this.hasTreatmentDiet = false,
@@ -78,7 +76,6 @@ class DiabetesHistory extends Equatable {
   @override
   List<Object?> get props => [
         diabetesType,
-        hasOtherDiabetesType,
         yearOfDiagnosis,
         lastHbA1c,
         hasTreatmentDiet,
@@ -90,7 +87,6 @@ class DiabetesHistory extends Equatable {
 
   DiabetesHistory copyWith({
     String? diabetesType,
-    bool? hasOtherDiabetesType,
     int? yearOfDiagnosis,
     double? lastHbA1c,
     bool? hasTreatmentDiet,
@@ -101,7 +97,6 @@ class DiabetesHistory extends Equatable {
   }) {
     return DiabetesHistory(
       diabetesType: diabetesType ?? this.diabetesType,
-      hasOtherDiabetesType: hasOtherDiabetesType ?? this.hasOtherDiabetesType,
       yearOfDiagnosis: yearOfDiagnosis ?? this.yearOfDiagnosis,
       lastHbA1c: lastHbA1c ?? this.lastHbA1c,
       hasTreatmentDiet: hasTreatmentDiet ?? this.hasTreatmentDiet,
