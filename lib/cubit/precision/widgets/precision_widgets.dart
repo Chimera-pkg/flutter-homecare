@@ -394,3 +394,108 @@ class SelectionCard extends StatelessWidget {
     );
   }
 }
+
+class FeatureDetailCard extends StatelessWidget {
+  final IconData iconData;
+  final String title;
+  final Map<String?, List<String>> sections;
+  final Color borderColor;
+
+  const FeatureDetailCard({
+    super.key,
+    required this.iconData,
+    required this.title,
+    required this.sections,
+    this.borderColor = Const.aqua,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor, width: 1.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(iconData, color: borderColor, size: 28),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ...sections.entries.map((entry) {
+            return _buildSection(entry.key, entry.value);
+          }),
+          const Divider(height: 32),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Learn More',
+                style: TextStyle(
+                  color: Colors.grey.shade700,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(Icons.play_circle_fill, color: Colors.grey.shade400),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSection(String? title, List<String> items) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (title != null) ...[
+            Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(height: 8)
+          ],
+          ...items.map((item) => Padding(
+                padding: const EdgeInsets.only(left: 8.0, bottom: 4.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('• ', style: TextStyle(color: Colors.grey)),
+                    Expanded(
+                      child: Text(
+                        item,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+        ],
+      ),
+    );
+  }
+}

@@ -73,15 +73,17 @@ class PrecisionNutritionPage extends StatelessWidget {
 
                       // Step 3: Implementation Card
                       PrecisionNutritionCard(
-                        step: "3",
-                        title: "Precision Nutrition Implementation",
-                        description:
-                            "Track progress and adapt your plan through continuous support, biomarker monitoring, and smart digital tools.",
-                        buttonText: "Start Now",
-                        imagePath: "assets/illustration/implement.png",
-                        backgroundColor: const Color(0xFFF8F0FF),
-                        onTap: () => _showComingSoonDialog(context),
-                      ),
+                          step: "3",
+                          title: "Precision Nutrition Implementation",
+                          description:
+                              "Track progress and adapt your plan through continuous support, biomarker monitoring, and smart digital tools.",
+                          buttonText: "Start Now",
+                          imagePath: "assets/illustration/implement.png",
+                          backgroundColor: const Color(0xFFF8F0FF),
+                          onTap: () {
+                            GoRouter.of(context)
+                                .goNamed(AppRoutes.implementationJourney);
+                          }),
                     ],
                   ),
                 ),
