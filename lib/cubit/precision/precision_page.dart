@@ -63,7 +63,10 @@ class PrecisionNutritionPage extends StatelessWidget {
                         buttonText: "Book Now",
                         imagePath: "assets/illustration/planning.png",
                         backgroundColor: const Color(0xFFFFF6E9),
-                        onTap: () => _showComingSoonDialog(context),
+                        onTap: () {
+                          const path = AppRoutes.precisionNutritionPlan;
+                          GoRouter.of(context).goNamed(path);
+                        },
                       ),
 
                       const SizedBox(height: 16),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:m2health/const.dart';
 
 // Custom AppBar dengan tombol kembali dan judul di tengah
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -59,7 +60,7 @@ class PrimaryButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF00B4D8),
+          backgroundColor: Const.aqua,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -110,7 +111,7 @@ class SecondaryButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
-          foregroundColor: const Color(0xFF00B4D8),
+          foregroundColor: Const.aqua,
           side: const BorderSide(color: Color(0xFF00B4D8), width: 2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -299,7 +300,7 @@ class CustomCheckbox extends StatelessWidget {
         Checkbox(
           value: value,
           onChanged: onChanged,
-          activeColor: const Color(0xFF00B4D8),
+          activeColor: Const.aqua,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(4),
           ),
@@ -346,7 +347,7 @@ class SelectionCard extends StatelessWidget {
           color: isSelected ? const Color(0xFFE8F3FF) : Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? const Color(0xFF00B4D8) : Colors.grey.shade300,
+            color: isSelected ? Const.aqua : Colors.grey.shade300,
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -367,8 +368,7 @@ class SelectionCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color:
-                          isSelected ? const Color(0xFF00B4D8) : Colors.black87,
+                      color: isSelected ? Const.aqua : Colors.black87,
                     ),
                   ),
                   const SizedBox(height: 8),

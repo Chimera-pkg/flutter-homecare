@@ -45,6 +45,9 @@ class AppRoutes {
       '$precisionNutrition/assessment/form';
   static const String precisionNutritionAssessmentDetail =
       '$precisionNutrition/assessment/detail';
+  static const String precisionNutritionPlan = '$precisionNutrition/plan';
+  static const String weeklyMealPlan = '$precisionNutrition/plan/meal';
+  static const String weeklyMealPlanDetail = '$precisionNutrition/plan/meal/detail';
 
   // Diabetic Care Module
   static const String diabeticProfileForm = '$diabeticCare/profile/form';
