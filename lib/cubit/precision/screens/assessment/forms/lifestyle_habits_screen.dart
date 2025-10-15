@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../widgets/precision_widgets.dart';
-import '../precision_cubit.dart';
+import '../../../widgets/precision_widgets.dart';
+import '../../../bloc/nutrition_assessment_cubit.dart';
 import 'nutrition_habits_screen.dart';
 
 class LifestyleHabitsScreen extends StatefulWidget {
@@ -32,7 +32,7 @@ class _LifestyleHabitsScreenState extends State<LifestyleHabitsScreen> {
   void initState() {
     super.initState();
     final lifestyleHabits =
-        context.read<PrecisionCubit>().state.lifestyleHabits;
+        context.read<NutritionAssessmentCubit>().state.lifestyleHabits;
     if (lifestyleHabits == null) return;
     _sleepHours = lifestyleHabits.sleepHours;
     _activityLevelController.text = lifestyleHabits.activityLevel;
@@ -52,7 +52,9 @@ class _LifestyleHabitsScreenState extends State<LifestyleHabitsScreen> {
         smokingAlcoholHabits: _smokingAlcoholController.text,
       );
 
-      context.read<PrecisionCubit>().updateLifestyleHabits(lifestyleHabits);
+      context
+          .read<NutritionAssessmentCubit>()
+          .updateLifestyleHabits(lifestyleHabits);
 
       Navigator.push(
         context,

@@ -1,6 +1,6 @@
 import 'package:go_router/go_router.dart';
-import 'package:m2health/cubit/precision/screens/main_concern_screen.dart';
-import 'package:m2health/cubit/precision/screens/nutrition_assessment_detail_screen.dart';
+import 'package:m2health/cubit/precision/screens/assessment/forms/main_concern_screen.dart';
+import 'package:m2health/cubit/precision/screens/assessment/nutrition_assessment_detail_screen.dart';
 import 'package:m2health/route/app_routes.dart';
 import 'package:m2health/route/navigator_keys.dart';
 

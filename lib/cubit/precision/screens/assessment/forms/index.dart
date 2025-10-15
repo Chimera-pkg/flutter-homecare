@@ -4,4 +4,3 @@ export 'self_rated_health_screen.dart';
 export 'lifestyle_habits_screen.dart';
 export 'nutrition_habits_screen.dart';
 export 'biomarker_upload_screen.dart';
-export 'nutrition_assessment_detail_screen.dart';

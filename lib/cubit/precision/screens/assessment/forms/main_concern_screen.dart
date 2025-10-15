@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../widgets/precision_widgets.dart';
-import '../precision_cubit.dart';
+import '../../../widgets/precision_widgets.dart';
+import '../../../bloc/nutrition_assessment_cubit.dart';
 import 'health_history_screen.dart';
 
 class MainConcernScreen extends StatelessWidget {
@@ -10,7 +10,7 @@ class MainConcernScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => PrecisionCubit(),
+      create: (context) => NutritionAssessmentCubit(),
       child: const MainConcernView(),
     );
   }
@@ -23,7 +23,7 @@ class MainConcernView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(title: 'Precision Nutrition Assessment'),
-      body: BlocBuilder<PrecisionCubit, PrecisionState>(
+      body: BlocBuilder<NutritionAssessmentCubit, NutritionAssessmentState>(
         builder: (context, state) {
           return Padding(
             padding: const EdgeInsets.all(20.0),
@@ -60,7 +60,7 @@ class MainConcernView extends StatelessWidget {
                           imagePath: 'assets/illustration/foodies.png',
                           isSelected: state.mainConcern == 'Sub-Health',
                           onTap: () => context
-                              .read<PrecisionCubit>()
+                              .read<NutritionAssessmentCubit>()
                               .setMainConcern('Sub-Health'),
                         ),
                         SelectionCard(
@@ -70,7 +70,7 @@ class MainConcernView extends StatelessWidget {
                           imagePath: 'assets/illustration/planning.png',
                           isSelected: state.mainConcern == 'Chronic Disease',
                           onTap: () => context
-                              .read<PrecisionCubit>()
+                              .read<NutritionAssessmentCubit>()
                               .setMainConcern('Chronic Disease'),
                         ),
                         SelectionCard(
@@ -80,7 +80,7 @@ class MainConcernView extends StatelessWidget {
                           imagePath: 'assets/illustration/implement.png',
                           isSelected: state.mainConcern == 'Anti-aging',
                           onTap: () => context
-                              .read<PrecisionCubit>()
+                              .read<NutritionAssessmentCubit>()
                               .setMainConcern('Anti-aging'),
                         ),
                       ],

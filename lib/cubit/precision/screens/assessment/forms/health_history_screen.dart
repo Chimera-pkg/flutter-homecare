@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../widgets/precision_widgets.dart';
-import '../precision_cubit.dart';
+import '../../../widgets/precision_widgets.dart';
+import '../../../bloc/nutrition_assessment_cubit.dart';
 import 'self_rated_health_screen.dart';
 
 class HealthHistoryScreen extends StatefulWidget {
@@ -41,7 +41,8 @@ class _HealthHistoryScreenState extends State<HealthHistoryScreen> {
     }
 
     // Initialize all fields based on existing state if available
-    final healthProfile = context.read<PrecisionCubit>().state.healthProfile;
+    final healthProfile =
+        context.read<NutritionAssessmentCubit>().state.healthProfile;
     if (healthProfile == null) return;
 
     _ageController.text = healthProfile.age.toString();
@@ -88,7 +89,9 @@ class _HealthHistoryScreenState extends State<HealthHistoryScreen> {
             : _familyHistoryController.text,
       );
 
-      context.read<PrecisionCubit>().updateHealthProfile(healthProfile);
+      context
+          .read<NutritionAssessmentCubit>()
+          .updateHealthProfile(healthProfile);
 
       Navigator.push(
         context,

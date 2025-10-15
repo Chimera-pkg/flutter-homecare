@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../widgets/precision_widgets.dart';
-import '../precision_cubit.dart';
+import '../../../widgets/precision_widgets.dart';
+import '../../../bloc/nutrition_assessment_cubit.dart';
 import 'biomarker_upload_screen.dart';
 
 class NutritionHabitsScreen extends StatefulWidget {
@@ -35,7 +35,7 @@ class _NutritionHabitsScreenState extends State<NutritionHabitsScreen> {
   void initState() {
     super.initState();
     final nutritionHabits =
-        context.read<PrecisionCubit>().state.nutritionHabits;
+        context.read<NutritionAssessmentCubit>().state.nutritionHabits;
     if (nutritionHabits == null) return;
     _mealFrequencyController.text = nutritionHabits.mealFrequency;
     _foodSensitivitiesController.text = nutritionHabits.foodSensitivities;
@@ -57,7 +57,9 @@ class _NutritionHabitsScreenState extends State<NutritionHabitsScreen> {
         pastDiets: _pastDietsController.text,
       );
 
-      context.read<PrecisionCubit>().updateNutritionHabits(nutritionHabits);
+      context
+          .read<NutritionAssessmentCubit>()
+          .updateNutritionHabits(nutritionHabits);
 
       Navigator.push(
         context,

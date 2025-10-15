@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2health/route/app_routes.dart';
-import '../widgets/precision_widgets.dart';
-import '../precision_cubit.dart';
+import '../../../widgets/precision_widgets.dart';
+import '../../../bloc/nutrition_assessment_cubit.dart';
 
 class BiomarkerUploadScreen extends StatefulWidget {
   const BiomarkerUploadScreen({Key? key}) : super(key: key);
@@ -28,14 +28,14 @@ class _BiomarkerUploadScreenState extends State<BiomarkerUploadScreen> {
       // final fileName = 'medical_record_${_uploadedFiles.length + 1}.pdf';
       final fileName = result.files.single.name;
       _uploadedFiles.add(fileName);
-      context.read<PrecisionCubit>().addUploadedFile(fileName);
+      context.read<NutritionAssessmentCubit>().addUploadedFile(fileName);
     });
   }
 
   void _removeFile(String fileName) {
     setState(() {
       _uploadedFiles.remove(fileName);
-      context.read<PrecisionCubit>().removeUploadedFile(fileName);
+      context.read<NutritionAssessmentCubit>().removeUploadedFile(fileName);
     });
   }
 
@@ -50,7 +50,7 @@ class _BiomarkerUploadScreenState extends State<BiomarkerUploadScreen> {
   }
 
   void _submitAssessment() async {
-    await context.read<PrecisionCubit>().submitAssessment();
+    await context.read<NutritionAssessmentCubit>().submitAssessment();
 
     if (mounted) {
       // Show success dialog
@@ -80,7 +80,7 @@ class _BiomarkerUploadScreenState extends State<BiomarkerUploadScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(title: 'Biomarker Upload'),
-      body: BlocBuilder<PrecisionCubit, PrecisionState>(
+      body: BlocBuilder<NutritionAssessmentCubit, NutritionAssessmentState>(
         builder: (context, state) {
           return Padding(
             padding: const EdgeInsets.all(20.0),

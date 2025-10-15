@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../widgets/precision_widgets.dart';
-import '../precision_cubit.dart';
+import '../../../widgets/precision_widgets.dart';
+import '../../../bloc/nutrition_assessment_cubit.dart';
 import 'lifestyle_habits_screen.dart';
 
 class SelfRatedHealthScreen extends StatelessWidget {
@@ -11,7 +11,7 @@ class SelfRatedHealthScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(title: 'Self-Rated Health'),
-      body: BlocBuilder<PrecisionCubit, PrecisionState>(
+      body: BlocBuilder<NutritionAssessmentCubit, NutritionAssessmentState>(
         builder: (context, state) {
           return Padding(
             padding: const EdgeInsets.all(20.0),
@@ -75,7 +75,7 @@ class SelfRatedHealthScreen extends StatelessWidget {
                           divisions: 4,
                           onChanged: (value) {
                             context
-                                .read<PrecisionCubit>()
+                                .read<NutritionAssessmentCubit>()
                                 .updateSelfRatedHealth(value);
                           },
                         ),

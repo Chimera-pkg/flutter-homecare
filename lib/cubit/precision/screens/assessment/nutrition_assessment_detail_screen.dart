@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2health/route/app_routes.dart';
-import '../precision_cubit.dart';
-import '../widgets/precision_widgets.dart';
+import '../../bloc/nutrition_assessment_cubit.dart';
+import '../../widgets/precision_widgets.dart';
 
 class NutritionAssessmentDetailScreen extends StatelessWidget {
   const NutritionAssessmentDetailScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<PrecisionCubit>().state;
+    final state = context.watch<NutritionAssessmentCubit>().state;
     final healthProfile = state.healthProfile;
     final lifestyleHabits = state.lifestyleHabits;
     final nutritionHabits = state.nutritionHabits;
