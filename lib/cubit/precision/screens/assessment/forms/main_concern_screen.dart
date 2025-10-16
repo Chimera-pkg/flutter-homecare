@@ -1,29 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../widgets/precision_widgets.dart';
-import '../precision_cubit.dart';
-import 'health_history_screen.dart';
+import 'package:m2health/cubit/precision/screens/assessment/info/anti_aging_longevity_page.dart';
+import 'package:m2health/cubit/precision/screens/assessment/info/chronic_disease_support_page.dart';
+import 'package:m2health/cubit/precision/screens/assessment/info/sub_health_page.dart';
+import 'package:m2health/cubit/precision/widgets/precision_widgets.dart';
+import 'package:m2health/cubit/precision/bloc/nutrition_assessment_cubit.dart';
 
 class MainConcernScreen extends StatelessWidget {
-  const MainConcernScreen({Key? key}) : super(key: key);
+  const MainConcernScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => PrecisionCubit(),
+      create: (context) => NutritionAssessmentCubit(),
       child: const MainConcernView(),
     );
   }
 }
 
 class MainConcernView extends StatelessWidget {
-  const MainConcernView({Key? key}) : super(key: key);
+  const MainConcernView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(title: 'Precision Nutrition Assessment'),
-      body: BlocBuilder<PrecisionCubit, PrecisionState>(
+      body: BlocBuilder<NutritionAssessmentCubit, NutritionAssessmentState>(
         builder: (context, state) {
           return Padding(
             padding: const EdgeInsets.all(20.0),
@@ -60,7 +62,7 @@ class MainConcernView extends StatelessWidget {
                           imagePath: 'assets/illustration/foodies.png',
                           isSelected: state.mainConcern == 'Sub-Health',
                           onTap: () => context
-                              .read<PrecisionCubit>()
+                              .read<NutritionAssessmentCubit>()
                               .setMainConcern('Sub-Health'),
                         ),
                         SelectionCard(
@@ -70,7 +72,7 @@ class MainConcernView extends StatelessWidget {
                           imagePath: 'assets/illustration/planning.png',
                           isSelected: state.mainConcern == 'Chronic Disease',
                           onTap: () => context
-                              .read<PrecisionCubit>()
+                              .read<NutritionAssessmentCubit>()
                               .setMainConcern('Chronic Disease'),
                         ),
                         SelectionCard(
@@ -80,7 +82,7 @@ class MainConcernView extends StatelessWidget {
                           imagePath: 'assets/illustration/implement.png',
                           isSelected: state.mainConcern == 'Anti-aging',
                           onTap: () => context
-                              .read<PrecisionCubit>()
+                              .read<NutritionAssessmentCubit>()
                               .setMainConcern('Anti-aging'),
                         ),
                       ],
@@ -92,12 +94,36 @@ class MainConcernView extends StatelessWidget {
                 PrimaryButton(
                   text: 'Next',
                   onPressed: state.mainConcern != null
-                      ? () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const HealthHistoryScreen(),
-                            ),
-                          )
+                      ? () {
+                          switch (state.mainConcern) {
+                            case 'Sub-Health':
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const SubHealthPage(),
+                                ),
+                              );
+                              break;
+                            case 'Chronic Disease':
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ChronicDiseaseSupportPage(),
+                                ),
+                              );
+                              break;
+                            case 'Anti-aging':
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const AntiAgingLongevityPage(),
+                                ),
+                              );
+                              break;
+                          }
+                        }
                       : null,
                 ),
               ],

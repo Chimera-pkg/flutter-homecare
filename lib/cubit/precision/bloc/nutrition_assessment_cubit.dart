@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 
 // State untuk Precision Nutrition Assessment
-class PrecisionState extends Equatable {
+class NutritionAssessmentState extends Equatable {
   final String? mainConcern;
   final HealthProfile? healthProfile;
   final double selfRatedHealth;
@@ -13,7 +13,7 @@ class PrecisionState extends Equatable {
   final String? errorMessage;
   final bool isSubmitted;
 
-  const PrecisionState({
+  const NutritionAssessmentState({
     this.mainConcern,
     this.healthProfile,
     this.selfRatedHealth = 1.0,
@@ -25,7 +25,7 @@ class PrecisionState extends Equatable {
     this.isSubmitted = false,
   });
 
-  PrecisionState copyWith({
+  NutritionAssessmentState copyWith({
     String? mainConcern,
     HealthProfile? healthProfile,
     double? selfRatedHealth,
@@ -36,7 +36,7 @@ class PrecisionState extends Equatable {
     String? errorMessage,
     bool? isSubmitted,
   }) {
-    return PrecisionState(
+    return NutritionAssessmentState(
       mainConcern: mainConcern ?? this.mainConcern,
       healthProfile: healthProfile ?? this.healthProfile,
       selfRatedHealth: selfRatedHealth ?? this.selfRatedHealth,
@@ -64,8 +64,8 @@ class PrecisionState extends Equatable {
 }
 
 // Cubit untuk Precision Nutrition
-class PrecisionCubit extends Cubit<PrecisionState> {
-  PrecisionCubit() : super(const PrecisionState());
+class NutritionAssessmentCubit extends Cubit<NutritionAssessmentState> {
+  NutritionAssessmentCubit() : super(const NutritionAssessmentState());
 
   void setMainConcern(String concern) {
     emit(state.copyWith(mainConcern: concern));
@@ -99,11 +99,11 @@ class PrecisionCubit extends Cubit<PrecisionState> {
 
   Future<void> submitAssessment() async {
     emit(state.copyWith(isLoading: true, errorMessage: null));
-    
+
     try {
       // Simulate API call with dummy data
       await Future.delayed(const Duration(seconds: 2));
-      
+
       // Success - no error
       emit(state.copyWith(isLoading: false, isSubmitted: true));
     } catch (e) {
@@ -116,7 +116,7 @@ class PrecisionCubit extends Cubit<PrecisionState> {
   }
 
   void resetState() {
-    emit(const PrecisionState());
+    emit(const NutritionAssessmentState());
   }
 }
 

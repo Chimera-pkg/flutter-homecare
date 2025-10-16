@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2health/route/app_routes.dart';
-import 'precision_cubit.dart';
+import 'bloc/nutrition_assessment_cubit.dart';
 
 class PrecisionNutritionPage extends StatelessWidget {
   const PrecisionNutritionPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<PrecisionCubit, PrecisionState>(
+    return BlocBuilder<NutritionAssessmentCubit, NutritionAssessmentState>(
         builder: (context, state) {
       return Scaffold(
         appBar: AppBar(
@@ -63,22 +63,27 @@ class PrecisionNutritionPage extends StatelessWidget {
                         buttonText: "Book Now",
                         imagePath: "assets/illustration/planning.png",
                         backgroundColor: const Color(0xFFFFF6E9),
-                        onTap: () => _showComingSoonDialog(context),
+                        onTap: () {
+                          const path = AppRoutes.precisionNutritionPlan;
+                          GoRouter.of(context).goNamed(path);
+                        },
                       ),
 
                       const SizedBox(height: 16),
 
                       // Step 3: Implementation Card
                       PrecisionNutritionCard(
-                        step: "3",
-                        title: "Precision Nutrition Implementation",
-                        description:
-                            "Track progress and adapt your plan through continuous support, biomarker monitoring, and smart digital tools.",
-                        buttonText: "Start Now",
-                        imagePath: "assets/illustration/implement.png",
-                        backgroundColor: const Color(0xFFF8F0FF),
-                        onTap: () => _showComingSoonDialog(context),
-                      ),
+                          step: "3",
+                          title: "Precision Nutrition Implementation",
+                          description:
+                              "Track progress and adapt your plan through continuous support, biomarker monitoring, and smart digital tools.",
+                          buttonText: "Start Now",
+                          imagePath: "assets/illustration/implement.png",
+                          backgroundColor: const Color(0xFFF8F0FF),
+                          onTap: () {
+                            GoRouter.of(context)
+                                .goNamed(AppRoutes.implementationJourney);
+                          }),
                     ],
                   ),
                 ),

@@ -15,7 +15,7 @@ import 'package:m2health/cubit/pharmacogenomics/data/repositories/pharmacogenomi
 import 'package:m2health/cubit/pharmacogenomics/data/datasources/pharmacogenomics_remote_datasource_impl.dart';
 import 'package:m2health/cubit/pharmacogenomics/domain/usecases/get_pharmacogenomics.dart';
 import 'package:m2health/cubit/pharmacogenomics/domain/usecases/crud_pharmacogenomics.dart';
-import 'package:m2health/cubit/precision/precision_cubit.dart';
+import 'package:m2health/cubit/precision/bloc/nutrition_assessment_cubit.dart';
 import 'package:m2health/cubit/profiles/domain/usecases/index.dart';
 import 'package:m2health/cubit/profiles/presentation/bloc/certificate_cubit.dart';
 import 'package:m2health/cubit/profiles/presentation/bloc/profile_cubit.dart';
@@ -57,8 +57,8 @@ void main() async {
         Provider<Dio>(
           create: (context) => sl<Dio>(),
         ),
-        BlocProvider<PrecisionCubit>(
-          create: (context) => PrecisionCubit(),
+        BlocProvider<NutritionAssessmentCubit>(
+          create: (context) => NutritionAssessmentCubit(),
         ),
         BlocProvider(create: (context) => AppointmentCubit(sl<Dio>())),
         BlocProvider(create: (context) => ProviderAppointmentCubit(sl<Dio>())),
