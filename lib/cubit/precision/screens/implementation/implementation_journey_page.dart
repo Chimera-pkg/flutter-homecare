@@ -15,38 +15,43 @@ class ImplementationJourneyPage extends StatelessWidget {
             const Expanded(
               child: SingleChildScrollView(
                 child: Column(
+                  spacing: 16,
                   children: [
                     FeatureDetailCard(
                       iconData: Icons.description_outlined,
                       title: 'In-Depth Assesment (2-4 weeks)',
-                      sections: {
-                        // Using null key for single section without header
-                        null: [
-                          'Omics testing + functional medicine examinations',
-                          'Digital lifestyle profiling',
+                      child: Column(
+                        children: [
+                          CardBulletPoint(
+                              text:
+                                  'Omics testing + functional medicine examinations'),
+                          CardBulletPoint(text: 'Digital lifestyle profiling'),
                         ],
-                      },
+                      ),
                     ),
                     FeatureDetailCard(
                       iconData: Icons.groups_outlined,
                       title: 'Intervention (3-6 months)',
-                      sections: {
-                        null: [
-                          'Monthly biomarker retesting',
-                          'Dynamic microbiome adjustment',
-                          'Digital therapy app support',
+                      child: Column(
+                        children: [
+                          CardBulletPoint(text: 'Monthly biomarker retesting'),
+                          CardBulletPoint(
+                              text: 'Dynamic microbiome adjustment'),
+                          CardBulletPoint(text: 'Digital therapy app support'),
                         ],
-                      },
+                      ),
                     ),
                     FeatureDetailCard(
                       iconData: Icons.bar_chart_outlined,
                       title: 'Maintenance',
-                      sections: {
-                        null: [
-                          'Annual genomic re-evaluation',
-                          'Adaptive nutrition strategies for environmental/lifestyle changes',
+                      child: Column(
+                        children: [
+                          CardBulletPoint(text: 'Annual genomic re-evaluation'),
+                          CardBulletPoint(
+                              text:
+                                  'Adaptive nutrition strategies for environmental/lifestyle changes'),
                         ],
-                      },
+                      ),
                     ),
                   ],
                 ),

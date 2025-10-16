@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../widgets/precision_widgets.dart';
-import '../../../bloc/nutrition_assessment_cubit.dart';
-import 'health_history_screen.dart';
+import 'package:m2health/cubit/precision/screens/assessment/info/anti_aging_longevity_page.dart';
+import 'package:m2health/cubit/precision/screens/assessment/info/chronic_disease_support_page.dart';
+import 'package:m2health/cubit/precision/screens/assessment/info/sub_health_page.dart';
+import 'package:m2health/cubit/precision/widgets/precision_widgets.dart';
+import 'package:m2health/cubit/precision/bloc/nutrition_assessment_cubit.dart';
 
 class MainConcernScreen extends StatelessWidget {
-  const MainConcernScreen({Key? key}) : super(key: key);
+  const MainConcernScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +19,7 @@ class MainConcernScreen extends StatelessWidget {
 }
 
 class MainConcernView extends StatelessWidget {
-  const MainConcernView({Key? key}) : super(key: key);
+  const MainConcernView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -92,12 +94,36 @@ class MainConcernView extends StatelessWidget {
                 PrimaryButton(
                   text: 'Next',
                   onPressed: state.mainConcern != null
-                      ? () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const HealthHistoryScreen(),
-                            ),
-                          )
+                      ? () {
+                          switch (state.mainConcern) {
+                            case 'Sub-Health':
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const SubHealthPage(),
+                                ),
+                              );
+                              break;
+                            case 'Chronic Disease':
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ChronicDiseaseSupportPage(),
+                                ),
+                              );
+                              break;
+                            case 'Anti-aging':
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const AntiAgingLongevityPage(),
+                                ),
+                              );
+                              break;
+                          }
+                        }
                       : null,
                 ),
               ],

@@ -7,10 +7,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onBackPressed;
 
   const CustomAppBar({
-    Key? key,
+    super.key,
     required this.title,
     this.onBackPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -45,12 +45,12 @@ class PrimaryButton extends StatelessWidget {
   final double? width;
 
   const PrimaryButton({
-    Key? key,
+    super.key,
     required this.text,
     this.onPressed,
     this.isLoading = false,
     this.width,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -96,12 +96,12 @@ class SecondaryButton extends StatelessWidget {
   final double? width;
 
   const SecondaryButton({
-    Key? key,
+    super.key,
     required this.text,
     this.onPressed,
     this.icon,
     this.width,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +149,7 @@ class CustomTextField extends StatelessWidget {
   final void Function(String)? onChanged;
 
   const CustomTextField({
-    Key? key,
+    super.key,
     required this.label,
     this.hintText,
     this.controller,
@@ -157,7 +157,7 @@ class CustomTextField extends StatelessWidget {
     this.maxLines = 1,
     this.validator,
     this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -220,13 +220,13 @@ class CustomDropdown extends StatelessWidget {
   final String? Function(String?)? validator;
 
   const CustomDropdown({
-    Key? key,
+    super.key,
     required this.label,
     this.value,
     required this.items,
     this.onChanged,
     this.validator,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -287,11 +287,11 @@ class CustomCheckbox extends StatelessWidget {
   final void Function(bool?)? onChanged;
 
   const CustomCheckbox({
-    Key? key,
+    super.key,
     required this.label,
     required this.value,
     this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -328,13 +328,13 @@ class SelectionCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const SelectionCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.description,
     required this.imagePath,
     required this.isSelected,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -398,104 +398,144 @@ class SelectionCard extends StatelessWidget {
 class FeatureDetailCard extends StatelessWidget {
   final IconData iconData;
   final String title;
-  final Map<String?, List<String>> sections;
-  final Color borderColor;
+  final Color color;
+  final Widget? child;
 
   const FeatureDetailCard({
     super.key,
     required this.iconData,
     required this.title,
-    required this.sections,
-    this.borderColor = Const.aqua,
+    this.color = Const.aqua,
+    this.child,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderColor, width: 1.5),
+        border: Border.all(color: color, width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(iconData, color: borderColor, size: 28),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(iconData, color: color, size: 28),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      if (child != null) child!,
+                    ],
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-          const SizedBox(height: 16),
-          ...sections.entries.map((entry) {
-            return _buildSection(entry.key, entry.value);
-          }),
-          const Divider(height: 32),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Learn More',
-                style: TextStyle(
-                  color: Colors.grey.shade700,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
+          Container(color: color, height: 1.5, width: double.infinity),
+          GestureDetector(
+            onTap: () => {},
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Learn More',
+                    style: TextStyle(
+                      color: color,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Icon(Icons.play_circle_fill, color: color),
+                ],
               ),
-              const SizedBox(width: 8),
-              Icon(Icons.play_circle_fill, color: Colors.grey.shade400),
-            ],
+            ),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildSection(String? title, List<String> items) {
+class CardSection extends StatelessWidget {
+  final String title;
+  final List<String> items;
+
+  const CardSection({
+    super.key,
+    required this.title,
+    required this.items,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
+      padding: const EdgeInsets.only(bottom: 16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (title != null) ...[
-            Text(
-              title,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-                color: Colors.grey,
-              ),
+          // Section Title
+          Text(
+            title,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+              color: Colors.black,
+              letterSpacing: 0.5,
             ),
-            const SizedBox(height: 8)
-          ],
-          ...items.map((item) => Padding(
-                padding: const EdgeInsets.only(left: 8.0, bottom: 4.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('• ', style: TextStyle(color: Colors.grey)),
-                    Expanded(
-                      child: Text(
-                        item,
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                    ),
-                  ],
-                ),
-              )),
+          ),
+          const SizedBox(height: 8),
+          // List of bullet points
+          ...items.map((item) => CardBulletPoint(text: item)),
         ],
       ),
+    );
+  }
+}
+
+class CardBulletPoint extends StatelessWidget {
+  final String text;
+
+  const CardBulletPoint({super.key, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 8,
+      children: [
+        const Text(
+          '• ',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(fontSize: 12, height: 1.4),
+          ),
+        ),
+      ],
     );
   }
 }

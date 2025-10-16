@@ -50,11 +50,7 @@ class AppRoutes {
   static const String weeklyMealPlanDetail =
       '$precisionNutrition/plan/meal/detail';
   static const String implementationJourney =
-      '$precisionNutrition/implementation/journey';
-  static const String subHealthPopulations =
-      '$precisionNutrition/implementation/sub-health';
-  static const String chronicDiseaseSupport =
-      '$precisionNutrition/implementation/chronic-disease';
+      '$precisionNutrition/implementation-journey';
 
   // Diabetic Care Module
   static const String diabeticProfileForm = '$diabeticCare/profile/form';

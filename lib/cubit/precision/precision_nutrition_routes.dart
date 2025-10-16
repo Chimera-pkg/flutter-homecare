@@ -4,9 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:m2health/cubit/precision/bloc/nutrition_plan_cubit.dart';
 import 'package:m2health/cubit/precision/screens/assessment/forms/main_concern_screen.dart';
 import 'package:m2health/cubit/precision/screens/assessment/nutrition_assessment_detail_screen.dart';
-import 'package:m2health/cubit/precision/screens/implementation/chronic_disease_support_page.dart';
 import 'package:m2health/cubit/precision/screens/implementation/implementation_journey_page.dart';
-import 'package:m2health/cubit/precision/screens/implementation/sub_health_page.dart';
 import 'package:m2health/cubit/precision/screens/plan/nutrition_plan_page.dart';
 import 'package:m2health/cubit/precision/screens/plan/weekly_meal_plan_detail_page.dart';
 import 'package:m2health/cubit/precision/screens/plan/weekly_meal_plan_page.dart';
@@ -63,25 +61,11 @@ class PrecisionNutritionRoutes {
               }),
         ]),
     GoRoute(
-        path: 'implementation/journey',
+        path: 'implementation-journey',
         name: AppRoutes.implementationJourney,
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) {
           return const ImplementationJourneyPage();
-        }),
-    GoRoute(
-        path: 'implementation/sub-health',
-        name: AppRoutes.subHealthPopulations,
-        parentNavigatorKey: rootNavigatorKey,
-        builder: (context, state) {
-          return const SubHealthPage();
-        }),
-    GoRoute(
-        path: 'implementation/chronic-disease',
-        name: AppRoutes.chronicDiseaseSupport,
-        parentNavigatorKey: rootNavigatorKey,
-        builder: (context, state) {
-          return const ChronicDiseaseSupportPage();
         }),
   ];
 }
