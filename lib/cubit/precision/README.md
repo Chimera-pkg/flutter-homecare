@@ -32,7 +32,7 @@ lib/cubit/precision/
 
 ## State Management
 
-Modul menggunakan `PrecisionCubit` untuk mengelola state dengan properti:
+Modul menggunakan `NutritionAssessmentCubit` untuk mengelola state dengan properti:
 
 - `mainConcern`: Concern utama yang dipilih user
 - `healthProfile`: Profil kesehatan lengkap
@@ -91,7 +91,7 @@ Navigator.push(
 
 ```dart
 BlocProvider(
-  create: (context) => PrecisionCubit(),
+  create: (context) => NutritionAssessmentCubit(),
   child: YourScreen(),
 );
 ```

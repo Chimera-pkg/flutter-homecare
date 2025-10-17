@@ -64,4 +64,36 @@ class Profile {
       'updated_at': updatedAt,
     };
   }
+
+  Profile copyWith({
+    int? id,
+    int? userId,
+    int? age,
+    double? weight,
+    double? height,
+    String? phoneNumber,
+    String? username,
+    String? email,
+    String? homeAddress,
+    String? gender,
+    String? avatar,
+    String? createdAt,
+    String? updatedAt,
+  }) {
+    return Profile(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      age: age ?? this.age,
+      weight: weight ?? this.weight,
+      height: height ?? this.height,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      username: username ?? this.username,
+      email: email ?? this.email,
+      homeAddress: homeAddress ?? this.homeAddress,
+      gender: gender ?? this.gender,
+      avatar: avatar ?? this.avatar,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 }

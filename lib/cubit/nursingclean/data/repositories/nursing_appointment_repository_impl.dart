@@ -23,7 +23,7 @@ class NursingAppointmentRepositoryImpl extends NursingAppointmentRepository {
           providerJson: response['data']['provider']);
       return Right(createdAppointment);
     } catch (e) {
-      return Left(Failure(e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 }

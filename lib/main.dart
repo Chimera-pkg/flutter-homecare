@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:m2health/cubit/diabetes/bloc/diabetes_form_cubit.dart';
 import 'package:m2health/cubit/medical_record/domain/usecases/get_medical_records.dart';
 import 'package:m2health/cubit/medical_record/presentation/bloc/medical_record_bloc.dart';
 import 'package:m2health/cubit/nursingclean/domain/repositories/nursing_appointment_repository.dart';
@@ -11,9 +12,11 @@ import 'package:m2health/cubit/nursing/personal/nursing_personal_cubit.dart';
 import 'package:m2health/cubit/pharmacogenomics/domain/usecases/delete_pharmacogenomics.dart';
 import 'package:m2health/cubit/pharmacogenomics/presentation/bloc/pharmacogenomics_cubit.dart';
 import 'package:m2health/cubit/pharmacogenomics/domain/usecases/get_pharmacogenomics.dart';
-import 'package:m2health/cubit/pharmacogenomics/domain/usecases/store_pharmacogenomics.dart';
-import 'package:m2health/cubit/precision/precision_cubit.dart';
-import 'package:m2health/cubit/profiles/profile_cubit.dart';
+import 'package:m2health/cubit/pharmacogenomics/domain/usecases/crud_pharmacogenomics.dart';
+import 'package:m2health/cubit/precision/bloc/nutrition_assessment_cubit.dart';
+import 'package:m2health/cubit/profiles/domain/usecases/index.dart';
+import 'package:m2health/cubit/profiles/presentation/bloc/certificate_cubit.dart';
+import 'package:m2health/cubit/profiles/presentation/bloc/profile_cubit.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:m2health/route/app_router.dart';
 import 'package:m2health/service_locator.dart';
@@ -52,8 +55,8 @@ void main() async {
         Provider<Dio>(
           create: (context) => sl<Dio>(),
         ),
-        BlocProvider<PrecisionCubit>(
-          create: (context) => PrecisionCubit(),
+        BlocProvider<NutritionAssessmentCubit>(
+          create: (context) => NutritionAssessmentCubit(),
         ),
         BlocProvider(create: (context) => AppointmentCubit(sl<Dio>())),
         BlocProvider(create: (context) => ProviderAppointmentCubit(sl<Dio>())),
@@ -61,9 +64,17 @@ void main() async {
             create: (context) => PersonalCubit()..loadPersonalDetails()),
         BlocProvider(
             create: (context) => NursingPersonalCubit()..loadPersonalDetails()),
-        BlocProvider(create: (context) => ProfileCubit(sl<Dio>())),
         BlocProvider(
-          create: (context) => ProfileCubit(sl<Dio>()),
+            create: (context) => ProfileCubit(
+                  getProfileUseCase: sl<GetProfile>(),
+                  updateProfileUseCase: sl<UpdateProfile>(),
+                )),
+        BlocProvider(
+          create: (context) => CertificateCubit(
+            createCertificateUseCase: sl<CreateCertificate>(),
+            updateCertificateUseCase: sl<UpdateCertificate>(),
+            deleteCertificateUseCase: sl<DeleteCertificate>(),
+          ),
         ),
         BlocProvider(
           create: (context) => PharmacogenomicsCubit(
@@ -100,7 +111,8 @@ void main() async {
         // Medical Record Module
         BlocProvider(
             create: (context) =>
-                MedicalRecordBloc(getMedicalRecords: sl<GetMedicalRecords>()))
+                MedicalRecordBloc(getMedicalRecords: sl<GetMedicalRecords>())),
+        BlocProvider(create: (context) => DiabetesFormCubit(sl<Dio>())),
       ],
       child: ChangeNotifierProvider(
         create: (context) => AppLanguage(),
@@ -204,6 +216,33 @@ class _MyAppState extends State<MyApp> {
               cardTheme: const CardThemeData(
                 color: Colors.white,
                 surfaceTintColor: Colors.transparent,
+              ),
+              textSelectionTheme: TextSelectionThemeData(
+                cursorColor: Const.tosca,
+                selectionColor: Const.tosca.withValues(alpha: 0.4),
+              ),
+              inputDecorationTheme: InputDecorationTheme(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                  borderSide: const BorderSide(
+                    color: Colors.grey,
+                    width: 1.0,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                  borderSide: const BorderSide(
+                    color: Colors.grey,
+                    width: 1.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                  borderSide: const BorderSide(
+                    color: Const.tosca,
+                    width: 1.5,
+                  ),
+                ),
               ),
               textTheme: const TextTheme(
                 displayLarge: TextStyle(fontFamily: 'Poppins'),

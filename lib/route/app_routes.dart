@@ -29,6 +29,7 @@ class AppRoutes {
   static const String medicalRecord = '/medical-record';
   static const String pharmagenomics = '/pharmagenomics';
   static const String editProfile = '/edit-profile';
+  static const String editProfessionalProfile = '/edit-professional-profile';
 
   static const String partnership = '/request-partnership';
   static const String partnership_list = '/partnership-list';
@@ -38,6 +39,22 @@ class AppRoutes {
   static const String personal = '/personal';
   static const String nursing = '/nursing';
   static const String submenu = '/submenu';
+
+  // Precision Nutrition Module
+  static const String precisionNutritionAssessmentForm =
+      '$precisionNutrition/assessment/form';
+  static const String precisionNutritionAssessmentDetail =
+      '$precisionNutrition/assessment/detail';
+  static const String precisionNutritionPlan = '$precisionNutrition/plan';
+  static const String weeklyMealPlan = '$precisionNutrition/plan/meal';
+  static const String weeklyMealPlanDetail =
+      '$precisionNutrition/plan/meal/detail';
+  static const String implementationJourney =
+      '$precisionNutrition/implementation-journey';
+
+  // Diabetic Care Module
+  static const String diabeticProfileForm = '$diabeticCare/profile/form';
+  static const String diabeticProfileSummary = '$diabeticCare/profile/summary';
 
   // static const String home = '/';
   // static const String submenu = 'submenu';

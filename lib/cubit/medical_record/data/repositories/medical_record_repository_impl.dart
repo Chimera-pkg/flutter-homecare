@@ -17,7 +17,7 @@ class MedicalRecordRepositoryImpl implements MedicalRecordRepository {
       final remoteRecords = await remoteDataSource.getMedicalRecords();
       return Right(remoteRecords);
     } on Exception {
-      return const Left(Failure('Failed to fetch medical records'));
+      return const Left(ServerFailure('Failed to fetch medical records'));
     }
   }
 }
