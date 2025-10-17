@@ -1,9 +1,11 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:m2health/cubit/pharmacogenomics/presentation/bloc/pharmacogenomic_report_cubit.dart';
-import 'package:m2health/cubit/pharmacogenomics/presentation/bloc/pharmacogenomic_report_state.dart';
+import 'package:m2health/cubit/pharmacogenomics/presentation/bloc/pharmacogenomics_cubit.dart';
+import 'package:m2health/cubit/pharmacogenomics/presentation/bloc/pharmacogenomics_state.dart';
+import 'package:m2health/utils.dart';
 
 class PharamacogenomicReportForm extends StatelessWidget {
   const PharamacogenomicReportForm({super.key});
@@ -13,12 +15,12 @@ class PharamacogenomicReportForm extends StatelessWidget {
       type: FileType.custom,
       allowedExtensions: ['csv', 'pdf'],
     );
+    log('File picked: ${result?.files.single.name}',
+        name: 'PharamacogenomicReportForm');
 
     if (result != null && result.files.single.path != null) {
       final file = File(result.files.single.path!);
-      if (context.mounted) {
-        await context.read<PharmacogenomicReportCubit>().uploadReport(file);
-      }
+      await context.read<PharmacogenomicsCubit>().uploadReport(file);
     }
   }
 
@@ -34,14 +36,14 @@ class PharamacogenomicReportForm extends StatelessWidget {
             TextButton(
               child: const Text('Cancel'),
               onPressed: () {
-                Navigator.of(dialogContext).pop(); // Dismiss the dialog
+                Navigator.of(dialogContext).pop();
               },
             ),
             TextButton(
               child: const Text('Delete', style: TextStyle(color: Colors.red)),
               onPressed: () {
-                Navigator.of(dialogContext).pop(); // Dismiss the dialog
-                context.read<PharmacogenomicReportCubit>().removeReport();
+                Navigator.of(dialogContext).pop();
+                context.read<PharmacogenomicsCubit>().delete();
               },
             ),
           ],
@@ -52,7 +54,20 @@ class PharamacogenomicReportForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<PharmacogenomicReportCubit, PharmacogenomicReportState>(
+    return BlocConsumer<PharmacogenomicsCubit, PharmacogenomicsState>(
+      listener: (context, state) {
+        // The listener is more specific now
+        if (state is PharmacogenomicsError) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ),
+            );
+        }
+      },
       builder: (context, state) {
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 100),
@@ -62,23 +77,25 @@ class PharamacogenomicReportForm extends StatelessWidget {
     );
   }
 
-  Widget _buildUploadWidget(
-      BuildContext context, PharmacogenomicReportState state) {
-    if (state is PharmacogenomicReportUploading) {
+  Widget _buildUploadWidget(BuildContext context, PharmacogenomicsState state) {
+    if (state is PharmacogenomicsUploading) {
       return _buildUploadingState(context, state);
     }
-    if (state is PharmacogenomicReportReady) {
-      return _buildReadyState(context, state);
+    if (state is PharmacogenomicsReady) {
+      final report = state.data.fullReportPath;
+      if (report != null && report.isNotEmpty) {
+        return _buildReadyState(context, state);
+      }
     }
-    if (state is PharmacogenomicReportLoading) {
+    if (state is PharmacogenomicsLoading) {
       return _buildLoadingState(context);
     }
-    return _buildInitialState(context);
+    return _buildEmptyState(context);
   }
 
-  Widget _buildInitialState(BuildContext context) {
+  Widget _buildEmptyState(BuildContext context) {
     return GestureDetector(
-      key: const ValueKey('initial'),
+      key: const ValueKey('empty'),
       onTap: () => _pickAndUploadFile(context),
       child: Container(
         height: 80,
@@ -121,7 +138,7 @@ class PharamacogenomicReportForm extends StatelessWidget {
   }
 
   Widget _buildUploadingState(
-      BuildContext context, PharmacogenomicReportUploading state) {
+      BuildContext context, PharmacogenomicsUploading state) {
     return Container(
       key: const ValueKey('uploading'),
       padding: const EdgeInsets.all(16.0),
@@ -157,51 +174,55 @@ class PharamacogenomicReportForm extends StatelessWidget {
     );
   }
 
-  Widget _buildReadyState(
-      BuildContext context, PharmacogenomicReportReady state) {
-    return Container(
+  Widget _buildReadyState(BuildContext context, PharmacogenomicsReady state) {
+    return GestureDetector(
       key: const ValueKey('ready'),
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[300]!),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.insert_drive_file_outlined, color: Colors.grey),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  state.fileName,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 4),
-                const Row(
-                  children: [
-                    Icon(Icons.check_circle,
-                        color: Color(0xFF35C5CF), size: 16),
-                    SizedBox(width: 4),
-                    Text(
-                      'Ready',
-                      style: TextStyle(
-                          color: Color(0xFF35C5CF),
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ],
+      onTap: () {
+        Utils.openPDF(context, state.data.fullReportPath!);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey[300]!),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.insert_drive_file_outlined, color: Colors.grey),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    state.data.fullReportPath!.split('/').last,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4),
+                  const Row(
+                    children: [
+                      Icon(Icons.check_circle,
+                          color: Color(0xFF35C5CF), size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'Ready',
+                        style: TextStyle(
+                            color: Color(0xFF35C5CF),
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete_outline),
-            onPressed: () => _showDeleteConfirmation(context),
-          ),
-        ],
+            IconButton(
+              icon: const Icon(Icons.delete_outline),
+              onPressed: () => _showDeleteConfirmation(context),
+            ),
+          ],
+        ),
       ),
     );
   }

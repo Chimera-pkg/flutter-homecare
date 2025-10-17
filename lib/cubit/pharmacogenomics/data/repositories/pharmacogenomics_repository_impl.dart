@@ -1,4 +1,9 @@
+import 'dart:developer';
+import 'dart:io';
+
+import 'package:dartz/dartz.dart';
 import 'package:m2health/cubit/pharmacogenomics/data/datasources/pharmacogenomics_remote_datasource.dart';
+import 'package:m2health/cubit/pharmacogenomics/data/models/pharmacogenomics_model.dart';
 import 'package:m2health/cubit/pharmacogenomics/domain/entities/pharmacogenomics.dart';
 import 'package:m2health/cubit/pharmacogenomics/domain/repositories/pharmacogenomics_repository.dart';
 
@@ -8,39 +13,41 @@ class PharmacogenomicsRepositoryImpl implements PharmacogenomicsRepository {
   PharmacogenomicsRepositoryImpl({required this.remoteDataSource});
 
   @override
-  Future<List<Pharmacogenomics>> getPharmacogenomics() async {
-    print('[DEBUG] Repository: fetching pharmacogenomics');
+  Future<Option<Pharmacogenomics>> getPharmacogenomics() async {
+    log('Fetching pharmacogenomics', name: 'PharmacogenomicsRepository');
     final result = await remoteDataSource.getPharmacogenomics();
-    print(
-        '[DEBUG] Repository: fetched pharmacogenomics, count: ${result.length}');
-    return result;
+    if (result.isEmpty) {
+      log('No pharmacogenomics data found', name: 'PharmacogenomicsRepository');
+      return const None();
+    } else {
+      log('Pharmacogenomics data fetched successfully',
+          name: 'PharmacogenomicsRepository');
+      return Some(result.first);
+    }
   }
 
   @override
-  Future<Pharmacogenomics> getPharmacogenomicById(int id) async {
-    return await remoteDataSource.getPharmacogenomicById(id);
-  }
+  Future<void> storePharmacogenomics({
+    Pharmacogenomics? pharmacogenomics,
+    File? fullReportFile,
+    Function(double progress)? onProgress,
+  }) async {
+    print('[DEBUG] Repository: storing pharmacogenomics');
+    final pharmacogenomicsModel = pharmacogenomics == null
+        ? null
+        : PharmacogenomicsModel.fromEntity(pharmacogenomics);
 
-  @override
-  Future<void> createPharmacogenomic(String gene, String genotype,
-      String phenotype, String medicationGuidance) async {
-    await remoteDataSource.createPharmacogenomic(
-      gene,
-      genotype,
-      phenotype,
-      medicationGuidance
-    );
-  }
+    void onSendProgress(int sent, int total) {
+      if (onProgress != null && total != 0) {
+        final progress = sent / total;
+        onProgress(progress);
+      }
+    }
 
-  @override
-  Future<void> updatePharmacogenomic(int id, String gene, String genotype,
-      String phenotype, String medicationGuidance) async {
-    await remoteDataSource.updatePharmacogenomic(
-      id,
-      gene,
-      genotype,
-      phenotype,
-      medicationGuidance
+    await remoteDataSource.storePharmacogenomics(
+      data: pharmacogenomicsModel,
+      fullReportFile: fullReportFile,
+      onSendProgress: onSendProgress,
     );
   }
 
