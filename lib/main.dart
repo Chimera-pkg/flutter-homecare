@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:m2health/cubit/diabetes/bloc/diabetes_form_cubit.dart';
 import 'package:m2health/cubit/medical_record/domain/usecases/get_medical_records.dart';
@@ -10,9 +9,9 @@ import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_services/n
 import 'package:m2health/cubit/personal/personal_cubit.dart';
 import 'package:m2health/cubit/nursing/personal/nursing_personal_cubit.dart';
 import 'package:m2health/cubit/pharmacogenomics/domain/usecases/delete_pharmacogenomics.dart';
+import 'package:m2health/cubit/pharmacogenomics/domain/usecases/store_pharmacogenomics.dart';
 import 'package:m2health/cubit/pharmacogenomics/presentation/bloc/pharmacogenomics_cubit.dart';
 import 'package:m2health/cubit/pharmacogenomics/domain/usecases/get_pharmacogenomics.dart';
-import 'package:m2health/cubit/pharmacogenomics/domain/usecases/crud_pharmacogenomics.dart';
 import 'package:m2health/cubit/precision/bloc/nutrition_assessment_cubit.dart';
 import 'package:m2health/cubit/profiles/domain/usecases/index.dart';
 import 'package:m2health/cubit/profiles/presentation/bloc/certificate_cubit.dart';
@@ -274,7 +273,7 @@ class _MyAppState extends State<MyApp> {
                     DevicePreview.appBuilder(context, child),
                   ],
                 ),
-                bottomNavigationBar: _showBottomAppBar ? BottomAppBar() : null,
+                bottomNavigationBar: _showBottomAppBar ? const BottomAppBar() : null,
               );
             },
             localizationsDelegates: const [
