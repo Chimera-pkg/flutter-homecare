@@ -10,6 +10,7 @@ class ProviderAppointment {
   final String providerType;
   final Map<String, dynamic> patientData;
   final Map<String, dynamic> profileServiceData;
+  final Map<String, dynamic>? personalCase;
   final String createdAt;
   final String updatedAt;
 
@@ -25,6 +26,7 @@ class ProviderAppointment {
     required this.providerType,
     required this.patientData,
     required this.profileServiceData,
+    this.personalCase,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -87,19 +89,19 @@ class ProviderAppointment {
     // other fields as needed
   }) {
     return ProviderAppointment(
-      id: this.id,
-      userId: this.userId,
-      type: this.type,
+      id: id,
+      userId: userId,
+      type: type,
       status: status ?? this.status,
-      date: this.date,
-      hour: this.hour,
-      summary: this.summary,
-      payTotal: this.payTotal,
-      providerType: this.providerType,
-      patientData: this.patientData,
-      profileServiceData: this.profileServiceData,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt,
+      date: date,
+      hour: hour,
+      summary: summary,
+      payTotal: payTotal,
+      providerType: providerType,
+      patientData: patientData,
+      profileServiceData: profileServiceData,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
     );
   }
 }

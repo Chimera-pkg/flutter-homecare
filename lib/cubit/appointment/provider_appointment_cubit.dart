@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:m2health/const.dart';
@@ -35,9 +36,9 @@ class ProviderAppointmentCubit extends Cubit<ProviderAppointmentState> {
         ),
       );
 
-      print('=== API Response Debug ===');
-      print('Status: ${response.statusCode}');
-      print('Response: ${response.data}');
+      log('=== API Response Debug ===');
+      log('Status: ${response.statusCode}');
+      log('Response: ${response.data}');
 
       if (response.statusCode == 200) {
         final List<dynamic> appointmentsJson = response.data['data'] ?? [];
@@ -50,7 +51,7 @@ class ProviderAppointmentCubit extends Cubit<ProviderAppointmentState> {
 
           // If patient data is empty, fetch it separately
           if (appointment.patientData.isEmpty && appointment.userId > 0) {
-            print('Fetching patient data for user_id: ${appointment.userId}');
+            log('Fetching patient data for user_id: ${appointment.userId}');
             final patientData = await _fetchPatientData(appointment.userId);
 
             // Create new appointment with patient data
@@ -79,7 +80,7 @@ class ProviderAppointmentCubit extends Cubit<ProviderAppointmentState> {
         emit(ProviderAppointmentError('Failed to load appointments'));
       }
     } catch (e) {
-      print('Error fetching appointments: $e');
+      log('Error fetching appointments: $e');
       emit(ProviderAppointmentError('Error: $e'));
     }
   }
@@ -97,7 +98,7 @@ class ProviderAppointmentCubit extends Cubit<ProviderAppointmentState> {
         ),
       );
 
-      print('Patient data response: ${response.data}');
+      log('Patient data response: ${response.data}');
 
       if (response.statusCode == 200 && response.data['data'] != null) {
         return Map<String, dynamic>.from(response.data['data']);
@@ -105,14 +106,14 @@ class ProviderAppointmentCubit extends Cubit<ProviderAppointmentState> {
 
       return {};
     } catch (e) {
-      print('Error fetching patient data: $e');
+      log('Error fetching patient data: $e');
       return {};
     }
   }
 
   Future<void> acceptAppointment(int appointmentId) async {
     try {
-      print('Accepting appointment $appointmentId');
+      log('Accepting appointment $appointmentId');
 
       await _appointmentService.acceptProviderAppointment(appointmentId);
 
@@ -130,7 +131,7 @@ class ProviderAppointmentCubit extends Cubit<ProviderAppointmentState> {
         emit(ProviderAppointmentLoaded(updatedAppointments));
       }
     } catch (e) {
-      print('Error accepting appointment: $e');
+      log('Error accepting appointment: $e');
       emit(ProviderAppointmentError(
           'Error accepting appointment: ${e.toString()}'));
     }
@@ -138,66 +139,66 @@ class ProviderAppointmentCubit extends Cubit<ProviderAppointmentState> {
 
   Future<void> rejectAppointment(int appointmentId) async {
     try {
-      print('=== CUBIT: REJECTING APPOINTMENT ===');
-      print('Appointment ID: $appointmentId');
+      log('=== CUBIT: REJECTING APPOINTMENT ===');
+      log('Appointment ID: $appointmentId');
 
       // Get current state before making the API call
       final currentState = state;
-      print('Current state type: ${currentState.runtimeType}');
+      log('Current state type: ${currentState.runtimeType}');
 
       if (currentState is ProviderAppointmentLoaded) {
-        print(
+        log(
             'Number of appointments in current state: ${currentState.appointments.length}');
         final targetAppointment = currentState.appointments
             .where((appointment) => appointment.id == appointmentId)
             .firstOrNull;
 
         if (targetAppointment != null) {
-          print('Target appointment found:');
-          print('  - ID: ${targetAppointment.id}');
-          print('  - Current Status: ${targetAppointment.status}');
-          print(
+          log('Target appointment found:');
+          log('  - ID: ${targetAppointment.id}');
+          log('  - Current Status: ${targetAppointment.status}');
+          log(
               '  - Patient: ${targetAppointment.patientData['username'] ?? targetAppointment.patientData['name'] ?? 'Unknown'}');
-          print('  - Date: ${targetAppointment.date}');
-          print('  - Time: ${targetAppointment.hour}');
+          log('  - Date: ${targetAppointment.date}');
+          log('  - Time: ${targetAppointment.hour}');
         } else {
-          print('❌ Target appointment not found in current state');
+          log('❌ Target appointment not found in current state');
           emit(ProviderAppointmentError(
               'Appointment not found in current state'));
           return;
         }
       }
 
-      print('Calling appointment service to reject appointment...');
+      log('Calling appointment service to reject appointment...');
       await _appointmentService.rejectProviderAppointment(appointmentId);
-      print('✅ Appointment service call completed successfully');
+      log('✅ Appointment service call completed successfully');
 
       // Update the appointment in current state
       if (currentState is ProviderAppointmentLoaded) {
-        print('Updating appointment status in cubit state...');
+        log('Updating appointment status in cubit state...');
         final updatedAppointments =
             currentState.appointments.map((appointment) {
           if (appointment.id == appointmentId) {
-            print(
+            log(
                 'Updating appointment ${appointment.id} status from ${appointment.status} to rejected');
             return appointment.copyWith(status: 'rejected');
           }
           return appointment;
         }).toList();
 
-        print(
+        log(
             'Emitting updated state with ${updatedAppointments.length} appointments');
         emit(ProviderAppointmentLoaded(updatedAppointments));
-        print('✅ State updated successfully');
+        log('✅ State updated successfully');
       } else {
-        print(
+        log(
             '⚠️ Current state is not ProviderAppointmentLoaded, cannot update');
       }
     } catch (e) {
-      print('=== CUBIT: REJECT APPOINTMENT ERROR ===');
-      print('Error type: ${e.runtimeType}');
-      print('Error message: $e');
-      print('❌ Emitting error state');
+      log('=== CUBIT: REJECT APPOINTMENT ERROR ===');
+      log('Error type: ${e.runtimeType}');
+      log('Error message: $e');
+      log('❌ Emitting error state');
       emit(ProviderAppointmentError(
           'Error rejecting appointment: ${e.toString()}'));
     }
@@ -205,7 +206,7 @@ class ProviderAppointmentCubit extends Cubit<ProviderAppointmentState> {
 
   Future<void> completeAppointment(int appointmentId) async {
     try {
-      print('Completing appointment $appointmentId');
+      log('Completing appointment $appointmentId');
 
       await _appointmentService.completeProviderAppointment(appointmentId);
 
@@ -223,7 +224,7 @@ class ProviderAppointmentCubit extends Cubit<ProviderAppointmentState> {
         emit(ProviderAppointmentLoaded(updatedAppointments));
       }
     } catch (e) {
-      print('Error completing appointment: $e');
+      log('Error completing appointment: $e');
       emit(ProviderAppointmentError(
           'Error completing appointment: ${e.toString()}'));
     }
