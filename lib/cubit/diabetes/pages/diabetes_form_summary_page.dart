@@ -23,6 +23,7 @@ class DiabetesFormSummaryPage extends StatelessWidget {
           style: TextStyle(
             color: Colors.black87,
             fontWeight: FontWeight.bold,
+            fontSize: 18,
           ),
         ),
         leading: IconButton(
@@ -162,7 +163,7 @@ class _DiabetesHistorySection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('Diabetes History',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
         _SummaryCard(
           backgroundColor: const Color(0xFF35C5CF),
@@ -222,7 +223,7 @@ class _RiskFactorsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('Medical History & Risk Factors',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
         _SummaryCard(
           backgroundColor: const Color(0xFFB393FF),
@@ -296,7 +297,7 @@ class _LifestyleSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('Lifestyle & Self-Care',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
         _SummaryCard(
           backgroundColor: const Color(0xFFFF9A9A),
@@ -338,7 +339,7 @@ class _PhysicalSignsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('Physical Signs',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
         _SummaryCard(
           backgroundColor: const Color(0xFFF79E1B),
