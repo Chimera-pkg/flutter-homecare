@@ -6,6 +6,7 @@ import 'package:m2health/models/provider_appointment.dart';
 import 'package:m2health/const.dart';
 import 'package:dio/dio.dart';
 import 'package:m2health/utils.dart';
+import 'package:m2health/views/appointment/provider_appointment_detail_page.dart';
 
 class ProviderAppointmentPage extends StatefulWidget {
   final String? providerType;
@@ -199,7 +200,17 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
     final patientData = appointment.patientData;
 
     return GestureDetector(
-      onTap: () => _showAppointmentDetail(appointment),
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) {
+              return ProviderAppointmentDetailPage(
+                appointmentId: appointment.id,
+              );
+            },
+          ),
+        );
+      },
       child: Card(
         margin: const EdgeInsets.only(bottom: 16),
         elevation: 2,
