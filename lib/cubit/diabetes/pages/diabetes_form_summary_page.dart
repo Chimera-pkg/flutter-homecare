@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:m2health/cubit/diabetes/bloc/diabetes_form_cubit.dart';
 import 'package:m2health/cubit/diabetes/bloc/diabetes_form_state.dart';
 import 'package:m2health/cubit/diabetes/widgets/diabetes_form_widget.dart';
+import 'package:m2health/cubit/nursing/personal/nursing_personal_page.dart';
 import 'package:m2health/route/app_routes.dart';
 
 class DiabetesFormSummaryPage extends StatelessWidget {
@@ -396,8 +397,9 @@ class _ActionButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      spacing: 16,
       children: [
-        PrimaryButton(
+        SecondaryButton(
           text: 'Edit Information',
           icon: Icons.edit,
           onPressed: () async {
@@ -407,7 +409,18 @@ class _ActionButtons extends StatelessWidget {
             if (!context.mounted) return;
             await context.read<DiabetesFormCubit>().loadForm();
           },
-        )
+        ),
+        PrimaryButton(
+          text: 'Next',
+          onPressed: () async {
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => const PersonalPage(
+                title: "Nurse Services Case",
+                serviceType: "Nurse",
+              ),
+            ));
+          },
+        ),
       ],
     );
   }
