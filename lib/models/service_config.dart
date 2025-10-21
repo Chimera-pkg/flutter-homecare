@@ -28,6 +28,20 @@ class ServiceTitle {
       'service_type': serviceType,
     };
   }
+
+  ServiceTitle copyWith({
+    int? id,
+    String? title,
+    double? price,
+    String? serviceType,
+  }) {
+    return ServiceTitle(
+      id: id,
+      title: title ?? '',
+      price: price ?? 0.0,
+      serviceType: serviceType ?? '',
+    );
+  }
 }
 
 class ServiceConfig {

@@ -30,6 +30,7 @@ class AppRoutes {
   static const String pharmagenomics = '/pharmagenomics';
   static const String editProfile = '/edit-profile';
   static const String editProfessionalProfile = '/edit-professional-profile';
+  static const String manageServices = '/manage-services';
 
   static const String partnership = '/request-partnership';
   static const String partnership_list = '/partnership-list';

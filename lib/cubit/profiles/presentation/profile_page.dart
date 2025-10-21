@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/const.dart';
-import 'package:m2health/cubit/profiles/ServicesEdit_admin.dart';
 import 'package:m2health/cubit/profiles/domain/entities/profile.dart';
 import 'package:m2health/cubit/profiles/presentation/bloc/profile_cubit.dart';
 import 'package:m2health/cubit/profiles/presentation/bloc/profile_state.dart';
@@ -382,15 +381,10 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             ListTile(
               leading: const Icon(Icons.edit_note, color: Color(0xFF35C5CF)),
-              title: const Text('Edit Service Titles (admin)'),
+              title: const Text('Manage Services'),
               trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ServiceTitlesEditPage(),
-                  ),
-                );
+                GoRouter.of(context).push(AppRoutes.manageServices);
               },
             ),
           ],
