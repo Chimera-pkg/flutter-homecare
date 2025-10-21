@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
 import 'package:m2health/cubit/medical_record/injection.dart';
 import 'package:m2health/cubit/nursingclean/injection.dart';
+import 'package:m2health/cubit/pharmacogenomics/injection.dart';
 import 'package:m2health/cubit/profiles/injection.dart';
 import 'package:m2health/services/appointment_service.dart';
 
@@ -17,4 +18,5 @@ Future<void> setupLocator() async {
   initNursingModule(sl);
   initMedicalRecordModule(sl);
   initProfileModule(sl);
+  initPharmacogenomicsModule(sl);
 }
