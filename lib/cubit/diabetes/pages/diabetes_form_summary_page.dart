@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:m2health/cubit/diabetes/bloc/diabetes_form_cubit.dart';
 import 'package:m2health/cubit/diabetes/bloc/diabetes_form_state.dart';
 import 'package:m2health/cubit/diabetes/widgets/diabetes_form_widget.dart';
+import 'package:m2health/cubit/nursing/const.dart';
 import 'package:m2health/cubit/nursing/personal/nursing_personal_page.dart';
 import 'package:m2health/route/app_routes.dart';
 
@@ -416,8 +417,7 @@ class _ActionButtons extends StatelessWidget {
           onPressed: () async {
             Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => const PersonalPage(
-                title: "Nurse Services Case",
-                serviceType: "Nurse",
+                serviceType: NurseServiceType.specializedNurse,
               ),
             ));
           },

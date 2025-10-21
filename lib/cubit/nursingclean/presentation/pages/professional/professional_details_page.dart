@@ -7,17 +7,17 @@ class ProfessionalDetailsPage extends StatelessWidget {
   final ProfessionalEntity professional;
 
   const ProfessionalDetailsPage({
-    Key? key,
+    super.key,
     required this.professional,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          '${professional.role} Details',
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        title: const Text(
+          'Nurse Details',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
       body: SingleChildScrollView(

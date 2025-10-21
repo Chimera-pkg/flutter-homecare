@@ -1,36 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:m2health/cubit/nursing/const.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/professional/professional_bloc.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/professional/professional_event.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/professional/professional_state.dart';
 import 'package:m2health/cubit/nursingclean/presentation/pages/professional/professional_details_page.dart';
 
 class SearchProfessionalPage extends StatefulWidget {
-  final String serviceType;
+  final NurseServiceType serviceType;
 
-  const SearchProfessionalPage({Key? key, required this.serviceType})
-      : super(key: key);
+  const SearchProfessionalPage({super.key, required this.serviceType});
 
   @override
-  _SearchProfessionalPageState createState() => _SearchProfessionalPageState();
+  State<SearchProfessionalPage> createState() => _SearchProfessionalPageState();
 }
 
 class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
   @override
   void initState() {
     super.initState();
-    context
-        .read<ProfessionalBloc>()
-        .add(GetProfessionalsEvent(widget.serviceType));
+    context.read<ProfessionalBloc>().add(const GetProfessionalsEvent("nurse"));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Search ${widget.serviceType}',
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        title: const Text(
+          'Search Nurse',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
       body: Padding(
@@ -40,7 +38,7 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
             TextField(
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.search),
-                hintText: 'Search ${widget.serviceType}',
+                hintText: 'Search Nurse',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
@@ -137,7 +135,7 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      Text(widget.serviceType),
+                                      Text(widget.serviceType.label),
                                       Row(
                                         children: [
                                           TextButton(

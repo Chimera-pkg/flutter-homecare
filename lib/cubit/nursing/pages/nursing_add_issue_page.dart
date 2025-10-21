@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,20 +8,19 @@ import 'package:m2health/cubit/medical_record/domain/entities/medical_record.dar
 import 'package:m2health/cubit/medical_record/presentation/bloc/medical_record_bloc.dart';
 import 'package:m2health/cubit/medical_record/presentation/bloc/medical_record_event.dart';
 import 'package:m2health/cubit/medical_record/presentation/bloc/medical_record_state.dart';
+import 'package:m2health/cubit/nursing/const.dart';
 import 'package:m2health/cubit/nursing/pages/details/nursing_add_on.dart';
 import 'package:m2health/cubit/nursing/personal/nursing_personal_state.dart';
 import 'package:m2health/utils.dart';
 
-// import 'details/add_on.dart';
-
 class NursingAddIssuePage extends StatefulWidget {
   final NursingIssue? issue;
-  final String serviceType;
+  final NurseServiceType serviceType;
 
-  NursingAddIssuePage({this.issue, required this.serviceType});
+  const NursingAddIssuePage({super.key, this.issue, required this.serviceType});
 
   @override
-  _AddIssuePageState createState() => _AddIssuePageState();
+  State<NursingAddIssuePage> createState() => _AddIssuePageState();
 }
 
 class _AddIssuePageState extends State<NursingAddIssuePage> {
@@ -38,9 +39,6 @@ class _AddIssuePageState extends State<NursingAddIssuePage> {
     final issue = widget.issue;
     if (issue == null) return;
 
-    print('Mobility Status: $_mobilityStatus');
-    print('Related Health Record: $_selectedRecord');
-
     try {
       final token = await Utils.getSpString(Const.TOKEN);
 
@@ -54,10 +52,7 @@ class _AddIssuePageState extends State<NursingAddIssuePage> {
         'related_health_record_id': recordId, // Submit just the ID
       };
 
-      print('Data to be submitted: $data');
-
       final url = '${Const.API_NURSING_PERSONAL_CASES}/${issue.id}';
-      print('Request URL: $url');
 
       final response = await Dio().put(
         url,
@@ -70,12 +65,14 @@ class _AddIssuePageState extends State<NursingAddIssuePage> {
       );
 
       if (response.statusCode == 200) {
-        print('Issue updated successfully');
+        log('Issue updated successfully', name: 'NursingAddIssuePage');
       } else {
-        print('Failed to update issue: ${response.statusMessage}');
+        log('Failed to update issue: ${response.statusMessage}',
+            name: 'NursingAddIssuePage');
       }
-    } catch (e) {
-      print('Error: $e');
+    } catch (e, stackTrace) {
+      log('Error: $e',
+          name: 'NursingAddIssuePage', error: e, stackTrace: stackTrace);
     }
 
     Navigator.push(
@@ -93,9 +90,9 @@ class _AddIssuePageState extends State<NursingAddIssuePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Request ${widget.serviceType} Service',
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        title: const Text(
+          'Nurse Services Case',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
       body: BlocBuilder<MedicalRecordBloc, MedicalRecordState>(

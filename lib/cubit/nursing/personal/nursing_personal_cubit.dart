@@ -1,27 +1,21 @@
+import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:m2health/const.dart';
+import 'package:m2health/cubit/nursing/const.dart';
 import 'package:m2health/utils.dart';
 import 'nursing_personal_state.dart';
 
 class NursingPersonalCubit extends Cubit<NursingPersonalState> {
   NursingPersonalCubit() : super(NursingPersonalInitial());
 
-  void loadPersonalDetails({String? serviceType}) async {
+  void loadPersonalDetails({NurseServiceType? serviceType}) async {
     emit(NursingPersonalLoading());
     try {
       final token = await Utils.getSpString(Const.TOKEN);
-      print('Token: $token');
-
-      // Build API endpoint with optional filtering
-      String apiUrl = Const.API_NURSING_PERSONAL_CASES;
-      if (serviceType != null) {
-        // Add query parameter for filtering by service type
-        apiUrl += '?service_type=${serviceType.toLowerCase()}';
-      }
-
       final response = await Dio().get(
-        apiUrl,
+        Const.API_NURSING_PERSONAL_CASES,
+        queryParameters: {'service_type': 'nurse'},
         options: Options(
           headers: {
             'Authorization': 'Bearer $token',
@@ -29,41 +23,26 @@ class NursingPersonalCubit extends Cubit<NursingPersonalState> {
         ),
       );
 
-      print('Response status code: ${response.statusCode}');
-      print('Response data: ${response.data}');
+      log('Response status code: ${response.statusCode}',
+          name: 'NursingPersonalCubit');
+      log('Response data: ${response.data}', name: 'NursingPersonalCubit');
 
       if (response.statusCode == 200) {
         final dataList = response.data['data']['data'] as List;
         var issues =
             dataList.map((json) => NursingIssue.fromJson(json)).toList();
 
-        // Client-side filtering as backup if backend doesn't support filtering
-        // if (serviceType != null) {
-        //   issues = issues.where((issue) {
-        //     final caseType = issue.caseType?.toLowerCase() ?? '';
-        //     switch (serviceType.toLowerCase()) {
-        //       case 'pharma':
-        //       case 'pharmacist':
-        //         return caseType == 'pharmacy' || caseType == 'pharmacist';
-        //       case 'nurse':
-        //         return caseType == 'nursing' || caseType == 'nurse';
-        //       case 'radiologist':
-        //         return caseType == 'radiology' || caseType == 'radiologist';
-        //       default:
-        //         return true;
-        //     }
-        //   }).toList();
-        // }
-
-        issues.forEach((issue) => issue.updateImageUrls());
-        print('Filtered issues for $serviceType: ${issues.length}');
+        log('Filtered issues for $serviceType: ${issues.length}',
+            name: 'NursingPersonalCubit');
         emit(NursingPersonalLoaded(issues));
       } else {
-        print('Failed to load data: ${response.statusMessage}');
+        log('Failed to load data: ${response.statusMessage}',
+            name: 'NursingPersonalCubit');
         emit(const NursingPersonalError('Failed to load data'));
       }
-    } catch (e) {
-      print('Error: $e');
+    } catch (e, stackTrace) {
+      log('Error: $e',
+          name: 'NursingPersonalCubit', error: e, stackTrace: stackTrace);
       if (e is DioException && e.response?.statusCode == 401) {
         emit(const NursingPersonalUnauthenticated());
       } else {
@@ -116,14 +95,16 @@ class NursingPersonalCubit extends Cubit<NursingPersonalState> {
         );
 
         if (response.statusCode == 201 || response.statusCode == 200) {
-          print("✅ Issue berhasil ditambahkan: ${response.data}");
+          log("✅ Issue berhasil ditambahkan: ${response.data}",
+              name: 'NursingPersonalCubit');
         } else {
-          print("⚠️ Gagal menambahkan issue: ${response.statusMessage}");
+          log("⚠️ Gagal menambahkan issue: ${response.statusMessage}",
+              name: 'NursingPersonalCubit');
           emit(const NursingPersonalError('Failed to add issue to server'));
         }
       } catch (e, stackTrace) {
-        print("❌ Error saat addIssue: $e");
-        print(stackTrace);
+        log("❌ Error saat addIssue: $e",
+            name: 'NursingPersonalCubit', error: e, stackTrace: stackTrace);
         emit(NursingPersonalError(e.toString()));
       }
     }

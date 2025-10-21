@@ -69,15 +69,6 @@ class NursingIssue {
     return [];
   }
 
-  void updateImageUrls() {
-    const String baseUrl = 'https://homecare-api.med-map.org';
-    images = images.map((image) {
-      if (image.startsWith('http://localhost:3334')) {
-        return image.replaceFirst('http://localhost:3334', baseUrl);
-      }
-      return image;
-    }).toList();
-  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -94,6 +85,37 @@ class NursingIssue {
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
+  }
+
+  NursingIssue copyWith({
+    int? id,
+    int? userId,
+    String? title,
+    String? description,
+    List<String>? images, 
+    String? mobilityStatus,
+    Map<String, dynamic>? relatedHealthRecord,
+    String? addOn,
+    double? estimatedBudget,
+    String? caseType, 
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return NursingIssue(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      images: images ?? this.images, 
+      mobilityStatus: mobilityStatus ?? this.mobilityStatus,
+      relatedHealthRecord:
+          relatedHealthRecord ?? this.relatedHealthRecord,
+      addOn: addOn ?? this.addOn,
+      estimatedBudget: estimatedBudget ?? this.estimatedBudget,
+      caseType: caseType ?? this.caseType, 
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
   }
 }
 

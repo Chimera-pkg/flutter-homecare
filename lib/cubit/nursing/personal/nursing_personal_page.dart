@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/const.dart';
+import 'package:m2health/cubit/nursing/const.dart';
 import 'package:m2health/cubit/nursing/pages/nursing_add_concern_page.dart';
 import 'package:m2health/cubit/nursing/personal/nursing_personal_case_detail_page.dart';
 import 'package:m2health/cubit/nursing/personal/nursing_personal_cubit.dart';
@@ -10,19 +11,15 @@ import 'package:m2health/cubit/nursing/pages/nursing_add_issue_page.dart';
 import 'package:intl/intl.dart';
 
 class PersonalPage extends StatefulWidget {
-  final String title; // Add title parameter
-  final String serviceType; // Add serviceType parameter
-  final Function(dynamic)? onItemTap; // Add onItemTap parameter (optional)
+  final NurseServiceType serviceType; // nurse or specialized_nurse
 
   const PersonalPage({
-    Key? key,
-    required this.title, // Add title to constructor
+    super.key,
     required this.serviceType,
-    this.onItemTap,
-  }) : super(key: key);
+  });
 
   @override
-  _PersonalPageState createState() => _PersonalPageState();
+  State<PersonalPage> createState() => _PersonalPageState();
 }
 
 class _PersonalPageState extends State<PersonalPage> {
@@ -61,7 +58,7 @@ class _PersonalPageState extends State<PersonalPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
               ],
             ),
             Expanded(
@@ -81,8 +78,7 @@ class _PersonalPageState extends State<PersonalPage> {
                       onRefresh: () async {
                         context
                             .read<NursingPersonalCubit>()
-                            .loadPersonalDetails(
-                                serviceType: widget.serviceType);
+                            .loadPersonalDetails();
                       },
                       child: issues.isEmpty
                           ? const Center(
