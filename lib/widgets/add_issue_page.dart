@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -32,10 +34,10 @@ class AddIssuePage extends StatefulWidget {
   final Issue? issue;
   final String serviceType;
 
-  AddIssuePage({this.issue, required this.serviceType});
+  const AddIssuePage({super.key, this.issue, required this.serviceType});
 
   @override
-  _AddIssuePageState createState() => _AddIssuePageState();
+  State<AddIssuePage> createState() => _AddIssuePageState();
 }
 
 class _AddIssuePageState extends State<AddIssuePage> {
@@ -78,7 +80,7 @@ class _AddIssuePageState extends State<AddIssuePage> {
         throw Exception('Failed to fetch medical records');
       }
     } catch (e) {
-      print('Error fetching medical records: $e');
+      log('Error fetching medical records: $e');
     } finally {
       setState(() {
         isLoading = false;
@@ -209,7 +211,7 @@ class _AddIssuePageState extends State<AddIssuePage> {
           ),
           if (isLoading)
             Container(
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha: 0.5),
               child: const Center(
                 child: CircularProgressIndicator(),
               ),

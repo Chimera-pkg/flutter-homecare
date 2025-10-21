@@ -15,14 +15,14 @@ class PersonalPage extends StatefulWidget {
   final Function(dynamic)? onItemTap; // Add onItemTap parameter (optional)
 
   const PersonalPage({
-    Key? key,
+    super.key,
     required this.title, // Add title to constructor
     required this.serviceType,
     this.onItemTap,
-  }) : super(key: key);
+  });
 
   @override
-  _PersonalPageState createState() => _PersonalPageState();
+  State<PersonalPage> createState() => _PersonalPageState();
 }
 
 class _PersonalPageState extends State<PersonalPage> {

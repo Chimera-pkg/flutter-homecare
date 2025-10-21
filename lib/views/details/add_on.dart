@@ -1,68 +1,75 @@
+import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/cubit/personal/personal_cubit.dart';
 import 'package:m2health/cubit/personal/personal_state.dart';
+import 'package:m2health/models/service_config.dart';
 import 'package:m2health/utils.dart';
 import 'package:equatable/equatable.dart';
 import 'package:m2health/views/search/search_professional.dart';
 
-class AddOnService extends Equatable {
-  final int id;
-  final String title;
-  final double price;
+abstract class AddOnState extends Equatable {
+  const AddOnState();
+  @override
+  List<Object?> get props => [];
+}
 
-  const AddOnService({
-    required this.id,
-    required this.title,
-    required this.price,
+class AddOnInitial extends AddOnState {}
+
+class AddOnLoading extends AddOnState {}
+
+class AddOnLoaded extends AddOnState {
+  final List<ServiceTitle> services;
+  final List<bool> selectedServices;
+  final double estimatedBudget;
+
+  const AddOnLoaded({
+    required this.services,
+    required this.selectedServices,
+    this.estimatedBudget = 0.0,
   });
 
-  factory AddOnService.fromJson(Map<String, dynamic> json) {
-    return AddOnService(
-      id: json['id'] ?? 0,
-      title: json['title'] ?? '',
-      price: (json['price'] as num?)?.toDouble() ?? 0.0,
+  AddOnLoaded copyWith({
+    List<ServiceTitle>? services,
+    List<bool>? selectedServices,
+    double? estimatedBudget,
+  }) {
+    return AddOnLoaded(
+      services: services ?? this.services,
+      selectedServices: selectedServices ?? this.selectedServices,
+      estimatedBudget: estimatedBudget ?? this.estimatedBudget,
     );
   }
 
   @override
-  List<Object?> get props => [id, title, price];
+  List<Object?> get props => [services, selectedServices, estimatedBudget];
 }
 
-class AddOn extends StatefulWidget {
-  final Issue issue;
+class AddOnError extends AddOnState {
+  final String message;
+  const AddOnError(this.message);
+  @override
+  List<Object?> get props => [message];
+}
+
+class AddOnCubit extends Cubit<AddOnState> {
   final String serviceType;
 
-  AddOn({required this.issue, required this.serviceType});
+  AddOnCubit({required this.serviceType}) : super(AddOnInitial());
 
-  @override
-  _AddOnState createState() => _AddOnState();
-}
-
-class _AddOnState extends State<AddOn> {
-  bool isLoading = true;
-  late List<bool> _selectedServices;
-  List<AddOnService>? serviceData; // Use the type-safe AddOn model
-  double _estimatedBudget = 0.0;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchServiceTitles();
-  }
-
-  Future<void> _fetchServiceTitles() async {
+  Future<void> fetchServices() async {
+    emit(AddOnLoading());
     try {
       final token = await Utils.getSpString(Const.TOKEN);
       String endpoint;
-      if (widget.serviceType == "Pharmacist") {
-        endpoint = '${Const.URL_API}/service-titles/pharma';
-      } else if (widget.serviceType == "Radiologist") {
-        endpoint = '${Const.URL_API}/service-titles/radiologist';
+      if (serviceType == "Pharmacist") {
+        endpoint = '${Const.URL_API}/service-titles?service_type=pharma';
+      } else if (serviceType == "Radiologist") {
+        endpoint = '${Const.URL_API}/service-titles?service_type=radiologist';
       } else {
-        endpoint = '${Const.URL_API}/service-titles/nurse';
+        endpoint = '${Const.URL_API}/service-titles?service_type=nurse';
       }
 
       final response = await Dio().get(
@@ -70,197 +77,231 @@ class _AddOnState extends State<AddOn> {
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
-      if (response.statusCode == 200 && response.data['data'] != null) {
-        final services = (response.data['data'] as List)
-            .map((json) => AddOnService.fromJson(json))
-            .toList();
+      final services = (response.data as List)
+          .map((json) => ServiceTitle.fromJson(json))
+          .toList();
 
-        setState(() {
-          serviceData = services;
-          _selectedServices =
-              List<bool>.generate(serviceData!.length, (_) => false);
-          isLoading = false;
-        });
-      } else {
-        _initializeDefaultServiceTitles();
-      }
+      emit(AddOnLoaded(
+        services: services,
+        selectedServices: List<bool>.generate(services.length, (_) => false),
+        estimatedBudget: 0.0,
+      ));
     } catch (e) {
-      print('Error fetching service titles: $e');
-      _initializeDefaultServiceTitles();
+      log('Error fetching service titles: $e');
+      emit(const AddOnError('Failed to fetch services. Pull to try again.'));
     }
   }
 
-  void _initializeDefaultServiceTitles() {
-    if (widget.serviceType == "Pharmacist") {
-      serviceData = const [
-        AddOnService(id: 1, title: 'Medication Review', price: 15.0),
-        AddOnService(id: 2, title: 'Prescription Consultation', price: 10.0),
-        AddOnService(id: 3, title: 'Medication Management Plan', price: 25.0),
-      ];
-    } else if (widget.serviceType == "Radiologist") {
-      serviceData = const [
-        AddOnService(
-            id: 1, title: 'Image Analysis & Interpretation', price: 150.0),
-        AddOnService(id: 2, title: 'CT Scan Review', price: 200.0),
-        AddOnService(id: 3, title: 'MRI Scan Analysis', price: 250.0),
-        AddOnService(id: 4, title: 'X-Ray Examination', price: 100.0),
-        AddOnService(id: 5, title: 'Ultrasound Analysis', price: 120.0),
-      ];
-    } else {
-      // "Nurse"
-      serviceData = const [
-        AddOnService(id: 1, title: 'Medical Escort', price: 20.0),
-        AddOnService(id: 2, title: 'Inject', price: 15.0),
-        AddOnService(id: 3, title: 'Blood Glucose Check', price: 10.0),
-      ];
-    }
+  void toggleServiceSelection(int index) {
+    if (state is AddOnLoaded) {
+      final currentState = state as AddOnLoaded;
 
-    setState(() {
-      _selectedServices =
-          List<bool>.generate(serviceData!.length, (_) => false);
-      isLoading = false;
-    });
-  }
+      final newSelectedServices =
+          List<bool>.from(currentState.selectedServices);
+      newSelectedServices[index] = !newSelectedServices[index];
 
-  void _updateEstimatedBudget() {
-    double budget = 0.0;
-    for (int i = 0; i < _selectedServices.length; i++) {
-      if (_selectedServices[i]) {
-        budget += serviceData![i].price;
+      double budget = 0.0;
+      for (int i = 0; i < newSelectedServices.length; i++) {
+        if (newSelectedServices[i]) {
+          budget += currentState.services[i].price;
+        }
       }
+
+      emit(currentState.copyWith(
+        selectedServices: newSelectedServices,
+        estimatedBudget: budget,
+      ));
     }
-    setState(() {
-      _estimatedBudget = budget;
-    });
   }
+}
 
-  void _submitData() {
-    final String selectedAddOns = _selectedServices
-        .asMap()
-        .entries
-        .where((entry) => entry.value)
-        .map((entry) => serviceData![entry.key].title)
-        .join(', ');
+class AddOn extends StatelessWidget {
+  final Issue issue;
+  final String serviceType;
 
-    final updatedIssue = widget.issue.copyWith(
-      addOn: selectedAddOns,
-      estimatedBudget: _estimatedBudget,
+  const AddOn({super.key, required this.issue, required this.serviceType});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) =>
+          AddOnCubit(serviceType: serviceType)..fetchServices(),
+      child: _AddOnView(issue: issue, serviceType: serviceType),
     );
+  }
+}
 
-    context.read<PersonalCubit>().updateIssue(updatedIssue);
+class _AddOnView extends StatelessWidget {
+  final Issue issue;
+  final String serviceType;
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SearchPage(
-          serviceType: widget.serviceType,
+  const _AddOnView({required this.issue, required this.serviceType});
+
+  void _submitData(BuildContext context) {
+    final state = context.read<AddOnCubit>().state;
+
+    if (state is AddOnLoaded) {
+      final String selectedAddOns = state.selectedServices
+          .asMap()
+          .entries
+          .where((entry) => entry.value)
+          .map((entry) => state.services[entry.key].title)
+          .join(', ');
+
+      final updatedIssue = issue.copyWith(
+        addOn: selectedAddOns,
+        estimatedBudget: state.estimatedBudget,
+      );
+
+      context.read<PersonalCubit>().updateIssue(updatedIssue);
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SearchPage(
+            serviceType: serviceType,
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Add-On Services')),
-        body: const Center(child: CircularProgressIndicator()),
-      );
-    }
-
-    if (serviceData == null || serviceData!.isEmpty) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Add-On Services')),
-        body: const Center(child: Text('No services available')),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.serviceType == "Pharmacist"
+          serviceType == "Pharmacist"
               ? 'Pharmacist Add-On Services'
-              : widget.serviceType == "Radiologist"
+              : serviceType == "Radiologist"
                   ? 'Radiologist Add-On Services'
                   : 'Nursing Add-On Services',
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: serviceData!.length,
-                itemBuilder: (context, i) {
-                  final service = serviceData![i];
-                  return Card(
-                    child: ListTile(
-                      leading: Checkbox(
-                        value: _selectedServices[i],
-                        onChanged: (bool? value) {
-                          setState(() {
-                            _selectedServices[i] = value ?? false;
-                            _updateEstimatedBudget();
-                          });
+      body: BlocBuilder<AddOnCubit, AddOnState>(
+        builder: (context, state) {
+          if (state is AddOnInitial || state is AddOnLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state is AddOnError) {
+            return RefreshIndicator(
+              onRefresh: () => context.read<AddOnCubit>().fetchServices(),
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.4,
+                    child: Center(child: Text(state.message)),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          if (state is AddOnLoaded) {
+            if (state.services.isEmpty) {
+              return RefreshIndicator(
+                onRefresh: () => context.read<AddOnCubit>().fetchServices(),
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: [
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.4,
+                      child: const Center(child: Text('No services available')),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: () =>
+                          context.read<AddOnCubit>().fetchServices(),
+                      child: ListView.builder(
+                        itemCount: state.services.length,
+                        itemBuilder: (context, i) {
+                          final service = state.services[i];
+                          return Card(
+                            child: ListTile(
+                              leading: Checkbox(
+                                value: state.selectedServices[i],
+                                onChanged: (bool? value) {
+                                  context
+                                      .read<AddOnCubit>()
+                                      .toggleServiceSelection(i);
+                                },
+                                activeColor: const Color(0xFF35C5CF),
+                              ),
+                              title: Text(
+                                service.title,
+                                style: const TextStyle(
+                                    fontSize: 12, fontWeight: FontWeight.bold),
+                              ),
+                              subtitle: Text(
+                                '\$${service.price}',
+                                style: const TextStyle(
+                                  color: Color(0xFF35C5CF),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              trailing: const Icon(Icons.info_outline_rounded,
+                                  color: Colors.grey),
+                            ),
+                          );
                         },
-                        activeColor: const Color(0xFF35C5CF),
                       ),
-                      title: Text(
-                        service.title,
-                        style: const TextStyle(
-                            fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Estimated Budget',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
                       ),
-                      subtitle: Text(
-                        '\$${service.price}',
+                      Text(
+                        // Read budget from state
+                        '\$${state.estimatedBudget.toStringAsFixed(2)}',
                         style: const TextStyle(
-                          color: Color(0xFF35C5CF),
-                          fontWeight: FontWeight.bold,
+                            fontSize: 20, fontWeight: FontWeight.w900),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: 352,
+                    height: 58,
+                    child: ElevatedButton(
+                      onPressed: () => _submitData(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF35C5CF),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
                         ),
                       ),
-                      trailing: const Icon(Icons.info_outline_rounded,
-                          color: Colors.grey),
+                      child: const Text(
+                        'Book Appointment',
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                      ),
                     ),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Estimated Budget',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  '\$$_estimatedBudget',
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.w900),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              width: 352,
-              height: 58,
-              child: ElevatedButton(
-                onPressed: _submitData,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF35C5CF),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
                   ),
-                ),
-                child: const Text(
-                  'Book Appointment',
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
+                ],
               ),
-            ),
-          ],
-        ),
+            );
+          }
+
+          // Fallback
+          return const Center(child: Text('Something went wrong.'));
+        },
       ),
     );
   }
