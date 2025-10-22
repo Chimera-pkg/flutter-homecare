@@ -191,66 +191,69 @@ class _AddOnView extends StatelessWidget {
           }
 
           if (state is AddOnLoaded) {
-            if (state.services.isEmpty) {
-              return RefreshIndicator(
-                onRefresh: () => context.read<AddOnCubit>().fetchServices(),
-                child: ListView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  children: [
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.4,
-                      child: const Center(child: Text('No services available')),
-                    ),
-                  ],
-                ),
-              );
-            }
-
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
                   Expanded(
-                    child: ListView.builder(
-                      itemCount: state.services.length,
-                      itemBuilder: (context, i) {
-                        final service = state.services[i];
-                        return Card(
-                          child: ListTile(
-                            leading: Checkbox(
-                              value: state.selectedServices[i],
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              side: BorderSide(
-                                color: Colors.grey.shade400,
-                                width: 1.5,
-                              ),
-                              onChanged: (bool? value) {
-                                context
-                                    .read<AddOnCubit>()
-                                    .toggleServiceSelection(i);
-                              },
-                              activeColor: const Color(0xFF35C5CF),
+                    child: state.services.isEmpty
+                        ? RefreshIndicator(
+                            onRefresh: () =>
+                                context.read<AddOnCubit>().fetchServices(),
+                            child: ListView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              children: [
+                                SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.4,
+                                  child: const Center(
+                                      child: Text('No services available')),
+                                ),
+                              ],
                             ),
-                            title: Text(
-                              service.title,
-                              style: const TextStyle(
-                                  fontSize: 12, fontWeight: FontWeight.bold),
-                            ),
-                            subtitle: Text(
-                              '\$${service.price}',
-                              style: const TextStyle(
-                                color: Color(0xFF35C5CF),
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            trailing: const Icon(Icons.info_outline_rounded,
-                                color: Colors.grey),
+                          )
+                        : ListView.builder(
+                            itemCount: state.services.length,
+                            itemBuilder: (context, i) {
+                              final service = state.services[i];
+                              return Card(
+                                child: ListTile(
+                                  leading: Checkbox(
+                                    value: state.selectedServices[i],
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    side: BorderSide(
+                                      color: Colors.grey.shade400,
+                                      width: 1.5,
+                                    ),
+                                    onChanged: (bool? value) {
+                                      context
+                                          .read<AddOnCubit>()
+                                          .toggleServiceSelection(i);
+                                    },
+                                    activeColor: const Color(0xFF35C5CF),
+                                  ),
+                                  title: Text(
+                                    service.title,
+                                    style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  subtitle: Text(
+                                    '\$${service.price}',
+                                    style: const TextStyle(
+                                      color: Color(0xFF35C5CF),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  trailing: const Icon(
+                                      Icons.info_outline_rounded,
+                                      color: Colors.grey),
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
-                    ),
                   ),
                   const SizedBox(height: 10),
                   Row(
