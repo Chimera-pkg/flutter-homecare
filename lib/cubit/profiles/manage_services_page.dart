@@ -86,7 +86,7 @@ class ServicesCubit extends Cubit<ServicesState> {
         'price': price,
         'serviceType': serviceType,
       });
-      await _dio.post('${Const.API_SERVICE_TITLES}/$id', data: formData);
+      await _dio.put('${Const.API_SERVICE_TITLES}/$id', data: formData);
       fetchServices();
     } catch (e) {
       emit(ServicesError('Failed to update service: $e'));
