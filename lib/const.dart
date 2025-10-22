@@ -23,7 +23,10 @@ class Const {
       URL_API + '/pharmacist/personal-cases';
 
   // Pharmacogenomics
-  static const String API_PHARMACOGENOMICS = URL_API + '/pharmacogenomics';
+  static const String API_PHARMACOGENOMICS = '$URL_API/pharmacogenomics';
+
+  // Wellness Genomics
+  static const String API_WELLNESS_GENOMICS = '$URL_API/wellness-genomics';
 
   static const String API_PHARMACIST_SERVICES =
       URL_API + '/pharmacist-services';

@@ -5,6 +5,7 @@ import 'package:m2health/cubit/profiles/manage_services_page.dart';
 import 'package:m2health/cubit/profiles/presentation/edit_professional_profile.dart';
 import 'package:m2health/cubit/profiles/presentation/edit_profile.dart';
 import 'package:m2health/cubit/profiles/profile_details/medical_record/medical_record.dart';
+import 'package:m2health/cubit/wellness_genomics/presentation/pages/wellness_genomics_page.dart';
 import 'package:m2health/route/app_routes.dart';
 
 class ProfileDetailRoutes {
@@ -19,6 +20,12 @@ class ProfileDetailRoutes {
       path: AppRoutes.pharmagenomics,
       builder: (context, state) {
         return const PharmagenomicsProfilePage();
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.wellnessGenomics,
+      builder: (context, state) {
+        return const WellnessGenomicsProfilePage();
       },
     ),
     GoRoute(

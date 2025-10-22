@@ -28,6 +28,7 @@ class AppRoutes {
   // Profile Detail
   static const String medicalRecord = '/medical-record';
   static const String pharmagenomics = '/pharmagenomics';
+  static const String wellnessGenomics = '/wellness-genomics';
   static const String editProfile = '/edit-profile';
   static const String editProfessionalProfile = '/edit-professional-profile';
   static const String manageServices = '/manage-services';
