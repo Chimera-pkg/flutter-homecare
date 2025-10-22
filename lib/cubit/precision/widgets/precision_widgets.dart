@@ -271,7 +271,7 @@ class CustomDropdown extends StatelessWidget {
               horizontal: 16,
               vertical: 12,
             ),
-            suffixIcon: const Icon(Icons.keyboard_arrow_down),
+            // suffixIcon: const Icon(Icons.keyboard_arrow_down),
           ),
         ),
         const SizedBox(height: 16),

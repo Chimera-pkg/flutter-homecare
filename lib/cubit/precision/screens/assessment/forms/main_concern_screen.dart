@@ -11,18 +11,6 @@ class MainConcernScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => NutritionAssessmentCubit(),
-      child: const MainConcernView(),
-    );
-  }
-}
-
-class MainConcernView extends StatelessWidget {
-  const MainConcernView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(title: 'Precision Nutrition Assessment'),
       body: BlocBuilder<NutritionAssessmentCubit, NutritionAssessmentState>(

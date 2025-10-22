@@ -1,71 +1,93 @@
+import 'dart:developer';
+import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:m2health/utils.dart';
+import 'package:path/path.dart' as p;
+import 'package:m2health/const.dart';
 
 // State untuk Precision Nutrition Assessment
 class NutritionAssessmentState extends Equatable {
+  final int? id;
+  final int? userId;
   final String? mainConcern;
   final HealthProfile? healthProfile;
   final double selfRatedHealth;
   final LifestyleHabits? lifestyleHabits;
   final NutritionHabits? nutritionHabits;
-  final List<String> uploadedFiles;
+  final List<String> fileUrls; // Uploaded file URLs
+  final List<File> files; // Files to be uploaded
   final bool isLoading;
   final String? errorMessage;
-  final bool isSubmitted;
+
+  bool get isSubmitted => id != null;
 
   const NutritionAssessmentState({
+    this.id,
+    this.userId,
     this.mainConcern,
     this.healthProfile,
     this.selfRatedHealth = 1.0,
     this.lifestyleHabits,
     this.nutritionHabits,
-    this.uploadedFiles = const [],
+    this.fileUrls = const [],
+    this.files = const [],
     this.isLoading = false,
     this.errorMessage,
-    this.isSubmitted = false,
   });
 
   NutritionAssessmentState copyWith({
+    int? id,
+    int? userId,
     String? mainConcern,
     HealthProfile? healthProfile,
     double? selfRatedHealth,
     LifestyleHabits? lifestyleHabits,
     NutritionHabits? nutritionHabits,
-    List<String>? uploadedFiles,
+    List<String>? fileUrls,
+    List<File>? files,
     bool? isLoading,
     String? errorMessage,
-    bool? isSubmitted,
   }) {
     return NutritionAssessmentState(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
       mainConcern: mainConcern ?? this.mainConcern,
       healthProfile: healthProfile ?? this.healthProfile,
       selfRatedHealth: selfRatedHealth ?? this.selfRatedHealth,
       lifestyleHabits: lifestyleHabits ?? this.lifestyleHabits,
       nutritionHabits: nutritionHabits ?? this.nutritionHabits,
-      uploadedFiles: uploadedFiles ?? this.uploadedFiles,
+      fileUrls: fileUrls ?? this.fileUrls,
+      files: files ?? this.files,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage ?? this.errorMessage,
-      isSubmitted: isSubmitted ?? this.isSubmitted,
     );
   }
 
   @override
   List<Object?> get props => [
+        id,
+        userId,
         mainConcern,
         healthProfile,
         selfRatedHealth,
         lifestyleHabits,
         nutritionHabits,
-        uploadedFiles,
+        fileUrls,
+        files,
         isLoading,
         errorMessage,
-        isSubmitted,
       ];
 }
 
 // Cubit untuk Precision Nutrition
 class NutritionAssessmentCubit extends Cubit<NutritionAssessmentState> {
-  NutritionAssessmentCubit() : super(const NutritionAssessmentState());
+  final Dio _dio;
+
+  NutritionAssessmentCubit(
+    this._dio,
+  ) : super(const NutritionAssessmentState());
 
   void setMainConcern(String concern) {
     emit(state.copyWith(mainConcern: concern));
@@ -87,31 +109,161 @@ class NutritionAssessmentCubit extends Cubit<NutritionAssessmentState> {
     emit(state.copyWith(nutritionHabits: habits));
   }
 
-  void addUploadedFile(String fileName) {
-    final newFiles = List<String>.from(state.uploadedFiles)..add(fileName);
-    emit(state.copyWith(uploadedFiles: newFiles));
+  void addFile(File file) {
+    final newFiles = List<File>.from(state.files)..add(file);
+    emit(state.copyWith(files: newFiles));
   }
 
-  void removeUploadedFile(String fileName) {
-    final newFiles = List<String>.from(state.uploadedFiles)..remove(fileName);
-    emit(state.copyWith(uploadedFiles: newFiles));
+  void removeFile(File file) {
+    final newFiles = List<File>.from(state.files)..remove(file);
+    emit(state.copyWith(files: newFiles));
+  }
+
+  void removeFileUrl(String url) {
+    final newFileUrls = List<String>.from(state.fileUrls)..remove(url);
+    emit(state.copyWith(fileUrls: newFileUrls));
   }
 
   Future<void> submitAssessment() async {
     emit(state.copyWith(isLoading: true, errorMessage: null));
 
     try {
-      // Simulate API call with dummy data
-      await Future.delayed(const Duration(seconds: 2));
+      List<MultipartFile> filesPayload = [];
+      for (var file in state.files) {
+        filesPayload.add(await MultipartFile.fromFile(
+          file.path,
+          filename: p.basename(file.path),
+        ));
+      }
 
-      // Success - no error
-      emit(state.copyWith(isLoading: false, isSubmitted: true));
-    } catch (e) {
+      final payload = FormData.fromMap({
+        'mainConcern': state.mainConcern,
+        'selfRatedHealth': state.selfRatedHealth,
+        'age': state.healthProfile?.age,
+        'gender': state.healthProfile?.gender,
+        'knownCondition': state.healthProfile?.knownCondition,
+        'specialConsiderations': state.healthProfile?.specialConsiderations,
+        'medicationHistory': state.healthProfile?.medicationHistory,
+        'familyHealthHistory': state.healthProfile?.familyHistory,
+        'sleepHours': state.lifestyleHabits?.sleepHours,
+        'activityLevel': state.lifestyleHabits?.activityLevel,
+        'exerciseFrequency': state.lifestyleHabits?.exerciseFrequency,
+        'stressLevel': state.lifestyleHabits?.stressLevel,
+        'smokingAlcoholHabit': state.lifestyleHabits?.smokingAlcoholHabits,
+        'mealFrequency': state.nutritionHabits?.mealFrequency,
+        'foodSensitivities': state.nutritionHabits?.foodSensitivities,
+        'favoriteFoods': state.nutritionHabits?.favoriteFoods,
+        'avoidedFoods': state.nutritionHabits?.avoidedFoods,
+        'waterIntake': state.nutritionHabits?.waterIntake,
+        'pastDiet': state.nutritionHabits?.pastDiets,
+        'medical_report_files': filesPayload
+      });
+
+      log('Payload of nutrtion assessment:\n $payload',
+          name: 'NutritionAssessmentCubit');
+      Response response;
+      final headers = Options(headers: {
+        'Authorization': 'Bearer ${await Utils.getSpString(Const.TOKEN)}'
+      });
+
+      if (state.isSubmitted) {
+        final url = '${Const.API_NUTRITION_ASSESSMENT}/${state.id}';
+        log('Attempting to UPDATE (PUT) assessment id: ${state.id}\n at $url',
+            name: 'NutritionAssessmentCubit');
+
+        response = await _dio.put(
+          url,
+          data: payload,
+          options: headers,
+        );
+      } else {
+        log('Attempting to CREATE (POST) new assessment',
+            name: 'NutritionAssessmentCubit');
+        response = await _dio.post(
+          Const.API_NUTRITION_ASSESSMENT,
+          data: payload,
+          options: headers,
+        );
+      }
+      log('Status code: ${response.statusCode}',
+          name: 'NutritionAssessmentCubit');
+      log('Response:\n${response.data}', name: 'NutritionAssessmentCubit');
+
+      emit(state.copyWith(isLoading: false));
+    } catch (e, stackTrace) {
+      log('Failed to submit nutrition assessment',
+          error: e, stackTrace: stackTrace, name: 'NutritionAssessmentCubit');
       emit(state.copyWith(
         isLoading: false,
-        errorMessage: 'Failed to submit assessment: ${e.toString()}',
-        isSubmitted: false,
+        errorMessage: 'Failed to submit nutrition assessment',
       ));
+    }
+  }
+
+  Future<bool> fetchAssessment() async {
+    emit(state.copyWith(isLoading: true, errorMessage: null));
+    try {
+      final response = await _dio.get(Const.API_NUTRITION_ASSESSMENT,
+          options: Options(headers: {
+            'Authorization': 'Bearer ${await Utils.getSpString(Const.TOKEN)}'
+          }));
+      log('Status code: ${response.statusCode}',
+          name: 'NutritionAssessmentCubit');
+      log('Response:\n${response.data}', name: 'NutritionAssessmentCubit');
+
+      Map<String, dynamic> data = {};
+      if (response.data is List) {
+        if ((response.data as List).isEmpty) {
+          emit(state.copyWith(isLoading: false)); // No data
+          return false;
+        }
+        data = (response.data as List).first;
+      } else if (response.data is Map<String, dynamic>) {
+        data = response.data;
+      }
+
+      final newState = NutritionAssessmentState(
+        id: data['id'],
+        userId: data['user_id'],
+        mainConcern: data['main_concern'],
+        selfRatedHealth: (data['self_rated_health'] as num).toDouble(),
+        fileUrls: List<String>.from(data['medical_report_files'] ?? []),
+        healthProfile: HealthProfile(
+          age: data['age'],
+          gender: data['gender'],
+          knownCondition: data['known_condition'],
+          specialConsiderations:
+              List<String>.from(data['special_considerations'] ?? []),
+          medicationHistory: data['medication_history'],
+          familyHistory: data['family_health_history'],
+        ),
+        lifestyleHabits: LifestyleHabits(
+          sleepHours: (data['sleep_hours'] as num).toDouble(),
+          activityLevel: data['activity_level'],
+          exerciseFrequency: data['exercise_frequency'],
+          stressLevel: data['stress_level'],
+          smokingAlcoholHabits: data['smoking_alcohol_habit'],
+        ),
+        nutritionHabits: NutritionHabits(
+          mealFrequency: data['meal_frequency'],
+          foodSensitivities: data['food_sensitivities'],
+          favoriteFoods: data['favorite_foods'],
+          avoidedFoods: data['avoided_foods'],
+          waterIntake: data['water_intake'],
+          pastDiets: data['past_diet'],
+        ),
+      );
+
+      emit(newState.copyWith(isLoading: false));
+      return true;
+    } catch (e, stackTrace) {
+      log('Failed to fetch nutrition assessment',
+          error: e, stackTrace: stackTrace, name: 'NutritionAssessmentCubit');
+      emit(state.copyWith(
+        isLoading: false,
+        errorMessage: 'Failed to fetch nutrition assessment',
+      ));
+      return false;
     }
   }
 

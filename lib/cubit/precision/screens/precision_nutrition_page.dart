@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:m2health/const.dart';
 import 'package:m2health/cubit/precision/bloc/nutrition_assessment_cubit.dart';
 import 'package:m2health/route/app_routes.dart';
 
@@ -13,7 +14,11 @@ class PrecisionNutritionPage extends StatelessWidget {
         builder: (context, state) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Precision Nutrition'),
+          title: const Text('Precision Nutrition',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              )),
           backgroundColor: Colors.white,
           foregroundColor: Colors.black,
           elevation: 0,
@@ -41,14 +46,22 @@ class PrecisionNutritionPage extends StatelessWidget {
                         title: "Precision Nutrition Assessment",
                         description:
                             "Start your journey with a deep analysis of your genes, metabolism and lifestyle to understand your body's unique needs.",
-                        buttonText: state.isSubmitted ? "View" : "Start Now",
+                        buttonText: "Start Now",
                         imagePath: "assets/illustration/foodies.png",
                         backgroundColor: const Color(0xFFE8F3FF),
-                        onTap: () {
-                          final path = state.isSubmitted
-                              ? AppRoutes.precisionNutritionAssessmentDetail
-                              : AppRoutes.precisionNutritionAssessmentForm;
-                          GoRouter.of(context).goNamed(path);
+                        isLoading: state.isLoading,
+                        onTap: () async {
+                          final hasAssessment = await context
+                              .read<NutritionAssessmentCubit>()
+                              .fetchAssessment();
+                          if (!context.mounted) return;
+                          if (hasAssessment) {
+                            GoRouter.of(context).goNamed(
+                                AppRoutes.precisionNutritionAssessmentDetail);
+                          } else {
+                            GoRouter.of(context).goNamed(
+                                AppRoutes.precisionNutritionAssessmentForm);
+                          }
                         },
                       ),
 
@@ -120,17 +133,18 @@ class PrecisionNutritionCard extends StatelessWidget {
   final String imagePath;
   final Color backgroundColor;
   final VoidCallback onTap;
+  final bool isLoading;
 
-  const PrecisionNutritionCard({
-    Key? key,
-    required this.step,
-    required this.title,
-    required this.description,
-    required this.buttonText,
-    required this.imagePath,
-    required this.backgroundColor,
-    required this.onTap,
-  }) : super(key: key);
+  const PrecisionNutritionCard(
+      {super.key,
+      required this.step,
+      required this.title,
+      required this.description,
+      required this.buttonText,
+      required this.imagePath,
+      required this.backgroundColor,
+      required this.onTap,
+      this.isLoading = false});
 
   @override
   Widget build(BuildContext context) {
@@ -187,7 +201,7 @@ class PrecisionNutritionCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: onTap,
+                  onPressed: isLoading ? null : onTap,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).primaryColor,
                     foregroundColor: Colors.white,
@@ -195,7 +209,21 @@ class PrecisionNutritionCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: Text(buttonText),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(buttonText),
+                      if (isLoading)
+                        const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Const.aqua,
+                          ),
+                        )
+                    ],
+                  ),
                 ),
               ],
             ),

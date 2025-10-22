@@ -37,7 +37,7 @@ class NutritionAssessmentDetailScreen extends StatelessWidget {
             _SelfRatedHealthCard(rating: state.selfRatedHealth),
             const SizedBox(height: 24),
             const _SectionTitle('Biomarker Upload'),
-            _BiomarkerUploadCard(uploadedFiles: state.uploadedFiles),
+            _BiomarkerUploadCard(uploadedFiles: state.fileUrls),
             const SizedBox(height: 32),
             const _ActionButtons(),
           ],
@@ -419,6 +419,8 @@ class _BiomarkerUploadCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final fileNames =
+        uploadedFiles.map((url) => url.split('/').last).join(", ");
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -433,7 +435,7 @@ class _BiomarkerUploadCard extends StatelessWidget {
             iconColor: primaryColor,
             label: 'Medical Report',
             value: uploadedFiles.isNotEmpty
-                ? 'Uploaded (${uploadedFiles.join(", ")})'
+                ? 'Uploaded ($fileNames)'
                 : 'Not Uploaded',
           ),
           const SizedBox(height: 16),

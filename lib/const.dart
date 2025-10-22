@@ -46,7 +46,10 @@ class Const {
   static const String API_PROVIDER_REJECT = URL_API + '/provider/appointments';
   static const String API_PROVIDER_COMPLETE =
       URL_API + '/provider/appointments';
-// end new api
+
+  static const String API_NUTRITION_ASSESSMENT =
+      '$URL_API/nutrition-assessments';
+
   static const String ROLE = 'role';
   static const String IS_LOGED_IN = 'is_logged_in';
   static const String TOKEN = 'token';

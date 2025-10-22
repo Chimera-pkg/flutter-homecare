@@ -55,7 +55,7 @@ void main() async {
           create: (context) => sl<Dio>(),
         ),
         BlocProvider<NutritionAssessmentCubit>(
-          create: (context) => NutritionAssessmentCubit(),
+          create: (context) => NutritionAssessmentCubit(sl<Dio>()),
         ),
         BlocProvider(create: (context) => AppointmentCubit(sl<Dio>())),
         BlocProvider(create: (context) => ProviderAppointmentCubit(sl<Dio>())),

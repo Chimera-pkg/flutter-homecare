@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:path/path.dart' as p;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,15 +9,13 @@ import '../../../widgets/precision_widgets.dart';
 import '../../../bloc/nutrition_assessment_cubit.dart';
 
 class BiomarkerUploadScreen extends StatefulWidget {
-  const BiomarkerUploadScreen({Key? key}) : super(key: key);
+  const BiomarkerUploadScreen({super.key});
 
   @override
   State<BiomarkerUploadScreen> createState() => _BiomarkerUploadScreenState();
 }
 
 class _BiomarkerUploadScreenState extends State<BiomarkerUploadScreen> {
-  final List<String> _uploadedFiles = [];
-
   void _pickFiles() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
@@ -24,19 +24,11 @@ class _BiomarkerUploadScreenState extends State<BiomarkerUploadScreen> {
 
     if (result == null) return;
 
-    setState(() {
-      // final fileName = 'medical_record_${_uploadedFiles.length + 1}.pdf';
-      final fileName = result.files.single.name;
-      _uploadedFiles.add(fileName);
-      context.read<NutritionAssessmentCubit>().addUploadedFile(fileName);
-    });
-  }
-
-  void _removeFile(String fileName) {
-    setState(() {
-      _uploadedFiles.remove(fileName);
-      context.read<NutritionAssessmentCubit>().removeUploadedFile(fileName);
-    });
+    final path = result.files.single.path;
+    if (path != null && mounted) {
+      final file = File(path);
+      context.read<NutritionAssessmentCubit>().addFile(file);
+    }
   }
 
   void _connectWearableDevice() {
@@ -82,6 +74,8 @@ class _BiomarkerUploadScreenState extends State<BiomarkerUploadScreen> {
       appBar: const CustomAppBar(title: 'Biomarker Upload'),
       body: BlocBuilder<NutritionAssessmentCubit, NutritionAssessmentState>(
         builder: (context, state) {
+          final existingUrls = state.fileUrls;
+          final newFiles = state.files;
           return Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
@@ -204,7 +198,7 @@ class _BiomarkerUploadScreenState extends State<BiomarkerUploadScreen> {
                         const SizedBox(height: 24),
 
                         // Uploaded Files Section
-                        if (_uploadedFiles.isNotEmpty) ...[
+                        if (existingUrls.isNotEmpty || newFiles.isNotEmpty) ...[
                           const Text(
                             'Uploaded Files',
                             style: TextStyle(
@@ -220,35 +214,48 @@ class _BiomarkerUploadScreenState extends State<BiomarkerUploadScreen> {
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(color: Colors.grey.shade300),
                             ),
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: _uploadedFiles.length,
-                              itemBuilder: (context, index) {
-                                final fileName = _uploadedFiles[index];
-                                return ListTile(
-                                  leading: const Icon(
-                                    Icons.description,
-                                    color: Color(0xFF00B4D8),
-                                  ),
-                                  title: Text(
-                                    fileName,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
+                            child: Column(
+                              children: [
+                                ...existingUrls.map((url) {
+                                  final fileName = url.split('/').last;
+                                  return ListTile(
+                                    leading: const Icon(
+                                      Icons.cloud_done,
+                                      color: Colors.green,
                                     ),
-                                  ),
-                                  trailing: IconButton(
-                                    icon: const Icon(
-                                      Icons.delete_outline,
-                                      color: Colors.red,
+                                    title: Text(fileName,
+                                        style: const TextStyle(fontSize: 14)),
+                                    trailing: IconButton(
+                                      icon: const Icon(Icons.delete_outline,
+                                          color: Colors.red),
+                                      onPressed: () => context
+                                          .read<NutritionAssessmentCubit>()
+                                          .removeFileUrl(url),
                                     ),
-                                    onPressed: () => _removeFile(fileName),
-                                  ),
-                                );
-                              },
+                                  );
+                                }),
+                                ...newFiles.map((file) {
+                                  final fileName = p.basename(file.path);
+                                  return ListTile(
+                                    leading: const Icon(
+                                      Icons.description,
+                                      color: Color(0xFF00B4D8),
+                                    ),
+                                    title: Text(fileName,
+                                        style: const TextStyle(fontSize: 14)),
+                                    trailing: IconButton(
+                                      icon: const Icon(Icons.delete_outline,
+                                          color: Colors.red),
+                                      onPressed: () => context
+                                          .read<NutritionAssessmentCubit>()
+                                          .removeFile(file),
+                                    ),
+                                  );
+                                }),
+                              ],
                             ),
                           ),
+                          const SizedBox(height: 24),
                         ],
                       ],
                     ),
