@@ -4,7 +4,7 @@ import 'package:m2health/cubit/nursing/const.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/professional/professional_bloc.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/professional/professional_event.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/professional/professional_state.dart';
-import 'package:m2health/cubit/nursingclean/presentation/pages/professional/professional_details_page.dart';
+import 'package:m2health/cubit/nursing/pages/professional_details_page.dart';
 
 class SearchProfessionalPage extends StatefulWidget {
   final NurseServiceType serviceType;
