@@ -4,7 +4,7 @@ import 'package:m2health/cubit/nursing/pages/nursing_services.dart';
 import 'package:m2health/cubit/precision/precision_nutrition_routes.dart';
 import 'package:m2health/route/navigator_keys.dart';
 import 'package:m2health/views/pharmacist_services.dart';
-import '../cubit/precision/precision_page.dart';
+import '../cubit/precision/screens/precision_nutrition_page.dart';
 import '../cubit/diabetes/diabetic_care.dart';
 import '../views/home_health_screening.dart';
 import '../views/remote_patient_monitoring.dart';
