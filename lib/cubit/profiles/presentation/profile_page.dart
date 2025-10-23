@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/cubit/profiles/domain/entities/profile.dart';
 import 'package:m2health/cubit/profiles/presentation/bloc/profile_cubit.dart';
@@ -311,9 +312,11 @@ class _ProfilePageState extends State<ProfilePage> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             ListTile(
-              leading: const Icon(
-                Icons.medical_services,
-                color: Color(0xFF35C5CF),
+              leading: SvgPicture.asset(
+                'assets/icons/capsule_n_pill.svg',
+                height: 28,
+                colorFilter:
+                    const ColorFilter.mode(Const.aqua, BlendMode.srcIn),
               ),
               title: const Text('Medical Records'),
               trailing: const Icon(
@@ -324,8 +327,16 @@ class _ProfilePageState extends State<ProfilePage> {
               },
             ),
             ListTile(
-              leading:
-                  const Icon(Icons.local_pharmacy, color: Color(0xFF35C5CF)),
+              leading: SizedBox(
+                height: 28,
+                width: 24,
+                child: SvgPicture.asset(
+                  'assets/icons/DNA.svg',
+                  height: 28,
+                  colorFilter:
+                      const ColorFilter.mode(Const.aqua, BlendMode.srcIn),
+                ),
+              ),
               title: const Text('Pharmagenomics Profile'),
               trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () {
@@ -333,8 +344,16 @@ class _ProfilePageState extends State<ProfilePage> {
               },
             ),
             ListTile(
-              leading:
-                  const Icon(Icons.local_pharmacy, color: Color(0xFF35C5CF)),
+              leading: SizedBox(
+                height: 28,
+                width: 24,
+                child: SvgPicture.asset(
+                  'assets/icons/DNA.svg',
+                  height: 28,
+                  colorFilter:
+                      const ColorFilter.mode(Const.aqua, BlendMode.srcIn),
+                ),
+              ),
               title: const Text('Wellness Genomics Profile'),
               trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () {
