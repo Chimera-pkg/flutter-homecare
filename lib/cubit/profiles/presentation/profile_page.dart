@@ -11,6 +11,8 @@ import 'package:intl/intl.dart';
 import 'package:m2health/widgets/auth_guard_dialog.dart';
 
 class ProfilePage extends StatefulWidget {
+  const ProfilePage({super.key});
+
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
@@ -79,58 +81,47 @@ class _ProfilePageState extends State<ProfilePage> {
                         // --- Header Section ---
                         Row(
                           children: [
-                            GestureDetector(
-                              onTap: () async {
-                                await context.push(
-                                  AppRoutes.editProfile,
-                                  extra: state.profile,
-                                );
-                                if (context.mounted) {
-                                  context.read<ProfileCubit>().loadProfile();
-                                }
-                              },
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10.0),
-                                child: Image.network(
-                                  state.profile.avatar ?? '',
-                                  width: 100,
-                                  height: 100,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      width: 100,
-                                      height: 100,
-                                      color: Colors.grey.shade200,
-                                      child: const Icon(
-                                        Icons.person,
-                                        size: 80,
-                                        color: Colors.grey,
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10.0),
+                              child: Image.network(
+                                state.profile.avatar ?? '',
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: 100,
+                                    height: 100,
+                                    color: Colors.grey.shade200,
+                                    child: const Icon(
+                                      Icons.person,
+                                      size: 80,
+                                      color: Colors.grey,
+                                    ),
+                                  );
+                                },
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
+                                  if (loadingProgress == null) {
+                                    return child;
+                                  }
+                                  return Container(
+                                    width: 100,
+                                    height: 100,
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        value: loadingProgress
+                                                    .expectedTotalBytes !=
+                                                null
+                                            ? loadingProgress
+                                                    .cumulativeBytesLoaded /
+                                                loadingProgress
+                                                    .expectedTotalBytes!
+                                            : null,
                                       ),
-                                    );
-                                  },
-                                  loadingBuilder:
-                                      (context, child, loadingProgress) {
-                                    if (loadingProgress == null) {
-                                      return child;
-                                    }
-                                    return Container(
-                                      width: 100,
-                                      height: 100,
-                                      child: Center(
-                                        child: CircularProgressIndicator(
-                                          value: loadingProgress
-                                                      .expectedTotalBytes !=
-                                                  null
-                                              ? loadingProgress
-                                                      .cumulativeBytesLoaded /
-                                                  loadingProgress
-                                                      .expectedTotalBytes!
-                                              : null,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                             const SizedBox(width: 16),
@@ -195,46 +186,48 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Profile Information',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 18),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.edit),
-                              onPressed: () async {
-                                await context.push(
-                                  AppRoutes.editProfile,
-                                  extra: state.profile,
-                                );
-                                if (context.mounted) {
-                                  context.read<ProfileCubit>().loadProfile();
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        if (isPatient) ...[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const SizedBox(height: 8),
-                              Text(
-                                  'Age: ${state.profile.age} | Weight: ${state.profile.weight} KG | Height: ${state.profile.height} cm'),
-                              const SizedBox(height: 8),
-                              Text(
-                                  'Phone Number: ${state.profile.phoneNumber}'),
-                              const SizedBox(height: 8),
-                              Text(
-                                  'Home Address (Primary): ${state.profile.homeAddress}'),
-                              const SizedBox(height: 16),
+                              const Text(
+                                'Profile Information',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 18),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () async {
+                                  await context.push(
+                                    AppRoutes.editProfile,
+                                    extra: state.profile,
+                                  );
+                                  if (context.mounted) {
+                                    context.read<ProfileCubit>().loadProfile();
+                                  }
+                                },
+                              ),
                             ],
                           ),
-                        ),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 8),
+                                Text(
+                                    'Age: ${state.profile.age} | Weight: ${state.profile.weight} KG | Height: ${state.profile.height} cm'),
+                                const SizedBox(height: 8),
+                                Text(
+                                    'Phone Number: ${state.profile.phoneNumber}'),
+                                const SizedBox(height: 8),
+                                Text(
+                                    'Home Address (Primary): ${state.profile.homeAddress}'),
+                                const SizedBox(height: 16),
+                              ],
+                            ),
+                          ),
+                        ],
                         Align(
                           alignment: Alignment.centerLeft,
                           child: OutlinedButton.icon(
