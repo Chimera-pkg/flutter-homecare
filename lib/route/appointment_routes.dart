@@ -6,10 +6,10 @@ import 'package:m2health/views/book_appointment.dart';
 class AppointmentRoutes {
   static List<GoRoute> routes = [
     GoRoute(
-        path: '${AppRoutes.providerAppointment}/:providerType',
+        path: AppRoutes.providerAppointment,
+        name: AppRoutes.providerAppointment,
         builder: (context, state) {
-          final providerType = state.pathParameters['providerType'];
-          return ProviderAppointmentPage(providerType: providerType);
+          return const ProviderAppointmentPage();
         }),
     GoRoute(
       path: AppRoutes.appointmentDetail,

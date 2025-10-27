@@ -29,10 +29,7 @@ class _UnifiedAppointmentPageState extends State<UnifiedAppointmentPage> {
     final isUserProvider = await AppointmentManager.isProvider();
 
     if (isUserProvider) {
-      final providerType = await AppointmentManager.getProviderType();
-      if (providerType != null) {
-        return ProviderAppointmentPage(providerType: providerType);
-      }
+      return const ProviderAppointmentPage();
     }
 
     return const AppointmentPage();

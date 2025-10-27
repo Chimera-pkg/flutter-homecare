@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:m2health/const.dart';
+import 'package:m2health/cubit/appointment/appointment_module.dart';
 import 'package:m2health/utils.dart';
 import 'package:meta/meta.dart';
 import 'package:m2health/models/provider_appointment.dart';
@@ -17,12 +18,13 @@ class ProviderAppointmentCubit extends Cubit<ProviderAppointmentState> {
     _appointmentService = AppointmentService(_dio);
   }
 
-  Future<void> fetchProviderAppointments(String? providerType) async {
+  Future<void> fetchProviderAppointments() async {
     try {
       emit(ProviderAppointmentLoading());
 
       final token = await Utils.getSpString(Const.TOKEN);
       var queryParam = <String, dynamic>{};
+      final providerType = await AppointmentManager.getProviderType();
       if (providerType != null) {
         queryParam['provider_type'] = providerType;
       }

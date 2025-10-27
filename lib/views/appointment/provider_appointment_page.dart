@@ -2,16 +2,16 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:m2health/cubit/appointment/provider_appointment_cubit.dart';
 import 'package:m2health/models/provider_appointment.dart';
 import 'package:m2health/const.dart';
+import 'package:m2health/route/app_routes.dart';
 import 'package:m2health/views/appointment/provider_appointment_detail_page.dart';
 
 class ProviderAppointmentPage extends StatefulWidget {
-  final String? providerType;
-
-  const ProviderAppointmentPage({super.key, required this.providerType});
+  const ProviderAppointmentPage({super.key});
 
   @override
   State<ProviderAppointmentPage> createState() =>
@@ -26,9 +26,7 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
-    context
-        .read<ProviderAppointmentCubit>()
-        .fetchProviderAppointments(widget.providerType);
+    context.read<ProviderAppointmentCubit>().fetchProviderAppointments();
   }
 
   @override
@@ -113,7 +111,7 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
                   onPressed: () {
                     context
                         .read<ProviderAppointmentCubit>()
-                        .fetchProviderAppointments(widget.providerType);
+                        .fetchProviderAppointments();
                   },
                 ),
               ),
@@ -150,7 +148,7 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
                       onPressed: () {
                         context
                             .read<ProviderAppointmentCubit>()
-                            .fetchProviderAppointments(widget.providerType);
+                            .fetchProviderAppointments();
                       },
                       child: const Text('Retry'),
                     ),
@@ -189,9 +187,8 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
     }
 
     return RefreshIndicator(
-      onRefresh: () => context
-          .read<ProviderAppointmentCubit>()
-          .fetchProviderAppointments(widget.providerType),
+      onRefresh: () =>
+          context.read<ProviderAppointmentCubit>().fetchProviderAppointments(),
       backgroundColor: Colors.white,
       color: Const.aqua,
       child: CustomScrollView(

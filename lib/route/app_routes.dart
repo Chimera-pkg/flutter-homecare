@@ -24,6 +24,7 @@ class AppRoutes {
   static const String appointmentDetail = '/appointment/detail';
   static const String bookAppointment = '/appointment/book';
   static const String providerAppointment = '/provider-appointment';
+  static const String providerAppointmentDetail = '/provider-appointment/detail';
 
   // Profile Detail
   static const String medicalRecord = '/medical-record';

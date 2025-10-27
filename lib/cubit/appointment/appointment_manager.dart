@@ -62,14 +62,11 @@ class AppointmentManager {
       final isUserProvider = await isProvider();
 
       if (isUserProvider) {
-        final providerType = await getProviderType();
-        if (providerType != null) {
-          return ProviderAppointmentPage(providerType: providerType);
-        }
+        return const ProviderAppointmentPage();
       }
 
       // Default to patient appointment page
-      return AppointmentPage();
+      return const AppointmentPage();
     } catch (e) {
       print('Error creating appointment widget: $e');
       // Return a default error widget
@@ -78,10 +75,10 @@ class AppointmentManager {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.error_outline, size: 64, color: Colors.red),
-              SizedBox(height: 16),
-              Text('Error loading appointments'),
-              SizedBox(height: 8),
+              const Icon(Icons.error_outline, size: 64, color: Colors.red),
+              const SizedBox(height: 16),
+              const Text('Error loading appointments'),
+              const SizedBox(height: 8),
               Text(e.toString()),
             ],
           ),
