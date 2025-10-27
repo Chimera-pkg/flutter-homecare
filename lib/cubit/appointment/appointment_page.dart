@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/cubit/appointment/appointment_cubit.dart';
 import 'package:m2health/route/app_routes.dart';
-import 'package:m2health/cubit/appointment/appointment_manager.dart';
 import 'package:m2health/models/appointment.dart';
 import 'package:m2health/services/provider_service.dart';
 import 'package:dio/dio.dart';
@@ -84,42 +84,48 @@ class _AppointmentPageState extends State<AppointmentPage>
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'My Appointment',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: () {
-                    // Handle search action
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(Icons.medical_services),
-                  onPressed: () async {
-                    // Check if user is a provider and navigate to provider appointments
-                    final isProvider = await AppointmentManager.isProvider();
-                    if (isProvider) {
-                      AppointmentManager.navigateToAppointmentPage(context);
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                              'This feature is only available for healthcare providers'),
-                        ),
-                      );
-                    }
-                  },
-                ),
-              ],
-            ),
-          ],
+        title: const Text(
+          'My Appointment',
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
+        centerTitle: false,
+        actionsPadding: const EdgeInsets.only(right: 10),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              // Handle search action
+            },
+          ),
+          IconButton(
+            icon: SvgPicture.asset(
+              'assets/icons/Filter.svg',
+              width: 24,
+              height: 24,
+            ),
+            onPressed: () {
+              // Handle filter action
+            },
+          ),
+
+          // IconButton(
+          //   icon: const Icon(Icons.medical_services),
+          //   onPressed: () async {
+          //     // Check if user is a provider and navigate to provider appointments
+          //     final isProvider = await AppointmentManager.isProvider();
+          //     if (isProvider) {
+          //       AppointmentManager.navigateToAppointmentPage(context);
+          //     } else {
+          //       ScaffoldMessenger.of(context).showSnackBar(
+          //         const SnackBar(
+          //           content: Text(
+          //               'This feature is only available for healthcare providers'),
+          //         ),
+          //       );
+          //     }
+          //   },
+          // ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: Const.aqua,

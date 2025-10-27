@@ -31,7 +31,7 @@ class CoreRoutes {
           routes: [
             GoRoute(
               path: AppRoutes.appointment,
-              builder: (context, state) => AppointmentPage(),
+              builder: (context, state) => const UnifiedAppointmentPage(),
             ),
           ],
         ),
@@ -55,7 +55,7 @@ class CoreRoutes {
           routes: [
             GoRoute(
               path: AppRoutes.profile,
-              builder: (context, state) => ProfilePage(),
+              builder: (context, state) => const ProfilePage(),
             ),
           ],
         ),

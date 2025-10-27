@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:m2health/cubit/appointment/provider_appointment_cubit.dart';
 import 'package:m2health/models/provider_appointment.dart';
@@ -41,18 +42,24 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          '${widget.providerType?.toUpperCase() ?? "Provider"} Appointments',
-          style: const TextStyle(fontWeight: FontWeight.bold),
+        title: const Text(
+          'My Appointment',
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
+        centerTitle: false,
+        actionsPadding: const EdgeInsets.only(right: 10),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              context
-                  .read<ProviderAppointmentCubit>()
-                  .fetchProviderAppointments(widget.providerType);
-            },
+            icon: const Icon(Icons.search),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: SvgPicture.asset(
+              'assets/icons/Filter.svg',
+              width: 24,
+              height: 24,
+            ),
+            onPressed: () {},
           ),
         ],
         bottom: TabBar(

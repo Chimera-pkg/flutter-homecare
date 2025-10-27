@@ -5,17 +5,15 @@ import 'package:m2health/cubit/appointment/appointment_cubit.dart';
 import 'package:m2health/cubit/appointment/provider_appointment_cubit.dart';
 import 'package:m2health/cubit/appointment/appointment_page.dart';
 import 'package:m2health/views/appointment/provider_appointment_page.dart';
-import 'package:m2health/utils.dart';
-import 'package:m2health/const.dart';
 
 /// Unified appointment entry widget that automatically routes to appropriate view
 class UnifiedAppointmentPage extends StatefulWidget {
   static const String route = '/unified-appointment';
 
-  const UnifiedAppointmentPage({Key? key}) : super(key: key);
+  const UnifiedAppointmentPage({super.key});
 
   @override
-  _UnifiedAppointmentPageState createState() => _UnifiedAppointmentPageState();
+  State<UnifiedAppointmentPage> createState() => _UnifiedAppointmentPageState();
 }
 
 class _UnifiedAppointmentPageState extends State<UnifiedAppointmentPage> {
@@ -47,7 +45,7 @@ class _UnifiedAppointmentPageState extends State<UnifiedAppointmentPage> {
       create: (context) => AppointmentCubit(
         context.read(), // Dio instance
       ),
-      child: AppointmentPage(),
+      child: const AppointmentPage(),
     );
   }
 
