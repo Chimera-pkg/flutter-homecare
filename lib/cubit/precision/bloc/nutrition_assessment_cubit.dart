@@ -137,29 +137,30 @@ class NutritionAssessmentCubit extends Cubit<NutritionAssessmentState> {
       }
 
       final payload = FormData.fromMap({
-        'mainConcern': state.mainConcern,
-        'selfRatedHealth': state.selfRatedHealth,
+        'main_concern': state.mainConcern,
+        'self_rated_health': state.selfRatedHealth,
         'age': state.healthProfile?.age,
         'gender': state.healthProfile?.gender,
-        'knownCondition': state.healthProfile?.knownCondition,
-        'specialConsiderations': state.healthProfile?.specialConsiderations,
-        'medicationHistory': state.healthProfile?.medicationHistory,
-        'familyHealthHistory': state.healthProfile?.familyHistory,
-        'sleepHours': state.lifestyleHabits?.sleepHours,
-        'activityLevel': state.lifestyleHabits?.activityLevel,
-        'exerciseFrequency': state.lifestyleHabits?.exerciseFrequency,
-        'stressLevel': state.lifestyleHabits?.stressLevel,
-        'smokingAlcoholHabit': state.lifestyleHabits?.smokingAlcoholHabits,
-        'mealFrequency': state.nutritionHabits?.mealFrequency,
-        'foodSensitivities': state.nutritionHabits?.foodSensitivities,
-        'favoriteFoods': state.nutritionHabits?.favoriteFoods,
-        'avoidedFoods': state.nutritionHabits?.avoidedFoods,
-        'waterIntake': state.nutritionHabits?.waterIntake,
-        'pastDiet': state.nutritionHabits?.pastDiets,
-        'medical_report_files': filesPayload
+        'known_condition': state.healthProfile?.knownCondition,
+        'special_considerations[]':
+            state.healthProfile?.specialConsiderations ?? [],
+        'medication_history': state.healthProfile?.medicationHistory,
+        'family_health_history': state.healthProfile?.familyHistory,
+        'sleep_hours': state.lifestyleHabits?.sleepHours,
+        'activity_level': state.lifestyleHabits?.activityLevel,
+        'exercise_frequency': state.lifestyleHabits?.exerciseFrequency,
+        'stress_level': state.lifestyleHabits?.stressLevel,
+        'smoking_alcohol_habit': state.lifestyleHabits?.smokingAlcoholHabits,
+        'meal_frequency': state.nutritionHabits?.mealFrequency,
+        'food_sensitivities': state.nutritionHabits?.foodSensitivities,
+        'favorite_foods': state.nutritionHabits?.favoriteFoods,
+        'avoided_foods': state.nutritionHabits?.avoidedFoods,
+        'water_intake': state.nutritionHabits?.waterIntake,
+        'past_diet': state.nutritionHabits?.pastDiets,
+        'medical_report_files[]': filesPayload
       });
 
-      log('Payload of nutrtion assessment:\n $payload',
+      log('Payload of nutrtion assessment:\n ${payload.fields}',
           name: 'NutritionAssessmentCubit');
       Response response;
       final headers = Options(headers: {
