@@ -8,7 +8,6 @@ import 'package:m2health/cubit/appointment/provider_appointment_cubit.dart';
 import 'package:m2health/models/provider_appointment.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/route/app_routes.dart';
-import 'package:m2health/views/appointment/provider_appointment_detail_page.dart';
 
 class ProviderAppointmentPage extends StatefulWidget {
   const ProviderAppointmentPage({super.key});
@@ -220,14 +219,9 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
 
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) {
-              return ProviderAppointmentDetailPage(
-                appointmentId: appointment.id,
-              );
-            },
-          ),
+        GoRouter.of(context).pushNamed(
+          AppRoutes.providerAppointmentDetail,
+          extra: appointment.id,
         );
       },
       child: Card(

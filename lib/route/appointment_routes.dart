@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:m2health/cubit/appointment/appointment_module.dart';
 import 'package:m2health/route/app_routes.dart';
+import 'package:m2health/views/appointment/provider_appointment_detail_page.dart';
 import 'package:m2health/views/book_appointment.dart';
 
 class AppointmentRoutes {
@@ -23,6 +24,14 @@ class AppointmentRoutes {
       builder: (context, state) {
         final data = state.extra as BookAppointmentPageData;
         return BookAppointmentPage(data: data);
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.providerAppointmentDetail,
+      name: AppRoutes.providerAppointmentDetail,
+      builder: (context, state) {
+        final id = state.extra as int;
+        return ProviderAppointmentDetailPage(appointmentId: id);
       },
     ),
   ];
