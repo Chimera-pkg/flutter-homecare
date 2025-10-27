@@ -101,7 +101,7 @@ class _PatientHeader extends StatelessWidget {
         return const Color(0xFF18B23C);
       case 'pending':
         return const Color(0xFFE59500);
-      case 'rejected':
+      case 'cancelled':
         return const Color(0xFFED3443);
       default:
         return Colors.grey;

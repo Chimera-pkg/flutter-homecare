@@ -41,14 +41,14 @@ class AppointmentCubit extends Cubit<AppointmentState> {
   Future<void> cancelAppointment(int appointmentId) async {
     try {
       await _appointmentService.updateAppointmentStatus(
-          appointmentId, 'Cancelled');
+          appointmentId, 'cancelled');
 
       if (state is AppointmentLoaded) {
         final currentState = state as AppointmentLoaded;
         final updatedAppointments =
             currentState.appointments.map((appointment) {
           if (appointment.id == appointmentId) {
-            return appointment.copyWith(status: 'Cancelled');
+            return appointment.copyWith(status: 'cancelled');
           }
           return appointment;
         }).toList();

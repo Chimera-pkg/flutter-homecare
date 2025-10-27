@@ -3,9 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/cubit/appointment/appointment_cubit.dart';
-import 'package:m2health/cubit/appointment/appointment_detail.dart';
 import 'package:m2health/route/app_routes.dart';
-import 'package:m2health/views/appointment/appointment_detail_page.dart';
 import 'package:m2health/cubit/appointment/appointment_manager.dart';
 import 'package:m2health/models/appointment.dart';
 import 'package:m2health/services/provider_service.dart';
@@ -30,7 +28,7 @@ class _AppointmentPageState extends State<AppointmentPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
     _providerService = ProviderService(Dio());
     context.read<AppointmentCubit>().fetchAppointments();
   }
@@ -133,6 +131,7 @@ class _AppointmentPageState extends State<AppointmentPage>
             Tab(text: 'Upcoming'),
             Tab(text: 'Completed'),
             Tab(text: 'Cancelled'),
+            Tab(text: 'Missed'),
           ],
         ),
       ),
@@ -151,6 +150,7 @@ class _AppointmentPageState extends State<AppointmentPage>
                       buildAppointmentList(state.appointments, 'upcoming'),
                       buildAppointmentList(state.appointments, 'completed'),
                       buildAppointmentList(state.appointments, 'cancelled'),
+                      buildAppointmentList(state.appointments, 'missed'),
                     ],
                   ),
                 ),
@@ -324,11 +324,28 @@ class __AppointmentListItemState extends State<_AppointmentListItem> {
     return null;
   }
 
+  Color _getStatusColor(String status) {
+    final statusLower = status.toLowerCase();
+    switch (statusLower) {
+      case 'completed':
+        return Colors.green;
+      case 'cancelled':
+        return Colors.red;
+      case 'pending':
+      case 'accepted':
+      case 'upcoming':
+        return const Color(0xFFE59500); // Orange
+      default:
+        return Colors.grey;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final appointment = widget.appointment;
     final appointmentStatus = appointment.status;
     final appointmentStatusLower = appointmentStatus.toLowerCase();
+    final statusColor = _getStatusColor(appointmentStatusLower);
 
     return FutureBuilder<Map<String, dynamic>?>(
       future: _providerDataFuture,
@@ -409,26 +426,13 @@ class __AppointmentListItemState extends State<_AppointmentListItem> {
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 8, vertical: 4),
                                       decoration: BoxDecoration(
-                                        color: appointmentStatusLower ==
-                                                'completed'
-                                            ? const Color(0x1A18B23C)
-                                            : appointmentStatusLower ==
-                                                    'cancelled'
-                                                ? const Color(0x1AED3443)
-                                                : const Color(0x1AE59500),
+                                        color:
+                                            statusColor.withValues(alpha: 0.1),
                                         borderRadius: BorderRadius.circular(4),
                                       ),
                                       child: Text(
                                         appointmentStatus,
-                                        style: TextStyle(
-                                          color: appointmentStatusLower ==
-                                                  'completed'
-                                              ? Colors.green
-                                              : appointmentStatusLower ==
-                                                      'cancelled'
-                                                  ? Colors.red
-                                                  : const Color(0xFFE59500),
-                                        ),
+                                        style: TextStyle(color: statusColor),
                                       ),
                                     ),
                                   ],
@@ -537,81 +541,81 @@ class __AppointmentListItemState extends State<_AppointmentListItem> {
                                 ),
                               ),
                             ),
-                          // if (appointmentStatusLower == 'missed')
-                          //   Row(
-                          //     mainAxisAlignment: MainAxisAlignment.center,
-                          //     children: [
-                          //       OutlinedButton(
-                          //         onPressed: () {
-                          //           final appointmentId = appointment.id;
-                          //           context
-                          //               .read<AppointmentCubit>()
-                          //               .deleteAppointment(appointmentId);
-                          //         },
-                          //         style: OutlinedButton.styleFrom(
-                          //           side: const BorderSide(color: Colors.red),
-                          //           shape: RoundedRectangleBorder(
-                          //             borderRadius: BorderRadius.circular(10),
-                          //           ),
-                          //         ),
-                          //         child: const Text(
-                          //           'Cancel Bookings',
-                          //           style: TextStyle(
-                          //             color: Colors.red,
-                          //             fontWeight: FontWeight.bold,
-                          //           ),
-                          //         ),
-                          //       ),
-                          //       const SizedBox(width: 10),
-                          //       Container(
-                          //         width: 160,
-                          //         decoration: BoxDecoration(
-                          //           borderRadius: BorderRadius.circular(10),
-                          //           gradient: const LinearGradient(
-                          //             colors: [
-                          //               Color(0xFF35C5CF),
-                          //               Color(0xFF9DCEFF),
-                          //             ],
-                          //             begin: Alignment.bottomRight,
-                          //             end: Alignment.topLeft,
-                          //           ),
-                          //         ),
-                          //         child: OutlinedButton(
-                          //           onPressed: () {
-                          //             final appointmentId = appointment
-                          //                 .id; // Get the appointment ID
-                          //             final profile = effectiveProfile;
-                          //             context.push(
-                          //               AppRoutes.bookAppointment,
-                          //               extra: BookAppointmentPageData(
-                          //                 pharmacist: profile,
-                          //                 appointmentId:
-                          //                     appointmentId, // Pass the appointment ID
-                          //                 initialDate: DateTime.parse(
-                          //                     appointment
-                          //                         .date), // Pre-fill date
-                          //                 initialTime: DateFormat('HH:mm')
-                          //                     .parse(appointment
-                          //                         .hour), // Pre-fill time
-                          //               ),
-                          //             );
-                          //           },
-                          //           style: OutlinedButton.styleFrom(
-                          //             side: const BorderSide(
-                          //                 color: Colors.transparent),
-                          //             backgroundColor: Colors.transparent,
-                          //             shape: RoundedRectangleBorder(
-                          //               borderRadius: BorderRadius.circular(10),
-                          //             ),
-                          //           ),
-                          //           child: const Text(
-                          //             'Reschedule',
-                          //             style: TextStyle(color: Colors.white),
-                          //           ),
-                          //         ),
-                          //       ),
-                          //     ],
-                          //   ),
+                          if (appointmentStatusLower == 'missed')
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                OutlinedButton(
+                                  onPressed: () {
+                                    final appointmentId = appointment.id;
+                                    context
+                                        .read<AppointmentCubit>()
+                                        .deleteAppointment(appointmentId);
+                                  },
+                                  style: OutlinedButton.styleFrom(
+                                    side: const BorderSide(color: Colors.red),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'Cancel Bookings',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Container(
+                                  width: 160,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        Color(0xFF35C5CF),
+                                        Color(0xFF9DCEFF),
+                                      ],
+                                      begin: Alignment.bottomRight,
+                                      end: Alignment.topLeft,
+                                    ),
+                                  ),
+                                  child: OutlinedButton(
+                                    onPressed: () {
+                                      final appointmentId = appointment
+                                          .id; // Get the appointment ID
+                                      final profile = effectiveProfile;
+                                      context.push(
+                                        AppRoutes.bookAppointment,
+                                        extra: BookAppointmentPageData(
+                                          pharmacist: profile,
+                                          appointmentId:
+                                              appointmentId, // Pass the appointment ID
+                                          initialDate: DateTime.parse(
+                                              appointment
+                                                  .date), // Pre-fill date
+                                          initialTime: DateFormat('HH:mm')
+                                              .parse(appointment
+                                                  .hour), // Pre-fill time
+                                        ),
+                                      );
+                                    },
+                                    style: OutlinedButton.styleFrom(
+                                      side: const BorderSide(
+                                          color: Colors.transparent),
+                                      backgroundColor: Colors.transparent,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'Reschedule',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           if (appointmentStatusLower == 'pending' ||
                               appointmentStatusLower == 'accepted' ||
                               appointmentStatusLower == 'upcoming')
