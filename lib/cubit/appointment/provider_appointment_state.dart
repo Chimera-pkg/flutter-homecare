@@ -13,6 +13,11 @@ class ProviderAppointmentLoaded extends ProviderAppointmentState {
   ProviderAppointmentLoaded(this.appointments);
 }
 
+class ProviderAppointmentChangeSucceed extends ProviderAppointmentLoaded {
+  final String? message;
+  ProviderAppointmentChangeSucceed(super.appointments, {this.message});
+}
+
 class ProviderAppointmentError extends ProviderAppointmentState {
   final String message;
 

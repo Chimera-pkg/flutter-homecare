@@ -128,7 +128,8 @@ class ProviderAppointmentCubit extends Cubit<ProviderAppointmentState> {
           return appointment;
         }).toList();
 
-        emit(ProviderAppointmentLoaded(updatedAppointments));
+        emit(ProviderAppointmentChangeSucceed(updatedAppointments,
+            message: 'Appointment accepted successfully'));
       }
     } catch (e) {
       log('Error accepting appointment: $e');
@@ -147,8 +148,7 @@ class ProviderAppointmentCubit extends Cubit<ProviderAppointmentState> {
       log('Current state type: ${currentState.runtimeType}');
 
       if (currentState is ProviderAppointmentLoaded) {
-        log(
-            'Number of appointments in current state: ${currentState.appointments.length}');
+        log('Number of appointments in current state: ${currentState.appointments.length}');
         final targetAppointment = currentState.appointments
             .where((appointment) => appointment.id == appointmentId)
             .firstOrNull;
@@ -157,8 +157,7 @@ class ProviderAppointmentCubit extends Cubit<ProviderAppointmentState> {
           log('Target appointment found:');
           log('  - ID: ${targetAppointment.id}');
           log('  - Current Status: ${targetAppointment.status}');
-          log(
-              '  - Patient: ${targetAppointment.patientData['username'] ?? targetAppointment.patientData['name'] ?? 'Unknown'}');
+          log('  - Patient: ${targetAppointment.patientData['username'] ?? targetAppointment.patientData['name'] ?? 'Unknown'}');
           log('  - Date: ${targetAppointment.date}');
           log('  - Time: ${targetAppointment.hour}');
         } else {
@@ -179,20 +178,18 @@ class ProviderAppointmentCubit extends Cubit<ProviderAppointmentState> {
         final updatedAppointments =
             currentState.appointments.map((appointment) {
           if (appointment.id == appointmentId) {
-            log(
-                'Updating appointment ${appointment.id} status from ${appointment.status} to rejected');
-            return appointment.copyWith(status: 'rejected');
+            log('Updating appointment ${appointment.id} status from ${appointment.status} to cancelled');
+            return appointment.copyWith(status: 'cancelled');
           }
           return appointment;
         }).toList();
 
-        log(
-            'Emitting updated state with ${updatedAppointments.length} appointments');
-        emit(ProviderAppointmentLoaded(updatedAppointments));
+        log('Emitting updated state with ${updatedAppointments.length} appointments');
+        emit(ProviderAppointmentChangeSucceed(updatedAppointments,
+            message: 'Appointment declined successfully'));
         log('✅ State updated successfully');
       } else {
-        log(
-            '⚠️ Current state is not ProviderAppointmentLoaded, cannot update');
+        log('⚠️ Current state is not ProviderAppointmentLoaded, cannot update');
       }
     } catch (e) {
       log('=== CUBIT: REJECT APPOINTMENT ERROR ===');
@@ -221,7 +218,8 @@ class ProviderAppointmentCubit extends Cubit<ProviderAppointmentState> {
           return appointment;
         }).toList();
 
-        emit(ProviderAppointmentLoaded(updatedAppointments));
+        emit(ProviderAppointmentChangeSucceed(updatedAppointments,
+            message: 'Appointment completed successfully'));
       }
     } catch (e) {
       log('Error completing appointment: $e');

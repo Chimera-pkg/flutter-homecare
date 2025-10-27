@@ -31,22 +31,11 @@ class _UnifiedAppointmentPageState extends State<UnifiedAppointmentPage> {
     if (isUserProvider) {
       final providerType = await AppointmentManager.getProviderType();
       if (providerType != null) {
-        return BlocProvider(
-          create: (context) => ProviderAppointmentCubit(
-            context.read(), // Dio instance
-          ),
-          child: ProviderAppointmentPage(providerType: providerType),
-        );
+        return ProviderAppointmentPage(providerType: providerType);
       }
     }
 
-    // Default to patient appointment page
-    return BlocProvider(
-      create: (context) => AppointmentCubit(
-        context.read(), // Dio instance
-      ),
-      child: const AppointmentPage(),
-    );
+    return const AppointmentPage();
   }
 
   @override

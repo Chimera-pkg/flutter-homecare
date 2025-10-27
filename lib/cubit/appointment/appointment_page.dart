@@ -198,12 +198,51 @@ class _AppointmentPageState extends State<AppointmentPage>
     );
   }
 
-  Widget buildAppointmentList(List<Appointment> appointments, String status) {
-    List<Appointment> filteredAppointments;
+  Widget buildAppointmentList(
+    List<Appointment> appointments,
+    String status,
+  ) {
+    final filteredAppointments =
+        _filterAndSortAppointments(appointments, status);
 
-    // Special handling for Upcoming tab to show accepted
-    if (status == 'upcoming') {
-      // For "Upcoming" tab, show both accepted appointments
+    return RefreshIndicator(
+      onRefresh: () => context.read<AppointmentCubit>().fetchAppointments(),
+      backgroundColor: Colors.white,
+      color: Const.aqua,
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
+        slivers: [
+          if (filteredAppointments.isEmpty)
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: _buildEmptyState(status),
+            )
+          else
+            SliverList.builder(
+              itemCount: filteredAppointments.length,
+              itemBuilder: (context, index) {
+                final appointment = filteredAppointments[index];
+                return _AppointmentListItem(
+                  key: ValueKey(appointment.id),
+                  appointment: appointment,
+                  getProviderData: _getProviderDataWithFallback,
+                );
+              },
+            ),
+        ],
+      ),
+    );
+  }
+
+  List<Appointment> _filterAndSortAppointments(
+      List<Appointment> appointments, String status) {
+    List<Appointment> filteredAppointments;
+    final lowerStatus = status.toLowerCase();
+
+    // Special handling for Upcoming tab
+    if (lowerStatus == 'upcoming') {
       filteredAppointments = appointments
           .where((appointment) =>
               appointment.status.toLowerCase() == 'accepted' ||
@@ -212,8 +251,8 @@ class _AppointmentPageState extends State<AppointmentPage>
     } else {
       // For other tabs, filter by exact status
       filteredAppointments = appointments
-          .where((appointment) =>
-              appointment.status.toLowerCase() == status.toLowerCase())
+          .where(
+              (appointment) => appointment.status.toLowerCase() == lowerStatus)
           .toList();
     }
 
@@ -224,39 +263,31 @@ class _AppointmentPageState extends State<AppointmentPage>
         final dateB = DateTime.parse(b.date);
         return dateB.compareTo(dateA);
       } catch (e) {
-        // In case of parsing error, keep original order
+        debugPrint('Error parsing appointment date: $e');
         return 0;
       }
     });
 
-    if (filteredAppointments.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.event_busy, size: 64, color: Colors.grey[400]),
-            const SizedBox(height: 16),
-            Text(
-              status == 'upcoming'
-                  ? 'No upcoming appointments found'
-                  : 'No ${status.toLowerCase()} appointments found',
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-            ),
-          ],
-        ),
-      );
-    }
+    return filteredAppointments;
+  }
 
-    return ListView.builder(
-      itemCount: filteredAppointments.length,
-      itemBuilder: (context, index) {
-        final appointment = filteredAppointments[index];
-        return _AppointmentListItem(
-          key: ValueKey(appointment.id), // Add a unique key for performance
-          appointment: appointment,
-          getProviderData: _getProviderDataWithFallback,
-        );
-      },
+  Widget _buildEmptyState(String status) {
+    final message = status.toLowerCase() == 'upcoming'
+        ? 'No upcoming appointments found'
+        : 'No ${status.toLowerCase()} appointments found';
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.event_busy, size: 64, color: Colors.grey[400]),
+          const SizedBox(height: 16),
+          Text(
+            message,
+            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+          ),
+        ],
+      ),
     );
   }
 }
