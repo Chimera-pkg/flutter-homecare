@@ -1,9 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:m2health/models/appointment.dart';
-import 'package:m2health/const.dart';
 import 'package:dio/dio.dart';
-import 'package:m2health/utils.dart';
 import 'package:m2health/services/appointment_service.dart';
 
 part 'appointment_state.dart';

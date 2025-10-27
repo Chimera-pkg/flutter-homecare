@@ -11,11 +11,10 @@ import 'package:m2health/views/appointment/provider_appointment_detail_page.dart
 class ProviderAppointmentPage extends StatefulWidget {
   final String? providerType;
 
-  const ProviderAppointmentPage({Key? key, required this.providerType})
-      : super(key: key);
+  const ProviderAppointmentPage({super.key, required this.providerType});
 
   @override
-  _ProviderAppointmentPageState createState() =>
+  State<ProviderAppointmentPage> createState() =>
       _ProviderAppointmentPageState();
 }
 
@@ -58,12 +57,15 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
         ],
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: const Color(0xFF40E0D0),
+          indicatorColor: Const.aqua,
+          labelColor: Const.aqua,
+          isScrollable: true,
+          tabAlignment: TabAlignment.start,
           tabs: const [
             Tab(text: 'Pending'),
             Tab(text: 'Accepted'),
             Tab(text: 'Completed'),
-            Tab(text: 'Rejected'),
+            Tab(text: 'Cancelled'),
           ],
         ),
       ),
@@ -123,7 +125,8 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
                   _buildProviderAppointmentList(state.appointments, 'accepted'),
                   _buildProviderAppointmentList(
                       state.appointments, 'completed'),
-                  _buildProviderAppointmentList(state.appointments, 'rejected'),
+                  _buildProviderAppointmentList(
+                      state.appointments, 'cancelled'),
                 ],
               );
             } else if (state is ProviderAppointmentError) {
@@ -402,7 +405,6 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
       case 'accepted':
         return Colors.green;
       case 'cancelled':
-      case 'rejected':
         return Colors.red;
       case 'pending':
       default:
