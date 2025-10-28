@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:m2health/app_localzations.dart';
 import 'package:m2health/const.dart';
 
@@ -156,17 +157,7 @@ class _PharmaState extends State<HomeHealth> {
                           });
                           return;
                         case 1:
-                          // navbarVisibility(true);
-
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MedicalStorePage(),
-                            ),
-                          ).then((_) {
-                            // Show the bottom navigation bar when returning
-                            // navbarVisibility(false);
-                          });
+                          GoRouter.of(context).go(AppRoutes.medicalStore);
                           return;
                         default:
                           route = AppRoutes.home;
