@@ -1,3 +1,4 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -162,8 +163,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         if (value == null || value.trim().isEmpty) {
                           return 'Please enter an email';
                         }
-                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                            .hasMatch(value)) {
+                        if (!EmailValidator.validate(value.trim())) {
                           return 'Please enter a valid email';
                         }
                         return null;

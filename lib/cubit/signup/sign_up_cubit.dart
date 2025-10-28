@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:bloc/bloc.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/const.dart';
-import 'package:m2health/services/sso_service.dart';
 import 'package:omega_dio_logger/omega_dio_logger.dart';
 
 abstract class SignUpState {}
@@ -29,8 +29,6 @@ class SignUpCubit extends Cubit<SignUpState> {
     // _ssoService = SSOService(_dio);
   }
 
-  final RegExp emailRegex =
-      RegExp(r'^.+@[a-zA-Z]+\.{1}[a-zA-Z]+(\.{0,1}[a-zA-Z]+)?$');
   Future<void> signUp(
     String email,
     String password,
@@ -43,7 +41,7 @@ class SignUpCubit extends Cubit<SignUpState> {
     print('Role: $role');
 
     if (email.isEmpty ||
-        !emailRegex.hasMatch(email) ||
+        !EmailValidator.validate(email) ||
         password.isEmpty ||
         username.isEmpty ||
         role.isEmpty) {
