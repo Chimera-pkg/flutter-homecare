@@ -159,15 +159,15 @@ class _PharmaState extends State<OpinionMedical> {
                         case 1:
                           // navbarVisibility(true);
 
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MedicalStorePage(),
-                            ),
-                          ).then((_) {
-                            // Show the bottom navigation bar when returning
-                            // navbarVisibility(false);
-                          });
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => MedicalStorePage(),
+                          //   ),
+                          // ).then((_) {
+                          //   // Show the bottom navigation bar when returning
+                          //   // navbarVisibility(false);
+                          // });
                           return;
                         case 2:
                           route = AppRoutes.home;
