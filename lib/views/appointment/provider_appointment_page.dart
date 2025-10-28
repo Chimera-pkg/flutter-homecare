@@ -201,12 +201,15 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
               child: buildEmptyState(status),
             )
           else
-            SliverList.builder(
-              itemCount: filteredAppointments.length,
-              itemBuilder: (context, index) {
-                final appointment = filteredAppointments[index];
-                return _buildProviderAppointmentCard(appointment, status);
-              },
+            SliverPadding(
+              padding: const EdgeInsets.only(bottom: 64.0),
+              sliver: SliverList.builder(
+                itemCount: filteredAppointments.length,
+                itemBuilder: (context, index) {
+                  final appointment = filteredAppointments[index];
+                  return _buildProviderAppointmentCard(appointment, status);
+                },
+              ),
             ),
         ],
       ),
