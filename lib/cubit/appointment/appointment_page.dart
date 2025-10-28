@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/cubit/appointment/appointment_cubit.dart';
+import 'package:m2health/cubit/appointment/widgets/cancel_appoinment_dialog.dart';
 import 'package:m2health/route/app_routes.dart';
 import 'package:m2health/models/appointment.dart';
 import 'package:m2health/services/provider_service.dart';
@@ -669,84 +670,12 @@ class __AppointmentListItemState extends State<_AppointmentListItem> {
                                     showDialog(
                                       context: context,
                                       builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                          ),
-                                          contentPadding:
-                                              const EdgeInsets.all(16.0),
-                                          content: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Align(
-                                                alignment: Alignment.topRight,
-                                                child: IconButton(
-                                                  icon: const Icon(Icons.close),
-                                                  onPressed: () {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                ),
-                                              ),
-                                              const Icon(Icons.warning_outlined,
-                                                  size: 50, color: Colors.red),
-                                              const SizedBox(height: 16),
-                                              const Text(
-                                                'Are you sure to cancel this booking?',
-                                                style: TextStyle(
-                                                  color: Colors.blue,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                              const SizedBox(height: 8),
-                                              const Text(
-                                                'You can rebook it later from the canceled appointment menu.',
-                                                textAlign: TextAlign.center,
-                                              ),
-                                              const SizedBox(height: 16),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceEvenly,
-                                                children: [
-                                                  ElevatedButton(
-                                                    onPressed: () {
-                                                      Navigator.of(context)
-                                                          .pop(); // Close dialog
-                                                    },
-                                                    child: const Text('No'),
-                                                  ),
-                                                  ElevatedButton(
-                                                    onPressed: () {
-                                                      // Close dialog and cancel the appointment
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                      context
-                                                          .read<
-                                                              AppointmentCubit>()
-                                                          .cancelAppointment(
-                                                              appointmentId);
-                                                    },
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      backgroundColor:
-                                                          Colors.red,
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(15),
-                                                      ),
-                                                    ),
-                                                    child: const Text(
-                                                        'Yes, Cancel'),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        );
+                                        return CancelAppoinmentDialog(
+                                            onPressYes: () {
+                                          context
+                                              .read<AppointmentCubit>()
+                                              .cancelAppointment(appointmentId);
+                                        });
                                       },
                                     );
                                   },
