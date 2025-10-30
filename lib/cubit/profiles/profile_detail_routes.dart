@@ -2,14 +2,48 @@ import 'package:go_router/go_router.dart';
 import 'package:m2health/cubit/pharmacogenomics/presentation/pharmagenomical_pages.dart';
 import 'package:m2health/cubit/profiles/domain/entities/profile.dart';
 import 'package:m2health/cubit/profiles/manage_services_page.dart';
-import 'package:m2health/cubit/profiles/presentation/edit_professional_profile.dart';
-import 'package:m2health/cubit/profiles/presentation/edit_profile.dart';
+import 'package:m2health/cubit/profiles/presentation/pages/edit_lifestyle_n_selfcare_page.dart';
+import 'package:m2health/cubit/profiles/presentation/pages/edit_medical_history_n_risk_factor_page.dart';
+import 'package:m2health/cubit/profiles/presentation/pages/edit_physical_sign_page.dart';
+import 'package:m2health/cubit/profiles/presentation/pages/edit_professional_profile.dart';
+import 'package:m2health/cubit/profiles/presentation/pages/edit_basic_info_page.dart';
 import 'package:m2health/cubit/profiles/profile_details/medical_record/medical_record.dart';
 import 'package:m2health/cubit/wellness_genomics/presentation/pages/wellness_genomics_page.dart';
 import 'package:m2health/route/app_routes.dart';
 
 class ProfileDetailRoutes {
   static List<GoRoute> routes = [
+    // Profile Information
+    GoRoute(
+      path: AppRoutes.profileBasicInfo,
+      name: AppRoutes.profileBasicInfo,
+      builder: (context, state) {
+        return const EditBasicInfoPage();
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.profileMedicalHistory,
+      name: AppRoutes.profileMedicalHistory,
+      builder: (context, state) {
+        return const EditMedicalHistoryNRiskFactorPage();
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.profileLifestyle,
+      name: AppRoutes.profileLifestyle,
+      builder: (context, state) {
+        return const EditLifestyleNSelfcarePage();
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.profilePhysicalSigns,
+      name: AppRoutes.profilePhysicalSigns,
+      builder: (context, state) {
+        return const EditPhysicalSignPage();
+      },
+    ),
+
+    // Health Records
     GoRoute(
       path: AppRoutes.medicalRecord,
       builder: (context, state) {
@@ -28,13 +62,8 @@ class ProfileDetailRoutes {
         return const WellnessGenomicsProfilePage();
       },
     ),
-    GoRoute(
-      path: AppRoutes.editProfile,
-      builder: (context, state) {
-        Profile profile = state.extra as Profile;
-        return EditProfilePage(profile: profile);
-      },
-    ),
+
+    // Professional Profile
     GoRoute(
       path: AppRoutes.editProfessionalProfile,
       builder: (context, state) {
@@ -42,6 +71,8 @@ class ProfileDetailRoutes {
         return EditProfessionalProfilePage(profile: profile);
       },
     ),
+
+    // Admin Panel
     GoRoute(
       path: AppRoutes.manageServices,
       builder: (context, state) {

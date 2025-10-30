@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+import 'package:m2health/const.dart';
 import 'package:m2health/cubit/profiles/domain/entities/profile.dart';
+import 'dart:io';
 import 'package:m2health/cubit/profiles/domain/usecases/update_profile.dart';
 import 'package:m2health/cubit/profiles/presentation/bloc/profile_cubit.dart';
 import 'package:m2health/cubit/profiles/presentation/bloc/profile_state.dart';
 
-class EditProfilePage extends StatefulWidget {
-  final Profile profile;
-
-  const EditProfilePage({super.key, required this.profile});
+class EditBasicInfoPage extends StatefulWidget {
+  const EditBasicInfoPage({super.key});
 
   @override
-  _EditProfilePageState createState() => _EditProfilePageState();
+  State<EditBasicInfoPage> createState() => _EditBasicInfoPageState();
 }
 
-class _EditProfilePageState extends State<EditProfilePage> {
+class _EditBasicInfoPageState extends State<EditBasicInfoPage> {
   final _formKey = GlobalKey<FormState>();
+  late Profile? profile;
   File? _selectedImage;
 
   late TextEditingController _usernameController;
@@ -33,14 +33,19 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   void initState() {
     super.initState();
-    final p = widget.profile;
-    _usernameController = TextEditingController(text: p.username);
-    _ageController = TextEditingController(text: p.age?.toString() ?? '');
-    _weightController = TextEditingController(text: p.weight?.toString() ?? '');
-    _heightController = TextEditingController(text: p.height?.toString() ?? '');
-    _phoneController = TextEditingController(text: p.phoneNumber ?? '');
-    _addressController = TextEditingController(text: p.homeAddress ?? '');
-    _selectedGender = genderItems.contains(p.gender) ? p.gender : null;
+    profile = context.read<ProfileCubit>().state is ProfileLoaded
+        ? (context.read<ProfileCubit>().state as ProfileLoaded).profile
+        : null;
+    _usernameController = TextEditingController(text: profile?.username);
+    _ageController = TextEditingController(text: profile?.age?.toString());
+    _weightController =
+        TextEditingController(text: profile?.weight?.toString());
+    _heightController =
+        TextEditingController(text: profile?.height?.toString());
+    _phoneController = TextEditingController(text: profile?.phoneNumber);
+    _addressController = TextEditingController(text: profile?.homeAddress);
+    _selectedGender =
+        genderItems.contains(profile?.gender) ? profile?.gender : null;
   }
 
   @override
@@ -141,9 +146,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                   _selectedImage!,
                                   fit: BoxFit.cover,
                                 )
-                              : widget.profile.avatar != null
+                              : profile != null && profile?.avatar != null
                                   ? Image.network(
-                                      widget.profile.avatar!,
+                                      profile!.avatar!,
                                       fit: BoxFit.cover,
                                       errorBuilder:
                                           (context, error, stackTrace) {
@@ -288,7 +293,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             return ElevatedButton(
               onPressed: isUpdating ? null : _submitForm,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF40E0D0),
+                backgroundColor: Const.aqua,
                 minimumSize: const Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -305,7 +310,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     )
                   : const Text(
                       'Save',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
             );
           }),
