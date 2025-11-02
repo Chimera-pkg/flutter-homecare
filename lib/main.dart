@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:m2health/cubit/diabetes/bloc/diabetes_form_cubit.dart';
+import 'package:m2health/cubit/medical_record/domain/usecases/delete_medical_record.dart';
 import 'package:m2health/cubit/medical_record/domain/usecases/get_medical_records.dart';
 import 'package:m2health/cubit/medical_record/presentation/bloc/medical_record_bloc.dart';
 import 'package:m2health/cubit/nursingclean/domain/repositories/nursing_appointment_repository.dart';
@@ -109,8 +110,11 @@ void main() async {
         ),
         // Medical Record Module
         BlocProvider(
-            create: (context) =>
-                MedicalRecordBloc(getMedicalRecords: sl<GetMedicalRecords>())),
+          create: (context) => MedicalRecordBloc(
+            getMedicalRecords: sl<GetMedicalRecords>(),
+            deleteMedicalRecord: sl<DeleteMedicalRecord>(),
+          ),
+        ),
         BlocProvider(create: (context) => DiabetesFormCubit(sl<Dio>())),
       ],
       child: ChangeNotifierProvider(
@@ -273,7 +277,8 @@ class _MyAppState extends State<MyApp> {
                     DevicePreview.appBuilder(context, child),
                   ],
                 ),
-                bottomNavigationBar: _showBottomAppBar ? const BottomAppBar() : null,
+                bottomNavigationBar:
+                    _showBottomAppBar ? const BottomAppBar() : null,
               );
             },
             localizationsDelegates: const [

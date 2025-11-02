@@ -97,7 +97,7 @@ class _AddIssuePageState extends State<NursingAddIssuePage> {
       ),
       body: BlocBuilder<MedicalRecordBloc, MedicalRecordState>(
         builder: (context, state) {
-          if (state is MedicalRecordLoaded) {
+          if (state.listStatus == ListStatus.success) {
             _medicalRecords = state.medicalRecords;
             if (_medicalRecords.isNotEmpty && _selectedRecord == null) {
               _selectedRecord = _medicalRecords.first;
@@ -171,10 +171,10 @@ class _AddIssuePageState extends State<NursingAddIssuePage> {
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10.0),
-                    if (state is MedicalRecordLoading)
+                    if (state.listStatus == ListStatus.loading)
                       const Center(child: CircularProgressIndicator())
-                    else if (state is MedicalRecordError)
-                      Text('Error: ${state.message}')
+                    else if (state.listStatus == ListStatus.failure)
+                      Text('Error: ${state.listError}')
                     else if (_medicalRecords.isEmpty)
                       const Text('No medical records available')
                     else
