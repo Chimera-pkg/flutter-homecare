@@ -24,59 +24,59 @@ class DiabetesFormCubit extends Cubit<DiabetesFormState> {
       );
 
       final data = response.data['data'];
+      log('Loaded diabetes profile data: $data', name: 'DiabetesFormCubit');
       final bool hasBeenSubmitted = data['diabetes_type'] != null;
 
-      DiabetesHistory loadedHistory = const DiabetesHistory();
-      RiskFactors loadedRiskFactors = const RiskFactors();
-      LifestyleSelfCare loadedLifestyleSelfCare = const LifestyleSelfCare();
-      PhysicalSigns loadedPhysicalSigns = const PhysicalSigns();
+      final diabetesHistory = DiabetesHistory(
+        diabetesType: data['diabetes_type'],
+        yearOfDiagnosis: data['year_of_diagnosis'],
+        lastHbA1c: data['last_hba1c'] != null
+            ? double.tryParse(data['last_hba1c'].toString())
+            : null,
+        hasTreatmentDiet: data['treatment_diet_exercise'] != null,
+        hasTreatmentOral: data['treatment_oral_meds'] != null,
+        oralMedication: data['treatment_oral_meds'],
+        hasTreatmentInsulin: data['treatment_insulin'] != null,
+        insulinTypeDose: data['treatment_insulin'],
+      );
 
-      if (hasBeenSubmitted) {
-        loadedHistory = DiabetesHistory(
-          diabetesType: data['diabetes_type'],
-          yearOfDiagnosis: data['year_of_diagnosis'],
-          lastHbA1c: data['last_hba1c'] != null
-              ? double.tryParse(data['last_hba1c'].toString())
-              : null,
-          hasTreatmentDiet: data['treatment_diet_exercise'] != null,
-          hasTreatmentOral: data['treatment_oral_meds'] != null,
-          oralMedication: data['treatment_oral_meds'],
-          hasTreatmentInsulin: data['treatment_insulin'] != null,
-          insulinTypeDose: data['treatment_insulin'],
-        );
-
-        loadedRiskFactors = RiskFactors(
-          hasHypertension: data['has_hypertension'] == 1,
-          hasDyslipidemia: data['has_dyslipidemia'] == 1,
-          hasCardiovascularDisease: data['has_cardiovascular_disease'] == 1,
-          hasNeuropathy: data['has_neuropathy'] == 1,
-          hasEyeDisease: data['has_eye_disease'] == 1,
-          hasKidneyDisease: data['has_kidney_disease'] == 1,
-          hasFamilyHistory: data['has_family_history'] == 1,
-          smokingStatus: data['smoking_status'],
-        );
-
-        loadedLifestyleSelfCare = LifestyleSelfCare(
-          recentHypoglycemia: data['recent_hypoglycemia'],
-          physicalActivity: data['physical_activity'],
-          dietQuality: data['diet_quality'],
-        );
-
-        loadedPhysicalSigns = PhysicalSigns(
-          eyesLastExamDate: data['eyes_last_exam_date']?.toString(),
-          eyesFindings: data['eyes_findings'],
-          kidneysEgfr: data['kidneys_egfr'],
-          kidneysUrineAcr: data['kidneys_urine_acr'],
-          feetSkinStatus: data['feet_skin_status'],
-          feetDeformityStatus: data['feet_deformity_status'],
-        );
+      // Helper to convert integer to nullable bool
+      bool? toNullableBool(dynamic value) {
+        return value == null ? null : value == 1;
       }
 
+      final riskFactors = RiskFactors(
+        hasHypertension: toNullableBool(data['has_hypertension']),
+        hasDyslipidemia: toNullableBool(data['has_dyslipidemia']),
+        hasCardiovascularDisease:
+            toNullableBool(data['has_cardiovascular_disease']),
+        hasNeuropathy: toNullableBool(data['has_neuropathy']),
+        hasEyeDisease: toNullableBool(data['has_eye_disease']),
+        hasKidneyDisease: toNullableBool(data['has_kidney_disease']),
+        hasFamilyHistory: toNullableBool(data['has_family_history']),
+        smokingStatus: data['smoking_status'],
+      );
+
+      final lifestyleSelfCare = LifestyleSelfCare(
+        recentHypoglycemia: data['recent_hypoglycemia'],
+        physicalActivity: data['physical_activity'],
+        dietQuality: data['diet_quality'],
+      );
+
+      final physicalSigns = PhysicalSigns(
+        eyesLastExamDate: data['eyes_last_exam_date']?.toString(),
+        eyesFindings: data['eyes_findings'],
+        kidneysEgfr: data['kidneys_egfr'],
+        kidneysUrineAcr: data['kidneys_urine_acr'],
+        feetSkinStatus: data['feet_skin_status'],
+        feetDeformityStatus: data['feet_deformity_status'],
+      );
+
       emit(state.copyWith(
-        diabetesHistory: loadedHistory,
-        riskFactors: loadedRiskFactors,
-        lifestyleSelfCare: loadedLifestyleSelfCare,
-        physicalSigns: loadedPhysicalSigns,
+        diabetesHistory: diabetesHistory,
+        riskFactors: riskFactors,
+        lifestyleSelfCare: lifestyleSelfCare,
+        physicalSigns: physicalSigns,
         isSubmitted: hasBeenSubmitted,
         isLoading: false,
       ));

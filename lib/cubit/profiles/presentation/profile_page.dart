@@ -10,6 +10,7 @@ import 'package:m2health/utils.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:m2health/widgets/auth_guard_dialog.dart';
+import 'package:m2health/widgets/profile_widget.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -31,6 +32,10 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
+    _fetchData();
+  }
+
+  void _fetchData() {
     context.read<ProfileCubit>().loadProfile();
   }
 
@@ -72,182 +77,30 @@ class _ProfilePageState extends State<ProfilePage> {
                 final Profile profile = state.profile;
                 return RefreshIndicator(
                   onRefresh: () async {
-                    context.read<ProfileCubit>().loadProfile();
+                    _fetchData();
                   },
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        // --- Header Section ---
-                        Row(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10.0),
-                              child: Image.network(
-                                state.profile.avatar ?? '',
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    width: 100,
-                                    height: 100,
-                                    color: Colors.grey.shade200,
-                                    child: const Icon(
-                                      Icons.person,
-                                      size: 80,
-                                      color: Colors.grey,
-                                    ),
-                                  );
-                                },
-                                loadingBuilder:
-                                    (context, child, loadingProgress) {
-                                  if (loadingProgress == null) {
-                                    return child;
-                                  }
-                                  return Container(
-                                    width: 100,
-                                    height: 100,
-                                    child: Center(
-                                      child: CircularProgressIndicator(
-                                        value: loadingProgress
-                                                    .expectedTotalBytes !=
-                                                null
-                                            ? loadingProgress
-                                                    .cumulativeBytesLoaded /
-                                                loadingProgress
-                                                    .expectedTotalBytes!
-                                            : null,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Flexible(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    state.profile.username,
-                                    style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  const Text(
-                                    'Last updated:',
-                                    style: TextStyle(color: Colors.grey),
-                                  ),
-                                  Text(
-                                    formatDateTime(state.profile.updatedAt),
-                                    style: const TextStyle(color: Colors.black),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        if (isPatient)
-                          _buildHealthRecordsSection(context)
-                        else if (isProfessional)
-                          _buildProfessionalProfileSection(
-                            context,
-                            profile: profile,
-                          )
-                        else if (isAdmin)
-                          _buildAdminSection(context),
-                        const SizedBox(height: 16),
-                        Card(
-                          elevation: 4,
-                          shadowColor: Colors.grey,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Appointment',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                ListTile(
-                                  leading: const Icon(Icons.calendar_today,
-                                      color: Color(0xFF35C5CF)),
-                                  title: const Text('All My Appointments'),
-                                  trailing: const Icon(Icons.arrow_forward_ios),
-                                  onTap: () {
-                                    context.go(AppRoutes.appointment);
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
+                        _ProfileHeader(
+                          profile: profile,
+                          lastUpdated: formatDateTime(profile.updatedAt),
                         ),
                         const SizedBox(height: 16),
                         if (isPatient) ...[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'Profile Information',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 18),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.edit),
-                                onPressed: () async {
-                                  await context.push(
-                                    AppRoutes.editProfile,
-                                    extra: state.profile,
-                                  );
-                                  if (context.mounted) {
-                                    context.read<ProfileCubit>().loadProfile();
-                                  }
-                                },
-                              ),
-                            ],
-                          ),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(height: 8),
-                                Text(
-                                    'Age: ${state.profile.age} | Weight: ${state.profile.weight} KG | Height: ${state.profile.height} cm'),
-                                const SizedBox(height: 8),
-                                Text(
-                                    'Phone Number: ${state.profile.phoneNumber}'),
-                                const SizedBox(height: 8),
-                                Text(
-                                    'Home Address (Primary): ${state.profile.homeAddress}'),
-                                const SizedBox(height: 16),
-                              ],
-                            ),
-                          ),
-                        ],
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: OutlinedButton.icon(
-                            onPressed: () async {
-                              await Utils.clearSp();
-                              debugPrint('Data telah dibersihkan');
-                              GoRouter.of(context).go(AppRoutes.signIn);
-                            },
-                            icon: const Icon(Icons.logout, color: Colors.red),
-                            label: const Text('Logout',
-                                style: TextStyle(color: Colors.red)),
-                            style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: Colors.red),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-                        ),
+                          const _ProfileInformationSection(),
+                          const SizedBox(height: 16),
+                          const _HealthRecordsSection(),
+                        ] else if (isProfessional)
+                          _ProfessionalProfileSection(profile: profile)
+                        else if (isAdmin)
+                          const _AdminSection(),
+                        const SizedBox(height: 16),
+                        const _AppointmentSection(),
+                        const SizedBox(height: 16),
+                        const _LogoutButton(),
                         const SizedBox(height: 80)
                       ],
                     ),
@@ -264,12 +117,194 @@ class _ProfilePageState extends State<ProfilePage> {
       },
     );
   }
+}
 
-  Widget _buildProfessionalProfileSection(BuildContext context,
-      {required Profile profile}) {
+class _ProfileHeader extends StatelessWidget {
+  final Profile profile;
+  final String lastUpdated;
+
+  const _ProfileHeader({required this.profile, required this.lastUpdated});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        ProfileAvatarWidget(
+          avatarUrl: profile.avatar,
+          size: 100,
+          borderRadius: 10,
+        ),
+        const SizedBox(width: 16),
+        Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                profile.username,
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'Last updated:',
+                style: TextStyle(color: Colors.grey),
+              ),
+              Text(
+                lastUpdated,
+                style: const TextStyle(color: Colors.black),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ProfileInformationSection extends StatelessWidget {
+  const _ProfileInformationSection();
+
+  @override
+  Widget build(BuildContext context) {
     return Card(
       elevation: 4,
-      shadowColor: Colors.grey,
+      shadowColor: Colors.grey.withOpacity(0.2),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Profile Information',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+            ),
+            _ProfileListTile(
+              title: 'Basic Information',
+              svgAsset: 'assets/icons/lab_profile.svg',
+              onTap: () {
+                context.push(AppRoutes.profileBasicInfo);
+              },
+            ),
+            _ProfileListTile(
+              title: 'Medical History & Risk Factors',
+              svgAsset: 'assets/icons/medical_report.svg',
+              onTap: () {
+                context.push(AppRoutes.profileMedicalHistory);
+              },
+            ),
+            _ProfileListTile(
+              title: 'Lifestyle & Selfcare',
+              svgAsset: 'assets/icons/muscle.svg',
+              onTap: () {
+                context.push(AppRoutes.profileLifestyle);
+              },
+            ),
+            _ProfileListTile(
+              title: 'Physical Sign',
+              svgAsset: 'assets/icons/physical_sign.svg',
+              onTap: () {
+                context.push(AppRoutes.profilePhysicalSigns);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HealthRecordsSection extends StatelessWidget {
+  const _HealthRecordsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      shadowColor: Colors.grey.withOpacity(0.2),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Health Records',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+            ),
+            _ProfileListTile(
+              title: 'Medical Records',
+              svgAsset: 'assets/icons/capsule_n_pill.svg',
+              onTap: () {
+                context.push(AppRoutes.medicalRecord);
+              },
+            ),
+            _ProfileListTile(
+              title: 'Pharmagenomics Profile',
+              svgAsset: 'assets/icons/DNA.svg',
+              onTap: () {
+                context.push(AppRoutes.pharmagenomics);
+              },
+            ),
+            _ProfileListTile(
+              title: 'Wellness Genomics Profile',
+              svgAsset: 'assets/icons/DNA.svg',
+              onTap: () {
+                context.push(AppRoutes.wellnessGenomics);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AppointmentSection extends StatelessWidget {
+  const _AppointmentSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      shadowColor: Colors.grey.withOpacity(0.2),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Appointment',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+            ),
+            ListTile(
+              leading:
+                  const Icon(Icons.calendar_today, color: Color(0xFF35C5CF)),
+              title: const Text('All My Appointments'),
+              titleTextStyle: const TextStyle(
+                fontSize: 16,
+                color: Colors.black,
+                fontWeight: FontWeight.normal,
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: () {
+                context.go(AppRoutes.appointment);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfessionalProfileSection extends StatelessWidget {
+  final Profile profile;
+  const _ProfessionalProfileSection({required this.profile});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      shadowColor: Colors.grey.withOpacity(0.2),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -287,6 +322,7 @@ class _ProfilePageState extends State<ProfilePage> {
               title: const Text('Edit Professional Profile'),
               trailing: const Icon(
                 Icons.arrow_forward_ios,
+                size: 16,
               ),
               onTap: () {
                 context.push(AppRoutes.editProfessionalProfile, extra: profile);
@@ -297,79 +333,16 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
+}
 
-  Widget _buildHealthRecordsSection(BuildContext context) {
+class _AdminSection extends StatelessWidget {
+  const _AdminSection();
+
+  @override
+  Widget build(BuildContext context) {
     return Card(
       elevation: 4,
-      shadowColor: Colors.grey,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Health Records',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            ListTile(
-              leading: SvgPicture.asset(
-                'assets/icons/capsule_n_pill.svg',
-                height: 28,
-                colorFilter:
-                    const ColorFilter.mode(Const.aqua, BlendMode.srcIn),
-              ),
-              title: const Text('Medical Records'),
-              trailing: const Icon(
-                Icons.arrow_forward_ios,
-              ),
-              onTap: () {
-                context.push(AppRoutes.medicalRecord);
-              },
-            ),
-            ListTile(
-              leading: SizedBox(
-                height: 28,
-                width: 24,
-                child: SvgPicture.asset(
-                  'assets/icons/DNA.svg',
-                  height: 28,
-                  colorFilter:
-                      const ColorFilter.mode(Const.aqua, BlendMode.srcIn),
-                ),
-              ),
-              title: const Text('Pharmagenomics Profile'),
-              trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: () {
-                context.push(AppRoutes.pharmagenomics);
-              },
-            ),
-            ListTile(
-              leading: SizedBox(
-                height: 28,
-                width: 24,
-                child: SvgPicture.asset(
-                  'assets/icons/DNA.svg',
-                  height: 28,
-                  colorFilter:
-                      const ColorFilter.mode(Const.aqua, BlendMode.srcIn),
-                ),
-              ),
-              title: const Text('Wellness Genomics Profile'),
-              trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: () {
-                context.push(AppRoutes.wellnessGenomics);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAdminSection(BuildContext context) {
-    return Card(
-      elevation: 4,
-      shadowColor: Colors.grey,
+      shadowColor: Colors.grey.withOpacity(0.2),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -377,12 +350,17 @@ class _ProfilePageState extends State<ProfilePage> {
           children: [
             const Text(
               'Admin Panel',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
             ),
             ListTile(
               leading: const Icon(Icons.edit_note, color: Color(0xFF35C5CF)),
               title: const Text('Manage Services'),
-              trailing: const Icon(Icons.arrow_forward_ios),
+              titleTextStyle: const TextStyle(
+                fontSize: 16,
+                color: Colors.black,
+                fontWeight: FontWeight.normal,
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {
                 GoRouter.of(context).push(AppRoutes.manageServices);
               },
@@ -390,6 +368,68 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _LogoutButton extends StatelessWidget {
+  const _LogoutButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: OutlinedButton.icon(
+        onPressed: () async {
+          await Utils.clearSp();
+          if (context.mounted) {
+            GoRouter.of(context).go(AppRoutes.signIn);
+          }
+        },
+        icon: const Icon(Icons.logout, color: Colors.red),
+        label: const Text('Logout', style: TextStyle(color: Colors.red)),
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: Colors.red),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProfileListTile extends StatelessWidget {
+  final String title;
+  final String svgAsset;
+  final VoidCallback onTap;
+
+  const _ProfileListTile({
+    required this.title,
+    required this.svgAsset,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: SizedBox(
+        height: 28,
+        width: 24,
+        child: SvgPicture.asset(
+          svgAsset,
+          height: 28,
+          colorFilter: const ColorFilter.mode(Const.aqua, BlendMode.srcIn),
+        ),
+      ),
+      title: Text(title),
+      titleTextStyle: const TextStyle(
+        fontSize: 16,
+        color: Colors.black,
+        fontWeight: FontWeight.normal,
+      ),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+      onTap: onTap,
     );
   }
 }

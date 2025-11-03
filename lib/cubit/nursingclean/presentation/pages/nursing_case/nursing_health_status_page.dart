@@ -85,13 +85,13 @@ class _NursingHealthStatusPageState extends State<NursingHealthStatusPage> {
                 const SizedBox(height: 10.0),
                 BlocBuilder<MedicalRecordBloc, MedicalRecordState>(
                   builder: (context, medicalState) {
-                    if (medicalState is MedicalRecordLoading) {
+                    if (medicalState.listStatus == ListStatus.loading) {
                       return const Center(child: CircularProgressIndicator());
                     }
-                    if (medicalState is MedicalRecordError) {
-                      return Center(child: Text(medicalState.message));
+                    if (medicalState.listStatus == ListStatus.failure) {
+                      return Center(child: Text(medicalState.listError ?? 'Error loading records'));
                     }
-                    if (medicalState is MedicalRecordLoaded) {
+                    if (medicalState.listStatus == ListStatus.success) {
                       if (medicalState.medicalRecords.isEmpty) {
                         return const Text('No medical records available.');
                       }

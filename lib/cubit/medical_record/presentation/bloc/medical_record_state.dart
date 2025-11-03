@@ -1,31 +1,53 @@
+// medical_record/presentation/bloc/medical_record_state.dart
+
 import 'package:equatable/equatable.dart';
 import 'package:m2health/cubit/medical_record/domain/entities/medical_record.dart';
 
-abstract class MedicalRecordState extends Equatable {
-  const MedicalRecordState();
+enum ListStatus { initial, loading, success, failure }
 
-  @override
-  List<Object> get props => [];
-}
+enum DeleteStatus { initial, loading, success, failure }
 
-class MedicalRecordInitial extends MedicalRecordState {}
+class MedicalRecordState extends Equatable {
+  const MedicalRecordState({
+    this.listStatus = ListStatus.initial,
+    this.deleteStatus = DeleteStatus.initial,
+    this.medicalRecords = const <MedicalRecord>[],
+    this.listError,
+    this.deleteError,
+  });
 
-class MedicalRecordLoading extends MedicalRecordState {}
-
-class MedicalRecordLoaded extends MedicalRecordState {
+  final ListStatus listStatus;
   final List<MedicalRecord> medicalRecords;
+  final String? listError;
 
-  const MedicalRecordLoaded(this.medicalRecords);
+  final DeleteStatus deleteStatus;
+  final String? deleteError;
+
+  MedicalRecordState copyWith({
+    ListStatus? listStatus,
+    DeleteStatus? deleteStatus,
+    List<MedicalRecord>? medicalRecords,
+    String? listError,
+    String? deleteError,
+  }) {
+    return MedicalRecordState(
+      listStatus: listStatus ?? this.listStatus,
+      // Reset delete status on list status change
+      deleteStatus: (listStatus != null)
+          ? DeleteStatus.initial
+          : (deleteStatus ?? this.deleteStatus),
+      medicalRecords: medicalRecords ?? this.medicalRecords,
+      listError: listError ?? this.listError,
+      deleteError: deleteError ?? this.deleteError,
+    );
+  }
 
   @override
-  List<Object> get props => [medicalRecords];
-}
-
-class MedicalRecordError extends MedicalRecordState {
-  final String message;
-
-  const MedicalRecordError(this.message);
-
-  @override
-  List<Object> get props => [message];
+  List<Object?> get props => [
+        listStatus,
+        deleteStatus,
+        medicalRecords,
+        listError,
+        deleteError,
+      ];
 }

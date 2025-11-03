@@ -30,7 +30,10 @@ class AppRoutes {
   static const String medicalRecord = '/medical-record';
   static const String pharmagenomics = '/pharmagenomics';
   static const String wellnessGenomics = '/wellness-genomics';
-  static const String editProfile = '/edit-profile';
+  static const String profileBasicInfo = '/basic-info';
+  static const String profileMedicalHistory = '/medical-history';
+  static const String profileLifestyle = '/lifestyle';
+  static const String profilePhysicalSigns = '/physical-signs';
   static const String editProfessionalProfile = '/edit-professional-profile';
   static const String manageServices = '/manage-services';
 

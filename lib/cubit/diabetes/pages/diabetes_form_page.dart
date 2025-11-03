@@ -3,8 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2health/cubit/diabetes/bloc/diabetes_form_cubit.dart';
 import 'package:m2health/cubit/diabetes/bloc/diabetes_form_state.dart';
-import 'package:m2health/cubit/diabetes/pages/form/index.dart';
-import 'package:m2health/cubit/diabetes/widgets/diabetes_form_widget.dart';
+import 'package:m2health/cubit/diabetes/pages/form/diabetes_history_page.dart';
+import 'package:m2health/cubit/diabetes/pages/form/lifestyle_self_care_page.dart';
+import 'package:m2health/cubit/diabetes/pages/form/physical_signs_page.dart';
+import 'package:m2health/cubit/diabetes/pages/form/risk_factor_page.dart';
 import 'package:m2health/route/app_routes.dart';
 
 class DiabetesFormPage extends StatefulWidget {
@@ -15,14 +17,7 @@ class DiabetesFormPage extends StatefulWidget {
 }
 
 class _DiabetesFormPageState extends State<DiabetesFormPage> {
-  final _pageController = PageController();
-  int _currentPage = 0;
-  bool _canPop = false;
-
-  final _diabetesHistoryPageKey = GlobalKey<DiabetesHistoryPageState>();
-  final _riskFactorsPageKey = GlobalKey<RiskFactorsPageState>();
-  final _lifestylePageKey = GlobalKey<LifestyleSelfCarePageState>();
-  final _physicalSignPageKey = GlobalKey<PhysicalSignsPageState>();
+  final PageController _pageController = PageController();
 
   @override
   void dispose() {
@@ -30,184 +25,130 @@ class _DiabetesFormPageState extends State<DiabetesFormPage> {
     super.dispose();
   }
 
-  bool _validatePage() {
-    String? error;
-    switch (_currentPage) {
-      case 0:
-        return _diabetesHistoryPageKey.currentState?.validate() ?? true;
-      case 1:
-        error = _riskFactorsPageKey.currentState?.validate();
-      case 2:
-        error = _lifestylePageKey.currentState?.validate();
-      case 3:
-        return _physicalSignPageKey.currentState?.validate() ?? true;
-      default:
-        return false;
-    }
-
-    if (error != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error), backgroundColor: Colors.red),
-      );
-      return false;
-    }
-    return true;
-  }
-
-  void _nextPage() {
-    if (_currentPage >= 3) return;
-    _pageController.nextPage(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
-  }
-
-  void _submitFormAndShowDialog() async {
-    final success = await context.read<DiabetesFormCubit>().submitForm();
+  Future<void> _submitForm() async {
+    final cubit = context.read<DiabetesFormCubit>();
+    final success = await cubit.submitForm();
     if (!mounted) return;
+
     if (!success) {
-      final errorMessage =
-          context.read<DiabetesFormCubit>().state.errorMessage ??
-              'An unknown error occurred.';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(errorMessage),
+          content: Text(cubit.state.errorMessage ?? 'Failed to submit form.'),
           backgroundColor: Colors.red,
         ),
       );
       return;
     }
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Success!'),
-        content: const Text(
-            'Your Diabetes Profile has been submitted successfully.'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(dialogContext).pop();
-              GoRouter.of(context).goNamed(AppRoutes.diabeticProfileSummary);
-            },
-            child: const Text('View Details'),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Future<bool> _showDiscardDialog() async {
-    final bool? shouldDiscard = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Text('Discard Progress?'),
-          content: const Text(
-              'Are you sure you want to leave? Any unsaved changes will be lost.'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop(false); // Don't discard
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.red,
-              ),
-              onPressed: () {
-                Navigator.of(dialogContext).pop(true); // Discard
-              },
-              child: const Text('Discard'),
-            ),
-          ],
-        );
-      },
-    );
-    return shouldDiscard ?? false;
-  }
-
-  void _handlePop() async {
-    if (_currentPage != 0) {
-      _pageController.previousPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-      return;
-    }
-
-    final bool didConfirm = await _showDiscardDialog();
-
-    if (didConfirm && mounted) {
-      setState(() {
-        _canPop = true;
-      });
-      Navigator.of(context).pop();
-    }
+    GoRouter.of(context).goNamed(AppRoutes.diabeticProfileSummary);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Diabetes Form',
-          style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        elevation: 1.0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: _handlePop,
-        ),
-      ),
-      body: PopScope(
-        canPop: _canPop,
-        onPopInvokedWithResult: (bool didPop, Object? result) {
-          if (didPop) {
-            return;
-          }
-          _handlePop();
-        },
-        child: PageView(
+    return BlocBuilder<DiabetesFormCubit, DiabetesFormState>(
+      builder: (context, state) {
+        if (state.isLoading) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (state.errorMessage != null && !state.isSubmitted) {
+          return Scaffold(
+            appBar: AppBar(title: const Text('Error')),
+            body: Center(
+              child: Text(state.errorMessage ?? 'Failed to load form data.'),
+            ),
+          );
+        }
+
+        return PageView(
           controller: _pageController,
           physics: const NeverScrollableScrollPhysics(),
-          onPageChanged: (index) {
-            setState(() {
-              _currentPage = index;
-            });
-          },
           children: [
-            DiabetesHistoryPage(key: _diabetesHistoryPageKey),
-            RiskFactorsPage(key: _riskFactorsPageKey),
-            LifestyleSelfCarePage(key: _lifestylePageKey),
-            PhysicalSignsPage(key: _physicalSignPageKey),
+            _buildDiabetesHistoryPage(context, state),
+            _buildRiskFactorsPage(context, state),
+            _buildLifestylePage(context, state),
+            _buildPhysicalSignsPage(context, state),
           ],
-        ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: BlocBuilder<DiabetesFormCubit, DiabetesFormState>(
-          builder: (context, state) {
-            return PrimaryButton(
-              text: _currentPage == 3 ? 'Submit Form' : 'Next',
-              isLoading: state.isLoading,
-              onPressed: () {
-                if (!_validatePage()) return;
-                if (_currentPage == 3) {
-                  _submitFormAndShowDialog();
-                } else {
-                  _nextPage();
-                }
-              },
-            );
-          },
-        ),
-      ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDiabetesHistoryPage(
+      BuildContext context, DiabetesFormState state) {
+    return DiabetesHistoryFormPage(
+      initialData: state.diabetesHistory,
+      onChange: (newData) {
+        context.read<DiabetesFormCubit>().updateDiabetesHistory(newData);
+      },
+      onSave: () {
+        _pageController.nextPage(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      },
+      saveButtonText: 'Next',
+      onPressBack: () => Navigator.of(context).pop(), // Handle back
+    );
+  }
+
+  Widget _buildRiskFactorsPage(BuildContext context, DiabetesFormState state) {
+    return RiskFactorsFormPage(
+      initialData: state.riskFactors,
+      onChange: (newData) {
+        context
+            .read<DiabetesFormCubit>()
+            .updateMedicalHistoryRiskFactors(newData);
+      },
+      onSave: () {
+        _pageController.nextPage(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      },
+      saveButtonText: 'Next',
+      onPressBack: () => _pageController.previousPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      ), // Handle back
+    );
+  }
+
+  Widget _buildLifestylePage(BuildContext context, DiabetesFormState state) {
+    return LifestyleSelfCareFormPage(
+      initialData: state.lifestyleSelfCare,
+      onChange: (newData) {
+        context.read<DiabetesFormCubit>().updateLifestyleSelfCare(newData);
+      },
+      onSave: () {
+        _pageController.nextPage(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      },
+      saveButtonText: 'Next',
+      onPressBack: () => _pageController.previousPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      ), // Handle back
+    );
+  }
+
+  Widget _buildPhysicalSignsPage(
+      BuildContext context, DiabetesFormState state) {
+    return PhysicalSignsFormPage(
+      initialData: state.physicalSigns,
+      onChange: (newData) {
+        context.read<DiabetesFormCubit>().updatePhysicalSigns(newData);
+      },
+      onSave: _submitForm,
+      saveButtonText: 'Submit',
+      onPressBack: () => _pageController.previousPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      ), // Handle back
     );
   }
 }

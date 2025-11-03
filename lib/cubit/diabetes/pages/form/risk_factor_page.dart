@@ -4,14 +4,35 @@ import 'package:m2health/cubit/diabetes/bloc/diabetes_form_cubit.dart';
 import 'package:m2health/cubit/diabetes/bloc/diabetes_form_state.dart';
 import 'package:m2health/cubit/diabetes/widgets/diabetes_form_widget.dart';
 
-class RiskFactorsPage extends StatefulWidget {
-  const RiskFactorsPage({super.key});
+class RiskFactorsFormPage extends StatefulWidget {
+  final RiskFactors initialData;
+  final ValueChanged<RiskFactors> onChange;
+  final VoidCallback onSave;
+  final String saveButtonText;
+  final VoidCallback? onPressBack;
+
+  const RiskFactorsFormPage({
+    super.key,
+    required this.initialData,
+    required this.onChange,
+    required this.onSave,
+    this.saveButtonText = 'Save',
+    this.onPressBack,
+  });
 
   @override
-  State<RiskFactorsPage> createState() => RiskFactorsPageState();
+  State<RiskFactorsFormPage> createState() => RiskFactorsPageState();
 }
 
-class RiskFactorsPageState extends State<RiskFactorsPage> {
+class RiskFactorsPageState extends State<RiskFactorsFormPage> {
+  late RiskFactors _currentData;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentData = widget.initialData;
+  }
+
   String? validate() {
     final factors = context.read<DiabetesFormCubit>().state.riskFactors;
     if (factors.hasHypertension == null ||
@@ -73,42 +94,71 @@ class RiskFactorsPageState extends State<RiskFactorsPage> {
       },
     ];
 
-    return BlocBuilder<DiabetesFormCubit, DiabetesFormState>(
-      builder: (context, state) {
-        final factors = state.riskFactors;
-        return SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const FormSectionHeader('Medical History & Risk Factors'),
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: riskFactorItems.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 10,
-                  mainAxisExtent: 136,
-                ),
-                itemBuilder: (context, index) {
-                  final item = riskFactorItems[index];
-                  return RiskFactorCard(
-                    name: item['name'],
-                    iconPath: item['icon'],
-                    options: item['options'],
-                    groupValue: _getGroupValue(item['name'], factors),
-                    onChanged: (value) {
-                      _updateRiskFactor(context, item['name'], value, factors);
-                    },
-                  );
-                },
-              ),
-            ],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          "Medical History & Risk Factors",
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
           ),
-        );
-      },
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: widget.onPressBack ?? () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const FormSectionHeader('Medical History & Risk Factors'),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: riskFactorItems.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 10,
+                mainAxisExtent: 136,
+              ),
+              itemBuilder: (context, index) {
+                final item = riskFactorItems[index];
+                return RiskFactorCard(
+                  name: item['name'],
+                  iconPath: item['icon'],
+                  options: item['options'],
+                  groupValue: _getGroupValue(item['name'], _currentData),
+                  onChanged: (value) {
+                    _updateRiskFactor(context, item['name'], value);
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: PrimaryButton(
+          text: widget.saveButtonText,
+          onPressed: () {
+            final validationError = validate();
+            if (validationError != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content: Text(validationError),
+                    backgroundColor: Colors.red),
+              );
+              return;
+            }
+            widget.onSave();
+          },
+        ),
+      ),
     );
   }
 
@@ -149,41 +199,41 @@ class RiskFactorsPageState extends State<RiskFactorsPage> {
     }
   }
 
-  void _updateRiskFactor(BuildContext context, String name, String? value,
-      RiskFactors oldFactors) {
+  void _updateRiskFactor(BuildContext context, String name, String? value) {
     bool? boolValue = value == 'Yes' ? true : (value == 'No' ? false : null);
     RiskFactors newFactors;
     switch (name) {
       case 'Hypertension':
-        newFactors = oldFactors.copyWith(hasHypertension: boolValue);
+        newFactors = _currentData.copyWith(hasHypertension: boolValue);
         break;
       case 'Dyslipidemia':
-        newFactors = oldFactors.copyWith(hasDyslipidemia: boolValue);
+        newFactors = _currentData.copyWith(hasDyslipidemia: boolValue);
         break;
       case 'Cardiovascular Disease':
-        newFactors = oldFactors.copyWith(hasCardiovascularDisease: boolValue);
+        newFactors = _currentData.copyWith(hasCardiovascularDisease: boolValue);
         break;
       case 'Neuropathy':
-        newFactors = oldFactors.copyWith(hasNeuropathy: boolValue);
+        newFactors = _currentData.copyWith(hasNeuropathy: boolValue);
         break;
       case 'Eye Disease (Retinopathy)':
-        newFactors = oldFactors.copyWith(hasEyeDisease: boolValue);
+        newFactors = _currentData.copyWith(hasEyeDisease: boolValue);
         break;
       case 'Kidney Disease':
-        newFactors = oldFactors.copyWith(hasKidneyDisease: boolValue);
+        newFactors = _currentData.copyWith(hasKidneyDisease: boolValue);
         break;
       case 'Family History of Diabetes':
-        newFactors = oldFactors.copyWith(hasFamilyHistory: boolValue);
+        newFactors = _currentData.copyWith(hasFamilyHistory: boolValue);
         break;
       case 'Smoking':
-        newFactors = oldFactors.copyWith(smokingStatus: value);
+        newFactors = _currentData.copyWith(smokingStatus: value);
         break;
       default:
-        newFactors = oldFactors;
+        newFactors = _currentData;
     }
-    context
-        .read<DiabetesFormCubit>()
-        .updateMedicalHistoryRiskFactors(newFactors);
+    setState(() {
+      _currentData = newFactors;
+    });
+    widget.onChange(newFactors);
   }
 }
 
