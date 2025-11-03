@@ -9,8 +9,7 @@ class AppointmentDetailLoading extends AppointmentDetailState {}
 
 class AppointmentDetailLoaded extends AppointmentDetailState {
   final Appointment appointment;
-  final Profile profile;
-  AppointmentDetailLoaded(this.appointment, this.profile);
+  AppointmentDetailLoaded(this.appointment);
 }
 
 class AppointmentDetailError extends AppointmentDetailState {

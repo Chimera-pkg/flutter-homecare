@@ -289,8 +289,8 @@ class AppointmentService {
     }
   }
 
-  /// Fetches the detail for a single patient appointment.
-  Future<Appointment> fetchPatientAppointmentDetail(int appointmentId) async {
+  /// Fetches the detail for an appointment.
+  Future<Appointment> fetchAppointmentDetail(int appointmentId) async {
     try {
       final token = await Utils.getSpString(Const.TOKEN);
       final response = await _dio.get(
@@ -484,13 +484,9 @@ class AppointmentService {
       int appointmentId, Map<String, dynamic> appointmentData) async {
     try {
       final token = await Utils.getSpString(Const.TOKEN);
-      final userId = await Utils.getSpString(Const.USER_ID);
 
       // Ensure user_id is included and is a number
-      final dataToSend = {
-        ...appointmentData,
-        'user_id': int.tryParse(userId ?? '1') ?? 1, // Convert to int
-      };
+      final dataToSend = appointmentData;
 
       print('Updating appointment $appointmentId with data: $dataToSend');
 

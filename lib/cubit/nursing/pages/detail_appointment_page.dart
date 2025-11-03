@@ -460,7 +460,7 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
                       child: const Text('Full Name: '),
                     ),
                     Flexible(
-                      child: Text(_profile?.username ?? 'Unknown'),
+                      child: Text(_profile?.name ?? 'Unknown'),
                     ),
                   ],
                 ),

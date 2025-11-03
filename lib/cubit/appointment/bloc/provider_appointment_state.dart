@@ -8,14 +8,14 @@ class ProviderAppointmentInitial extends ProviderAppointmentState {}
 class ProviderAppointmentLoading extends ProviderAppointmentState {}
 
 class ProviderAppointmentLoaded extends ProviderAppointmentState {
-  final List<ProviderAppointment> appointments;
+  final List<Appointment> appointments;
 
   ProviderAppointmentLoaded(this.appointments);
 }
 
-class ProviderAppointmentChangeSucceed extends ProviderAppointmentLoaded {
+class ProviderAppointmentChangeSucceed extends ProviderAppointmentState {
   final String? message;
-  ProviderAppointmentChangeSucceed(super.appointments, {this.message});
+  ProviderAppointmentChangeSucceed({this.message});
 }
 
 class ProviderAppointmentError extends ProviderAppointmentState {

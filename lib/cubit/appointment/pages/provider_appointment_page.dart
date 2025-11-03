@@ -5,7 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:m2health/cubit/appointment/bloc/provider_appointment_cubit.dart';
-import 'package:m2health/models/provider_appointment.dart';
+import 'package:m2health/cubit/appointment/models/appointment.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/route/app_routes.dart';
 
@@ -163,7 +163,7 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
   }
 
   Widget _buildProviderAppointmentList(
-      List<ProviderAppointment> appointments, String status) {
+      List<Appointment> appointments, String status) {
     final filteredAppointments = appointments
         .where((appointment) =>
             appointment.status.toLowerCase() == status.toLowerCase())
@@ -216,9 +216,8 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
     );
   }
 
-  Widget _buildProviderAppointmentCard(
-      ProviderAppointment appointment, String status) {
-    final patientData = appointment.patientData;
+  Widget _buildProviderAppointmentCard(Appointment appointment, String status) {
+    final patient = appointment.patient;
 
     return GestureDetector(
       onTap: () {
@@ -242,14 +241,12 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
                 children: [
                   CircleAvatar(
                     radius: 30,
-                    backgroundColor: Colors.grey[300],
-                    backgroundImage: (patientData['avatar'] != null &&
-                            patientData['avatar'].toString().isNotEmpty)
-                        ? NetworkImage(patientData['avatar'])
-                        : null,
-                    child: (patientData['avatar'] == null ||
-                            patientData['avatar'].toString().isEmpty)
-                        ? Icon(Icons.person, size: 30, color: Colors.grey[600])
+                    backgroundImage:
+                        (patient != null && patient.avatar.isNotEmpty)
+                            ? NetworkImage(patient.avatar)
+                            : null,
+                    child: (patient == null || patient.avatar.isEmpty)
+                        ? const Icon(Icons.person, size: 30, color: Colors.grey)
                         : null,
                   ),
                   const SizedBox(width: 16),
@@ -258,7 +255,7 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _getPatientName(appointment),
+                          patient?.name ?? 'Patient Name',
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -577,31 +574,5 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
         );
       },
     );
-  }
-
-  String _getPatientName(ProviderAppointment appointment) {
-    final patientData = appointment.patientData;
-
-    // Try different possible name fields in order of preference
-    final possibleNames = [
-      patientData['username'],
-      patientData['name'],
-      patientData['patient_name'],
-      patientData['user']?['username'],
-      patientData['user']?['name'],
-    ];
-
-    for (var name in possibleNames) {
-      if (name != null && name.toString().isNotEmpty) {
-        return name.toString();
-      }
-    }
-
-    // If patient data is empty, show user ID as fallback
-    if (patientData.isEmpty) {
-      return 'Patient (ID: ${appointment.userId})';
-    }
-
-    return 'Unknown Patient';
   }
 }

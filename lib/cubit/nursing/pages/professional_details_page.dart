@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:m2health/cubit/nursingclean/domain/entities/professional_entity.dart';
+import 'package:m2health/models/provider.dart';
 import 'package:m2health/views/book_appointment.dart';
 import 'package:m2health/const.dart';
 
@@ -307,26 +308,42 @@ class ProfessionalDetailsPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: ElevatedButton(
           onPressed: () {
-            final providerData = {
-              'id': professional.id,
-              'name': professional.name,
-              'avatar': professional.avatar,
-              'role': professional.role.toLowerCase(),
-              'provider_type': professional.providerType.toLowerCase(),
-              'experience': professional.experience,
-              'rating': professional.rating,
-              'about': professional.about,
-              'working_information': professional.workingInformation,
-              'working_hours': professional.workingHours,
-              'workplace': professional.workplace,
-              'user_id': professional.userId,
-            };
+            // final providerData = {
+            //   'id': professional.id,
+            //   'name': professional.name,
+            //   'avatar': professional.avatar,
+            //   'role': professional.role.toLowerCase(),
+            //   'provider_type': professional.providerType.toLowerCase(),
+            //   'experience': professional.experience,
+            //   'rating': professional.rating,
+            //   'about': professional.about,
+            //   'working_information': professional.workingInformation,
+            //   'working_hours': professional.workingHours,
+            //   'workplace': professional.workplace,
+            //   'user_id': professional.userId,
+            // };
+            final provider = Provider(
+              id: professional.id,
+              name: professional.name,
+              avatar: professional.avatar,
+              experience: professional.experience,
+              rating: professional.rating,
+              about: professional.about,
+              workingInformation: professional.workingInformation,
+              workingHours: professional.workingHours,
+              workplace: professional.workplace,
+              jobTitle: professional.role,
+              userId: professional.userId,
+              providerType: professional.providerType,
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
+            );
 
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => BookAppointmentPage(
-                    data: BookAppointmentPageData(pharmacist: providerData)),
+                    data: BookAppointmentPageData(provider: provider)),
               ),
             );
           },

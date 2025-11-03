@@ -5,8 +5,8 @@ class Profile {
   final double weight;
   final double height;
   final String phoneNumber;
-  final String username;
-  final String email;
+  final String name;
+  final String drugAllergy;
   final String homeAddress;
   final String gender;
   final String avatar; // Add this field
@@ -20,8 +20,8 @@ class Profile {
     required this.weight,
     required this.height,
     required this.phoneNumber,
-    required this.username,
-    required this.email,
+    required this.name,
+    required this.drugAllergy,
     required this.homeAddress,
     required this.gender,
     required this.avatar, // Add this parameter
@@ -37,8 +37,8 @@ class Profile {
       weight: (json['weight'] as num?)?.toDouble() ?? 0.0,
       height: (json['height'] as num?)?.toDouble() ?? 0.0,
       phoneNumber: json['phone_number'] ?? '',
-      username: json['username'] ?? '',
-      email: json['email'] ?? '',
+      name: json['name'] ?? '',
+      drugAllergy: json['drug_allergy'] ?? '',
       homeAddress: json['home_address'] ?? '',
       gender: json['gender'] ?? '',
       avatar: json['avatar'] ?? '', // Add this line
@@ -55,8 +55,8 @@ class Profile {
       'weight': weight,
       'height': height,
       'phone_number': phoneNumber,
-      'username': username,
-      'email': email,
+      'name': name,
+      'drug_allergy': drugAllergy,
       'home_address': homeAddress,
       'gender': gender,
       'avatar': avatar, // Add this line
@@ -72,8 +72,8 @@ class Profile {
     double? weight,
     double? height,
     String? phoneNumber,
-    String? username,
-    String? email,
+    String? name,
+    String? drugAllergy,
     String? homeAddress,
     String? gender,
     String? avatar,
@@ -87,8 +87,8 @@ class Profile {
       weight: weight ?? this.weight,
       height: height ?? this.height,
       phoneNumber: phoneNumber ?? this.phoneNumber,
-      username: username ?? this.username,
-      email: email ?? this.email,
+      name: name ?? this.name,
+      drugAllergy: drugAllergy ?? this.drugAllergy,
       homeAddress: homeAddress ?? this.homeAddress,
       gender: gender ?? this.gender,
       avatar: avatar ?? this.avatar,

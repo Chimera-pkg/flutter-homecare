@@ -6,12 +6,11 @@ class Provider {
   final double rating;
   final String about;
   final String workingInformation;
-  final String daysHour;
-  final String mapsLocation;
-  final String certification;
+  final String workingHours;
+  final String workplace;
+  final String jobTitle;
   final int userId;
   final String providerType; // 'pharmacist' or 'nurse'
-  final User? user;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -23,40 +22,16 @@ class Provider {
     required this.rating,
     required this.about,
     required this.workingInformation,
-    required this.daysHour,
-    required this.mapsLocation,
-    required this.certification,
+    required this.workingHours,
+    required this.workplace,
+    required this.jobTitle,
     required this.userId,
     required this.providerType,
-    this.user,
     required this.createdAt,
     required this.updatedAt,
   });
 
-  factory Provider.fromJson(Map<String, dynamic> json) {
-    return Provider(
-      id: json['id'] ?? 0,
-      name: json['name'] ?? '',
-      avatar: json['avatar'] ?? '',
-      experience: json['experience'] ?? 0,
-      rating: (json['rating'] ?? 0.0).toDouble(),
-      about: json['about'] ?? '',
-      workingInformation: json['working_information'] ?? '',
-      daysHour: json['days_hour'] ?? '',
-      mapsLocation: json['maps_location'] ?? '',
-      certification: json['certification'] ?? '',
-      userId: json['user_id'] ?? 0,
-      providerType: json['provider_type'] ?? '',
-      user: json['user'] != null ? User.fromJson(json['user']) : null,
-      createdAt: json['created_at'] != null
-          ? DateTime.parse(json['created_at'])
-          : DateTime.now(),
-      updatedAt: json['updated_at'] != null
-          ? DateTime.parse(json['updated_at'])
-          : DateTime.now(),
-    );
-  }
-
+  // Method to convert Provider to JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -66,47 +41,43 @@ class Provider {
       'rating': rating,
       'about': about,
       'working_information': workingInformation,
-      'days_hour': daysHour,
-      'maps_location': mapsLocation,
-      'certification': certification,
-      'user_id': userId,
+      'working_hours': workingHours,
+      'workplace': workplace,
+      'job_title': jobTitle,
+      'userId': userId,
       'provider_type': providerType,
-      'user': user?.toJson(),
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
     };
   }
 
-  String get displayName => name.isNotEmpty ? name : 'Unknown Provider';
-  String get displayExperience => '${experience}Y++';
-  String get displayRating => rating.toStringAsFixed(1);
-  bool get isAvailable => true; // Can be expanded with real availability logic
-}
-
-class User {
-  final int id;
-  final String name;
-  final String email;
-
-  User({
-    required this.id,
-    required this.name,
-    required this.email,
-  });
-
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
+  // Factory method to create Provider from JSON
+  factory Provider.fromJson(Map<String, dynamic> json) {
+    return Provider(
       id: json['id'] ?? 0,
-      name: json['name'] ?? '',
-      email: json['email'] ?? '',
+      name: json['name'] ?? 'Unknown',
+      avatar: json['avatar'] ?? '',
+      experience: json['experience'] ?? 0,
+      rating: (json['rating'] ?? 0).toDouble(),
+      about: json['about'] ?? 'No information available',
+      workingInformation: json['working_information'] ?? 'Not provided',
+      workingHours: json['working_hours'] ?? 'Not specified',
+      workplace: json['workplace'] ?? 'Unknown',
+      jobTitle: json['job_title'] ?? 'Not specified',
+      userId: json['userId'] ?? 0,
+      providerType: json['provider_type'] ?? 'Unknown',
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : DateTime.now(),
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'])
+          : DateTime.now(),
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'email': email,
-    };
+  // Method to display provider details
+  @override
+  String toString() {
+    return 'Provider(id: $id, name: $name, jobTitle: $jobTitle, rating: $rating, providerType: $providerType)';
   }
 }

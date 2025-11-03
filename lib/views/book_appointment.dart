@@ -1,7 +1,10 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:m2health/models/provider.dart';
 import 'package:m2health/utils.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'details/detail_appointment.dart';
@@ -10,13 +13,13 @@ import 'package:m2health/widgets/time_slot_grid_view.dart';
 import 'package:m2health/services/appointment_service.dart';
 
 class BookAppointmentPageData {
-  final Map<String, dynamic> pharmacist;
+  final Provider provider;
   final int? appointmentId; // Optional appointment ID for rescheduling
   final DateTime? initialDate; // Optional initial date for rescheduling
   final DateTime? initialTime; // Optional initial time for rescheduling
 
   const BookAppointmentPageData({
-    required this.pharmacist,
+    required this.provider,
     this.appointmentId,
     this.initialDate,
     this.initialTime,
@@ -24,7 +27,7 @@ class BookAppointmentPageData {
 
   @override
   String toString() {
-    return 'BookAppointmentPageData(pharmacist: $pharmacist, appointmentId: $appointmentId, initialDate: $initialDate, initialTime: $initialTime)';
+    return 'BookAppointmentPageData(provider: $provider, appointmentId: $appointmentId, initialDate: $initialDate, initialTime: $initialTime)';
   }
 }
 
@@ -45,6 +48,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
   late DateTime _focusedDay;
   late DateTime selectTime;
   late AppointmentService _appointmentService;
+  late bool isReschedule;
   bool _isSubmitting = false; // Add loading state to prevent duplicates
 
   @override
@@ -54,13 +58,14 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
     _selectedDay = widget.data.initialDate ?? DateTime.now();
     _focusedDay = widget.data.initialDate ?? DateTime.now();
     selectTime = widget.data.initialTime ?? DateTime.now();
+    isReschedule = widget.data.appointmentId != null;
     _appointmentService = AppointmentService(context.read<Dio>());
   }
 
   Future<void> _submitAppointment() async {
     // Prevent duplicate submissions
     if (_isSubmitting) {
-      print('Already submitting appointment, ignoring duplicate request');
+      log('Already submitting appointment, ignoring duplicate request');
       return;
     }
 
@@ -71,44 +76,24 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
     try {
       final userId = await Utils.getSpString(Const.USER_ID);
 
-      // Extract provider information from pharmacist data
-      final providerId = widget.data.pharmacist['id'];
-      final providerType =
-          widget.data.pharmacist['provider_type'] ?? 'pharmacist';
+      // Extract provider information from the Provider model
+      final provider = widget.data.provider;
 
-      print('Provider ID: $providerId');
-      print('Provider Type: $providerType');
-      print('Pharmacist data: ${widget.data.pharmacist}');
+      log('Provider ID: ${provider.id}');
+      log('Provider Type: ${provider.providerType}');
+      log('Provider Data: $provider');
 
-      if (providerId == null) {
-        throw Exception(
-            'Provider ID is required but not found in pharmacist data');
-      }
-
-      final appointmentData = {
-        'user_id': int.tryParse(userId ?? '1') ?? 1,
-        'provider_id': providerId, // Add provider_id
-        'provider_type': providerType.toLowerCase(), // Add provider_type
-        'type': providerType,
-        'status': 'pending',
-        'date': DateFormat('yyyy-MM-dd').format(_selectedDay),
-        'hour': DateFormat('HH:mm').format(selectTime),
-        'summary':
-            'Appointment booking with ${widget.data.pharmacist['name'] ?? 'provider'}',
-        'pay_total': 100.0,
-        'profile_services_data': widget.data.pharmacist,
-      };
-
-      print('Submitting appointment with data: $appointmentData');
-
-      if (widget.data.appointmentId != null) {
+      if (isReschedule) {
         // Update existing appointment
         await _appointmentService.updateAppointment(
           widget.data.appointmentId!,
-          appointmentData,
+          {
+            'date': DateFormat('yyyy-MM-dd').format(_selectedDay),
+            'hour': DateFormat('HH:mm').format(selectTime),
+          },
         );
 
-        print('Appointment rescheduled successfully');
+        log('Appointment rescheduled successfully');
         Navigator.pop(context);
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -118,40 +103,40 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
           ),
         );
       } else {
-        print('Appointment created successfully');
+        log('Appointment created successfully');
 
         // Navigate to appointment detail page
-        final detailData = {
-          'user_id': appointmentData['user_id'],
-          'provider_id': appointmentData['provider_id'],
-          'provider_type': appointmentData['provider_type'],
-          'type': appointmentData['type'],
-          'status': appointmentData['status'],
-          'date': appointmentData['date'],
-          'hour': appointmentData['hour'],
-          'summary': appointmentData['summary'],
-          'pay_total': appointmentData['pay_total'],
-          'profile_services_data': appointmentData['profile_services_data'],
+        final appointmentData = {
+          'user_id': int.tryParse(userId ?? '1') ?? 1,
+          'provider_id': provider.id,
+          'provider_type': provider.providerType.toLowerCase(),
+          'type': provider.providerType,
+          'status': 'pending',
+          'date': DateFormat('yyyy-MM-dd').format(_selectedDay),
+          'hour': DateFormat('HH:mm').format(selectTime),
+          'summary': 'Appointment booking with ${provider.name}',
+          'pay_total': 100.0,
+          'profile_services_data': provider.toJson(),
         };
 
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => DetailAppointmentPage(
-              appointmentData: detailData,
+              appointmentData: appointmentData,
             ),
           ),
         );
       }
     } catch (e) {
-      print('=== APPOINTMENT CREATION ERROR ===');
-      print('Error: $e');
+      log('=== APPOINTMENT CREATION ERROR ===');
+      log('Error: $e');
 
       // Enhanced error logging for debugging
       if (e is DioException && e.response != null) {
-        print('Status Code: ${e.response!.statusCode}');
-        print('Response Data: ${e.response!.data}');
-        print('Request Data: ${e.requestOptions.data}');
+        log('Status Code: ${e.response!.statusCode}');
+        log('Response Data: ${e.response!.data}');
+        log('Request Data: ${e.requestOptions.data}');
       }
 
       String errorMessage = 'Failed to create appointment';
@@ -186,13 +171,13 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
 
   @override
   Widget build(BuildContext context) {
-    final pharmacist = widget.data.pharmacist;
+    final provider = widget.data.provider;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Book Appointment',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          isReschedule ? 'Reschedule Appointment' : 'Book Appointment',
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: SingleChildScrollView(
@@ -204,8 +189,8 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Color(0xFF9AE1FF).withOpacity(0.33),
-                      Color(0xFF9DCEFF).withOpacity(0.33),
+                      const Color(0xFF9AE1FF).withOpacity(0.33),
+                      const Color(0xFF9DCEFF).withOpacity(0.33),
                     ],
                     end: Alignment.topLeft,
                     begin: Alignment.bottomRight,
@@ -222,7 +207,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(8.0),
                           child: Image.network(
-                            pharmacist['avatar'],
+                            provider.avatar,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               return Image.asset(
@@ -233,24 +218,23 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                           ),
                         ),
                       ),
-                      SizedBox(width: 16),
+                      const SizedBox(width: 16),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            pharmacist['name'],
-                            style: TextStyle(
+                            provider.name,
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
                             ),
                           ),
-                          Text(pharmacist['provider_type']),
+                          Text(provider.providerType),
                           Row(
                             children: [
-                              Icon(Icons.location_on, color: Colors.teal),
-                              SizedBox(width: 4),
-                              Text(
-                                  pharmacist['maps_location'] ?? 'No location'),
+                              const Icon(Icons.location_on, color: Colors.teal),
+                              const SizedBox(width: 4),
+                              Text(provider.workplace),
                             ],
                           ),
                         ],
@@ -260,8 +244,8 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                 ),
               ),
             ),
-            SizedBox(height: 16),
-            Align(
+            const SizedBox(height: 16),
+            const Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 'Select Date',
@@ -271,10 +255,10 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                 ),
               ),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Container(
               decoration: BoxDecoration(
-                color: Color(0xFF9AE1FF).withOpacity(0.3),
+                color: const Color(0xFF9AE1FF).withOpacity(0.3),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: TableCalendar(
@@ -318,13 +302,13 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                     color: Const.tosca,
                     shape: BoxShape.circle,
                   ),
-                  weekendTextStyle: TextStyle(color: Colors.black),
-                  defaultTextStyle: TextStyle(color: Colors.black),
+                  weekendTextStyle: const TextStyle(color: Colors.black),
+                  defaultTextStyle: const TextStyle(color: Colors.black),
                 ),
               ),
             ),
-            SizedBox(height: 16),
-            Align(
+            const SizedBox(height: 16),
+            const Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 'Select Hour',
@@ -334,7 +318,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                 ),
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -348,7 +332,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                     });
                   },
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
               ],
             )
           ],
@@ -357,9 +341,15 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ElevatedButton(
-          onPressed: _isSubmitting
-              ? null
-              : _submitAppointment, // Disable when submitting
+          onPressed: _isSubmitting ? null : _submitAppointment,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: _isSubmitting
+                ? const Color(0xFF35C5CF).withOpacity(0.6)
+                : const Color(0xFF35C5CF),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+          ), // Disable when submitting
           child: _isSubmitting
               ? const Row(
                   mainAxisSize: MainAxisSize.min,
@@ -383,14 +373,6 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                   widget.data.appointmentId != null ? 'Reschedule' : 'Next',
                   style: const TextStyle(color: Colors.white),
                 ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: _isSubmitting
-                ? const Color(0xFF35C5CF).withOpacity(0.6)
-                : const Color(0xFF35C5CF),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
-          ),
         ),
       ),
     );

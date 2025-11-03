@@ -7,9 +7,13 @@ import 'package:m2health/cubit/appointment/bloc/appointment_cubit.dart';
 import 'package:m2health/cubit/appointment/bloc/appointment_detail_cubit.dart';
 import 'package:m2health/cubit/appointment/models/appointment.dart';
 import 'package:m2health/cubit/appointment/widgets/cancel_appoinment_dialog.dart';
-import 'package:dio/dio.dart';
-import 'package:m2health/cubit/profiles/domain/entities/profile.dart';
 import 'package:m2health/models/personal_case.dart';
+import 'package:m2health/models/profile.dart';
+import 'package:m2health/models/provider.dart';
+import 'package:m2health/route/app_routes.dart';
+import 'package:m2health/service_locator.dart';
+import 'package:m2health/services/appointment_service.dart';
+import 'package:m2health/views/book_appointment.dart';
 import 'package:m2health/widgets/gradient_button.dart'; // Assuming you have this
 
 class DetailAppointmentPage extends StatefulWidget {
@@ -27,8 +31,7 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      // Use context.read<Dio>() assuming Dio is provided in your main app
-      create: (context) => AppointmentDetailCubit(context.read<Dio>())
+      create: (context) => AppointmentDetailCubit(sl<AppointmentService>())
         ..fetchAppointmentDetail(widget.appointmentId),
       child: Scaffold(
         appBar: AppBar(
@@ -50,7 +53,14 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
               return Center(child: Text('Error: ${state.message}'));
             }
             if (state is AppointmentDetailLoaded) {
-              return _buildContent(context, state.appointment, state.profile);
+              return RefreshIndicator(
+                onRefresh: () async {
+                  await context
+                      .read<AppointmentDetailCubit>()
+                      .fetchAppointmentDetail(widget.appointmentId);
+                },
+                child: _buildContent(context, state.appointment),
+              );
             }
             return const Center(child: Text('Something went wrong.'));
           },
@@ -69,8 +79,7 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
     );
   }
 
-  Widget _buildContent(
-      BuildContext context, Appointment appointment, Profile profile) {
+  Widget _buildContent(BuildContext context, Appointment appointment) {
     final personalCase = appointment.personalCase;
 
     return SingleChildScrollView(
@@ -82,7 +91,7 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
           const SizedBox(height: 16),
           _buildScheduleCard(appointment),
           const SizedBox(height: 16),
-          _buildPatientInfo(profile),
+          _buildPatientInfo(appointment.patient as Profile),
           const SizedBox(height: 16),
           _buildConcernInfo(personalCase),
           const SizedBox(height: 16),
@@ -92,7 +101,7 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
     );
   }
 
-  Widget _buildProviderCard(AppointmentProvider? provider, String status) {
+  Widget _buildProviderCard(Provider? provider, String status) {
     if (provider == null) return const SizedBox.shrink();
 
     return Card(
@@ -102,11 +111,10 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
           children: [
             CircleAvatar(
               radius: 30,
-              backgroundImage:
-                  (provider.avatar != null && provider.avatar!.isNotEmpty)
-                      ? NetworkImage(provider.avatar!)
-                      : null,
-              child: (provider.avatar == null || provider.avatar!.isEmpty)
+              backgroundImage: (provider.avatar.isNotEmpty)
+                  ? NetworkImage(provider.avatar)
+                  : null,
+              child: (provider.avatar.isEmpty)
                   ? const Icon(Icons.person, size: 30, color: Colors.grey)
                   : null,
             ),
@@ -122,7 +130,7 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
                       fontSize: 16,
                     ),
                   ),
-                  if (provider.jobTitle != null) Text(provider.jobTitle!),
+                  Text(provider.jobTitle),
                   const SizedBox(height: 8),
                   _StatusTag(status: status),
                 ],
@@ -180,11 +188,11 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
           const SizedBox(height: 12),
           _InfoRow(label: 'Age', text: '${profile.age} years old'),
           const SizedBox(height: 12),
-          _InfoRow(label: 'Gender', text: profile.gender ?? 'N/A'),
+          _InfoRow(label: 'Gender', text: profile.gender),
           const SizedBox(height: 12),
           _InfoRow(
             label: 'Address',
-            text: profile.homeAddress ?? 'N/A',
+            text: profile.homeAddress,
             isFlexible: true,
           ),
           const SizedBox(height: 12),
@@ -329,7 +337,7 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
               ),
               const Spacer(),
               Text(
-                '$total',
+                '\$$total',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
@@ -407,8 +415,15 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
           end: Alignment.topLeft,
         ),
         onPressed: () {
-          // TODO: Handle Reschedule logic
-          // This should navigate to the booking page with provider info
+          GoRouter.of(context).push(
+            AppRoutes.bookAppointment,
+            extra: BookAppointmentPageData(
+              provider: appointment.provider!,
+              appointmentId: appointment.id,
+              initialDate: DateTime.tryParse(appointment.date),
+              initialTime: DateFormat('HH:mm').parse(appointment.hour),
+            ),
+          );
         },
       ),
     );
@@ -562,7 +577,7 @@ class _StatusTag extends StatelessWidget {
         status,
         style: TextStyle(
           color: color,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );

@@ -8,8 +8,10 @@ import 'package:m2health/const.dart';
 import 'package:m2health/cubit/appointment/bloc/appointment_cubit.dart';
 import 'package:m2health/cubit/appointment/models/appointment.dart';
 import 'package:m2health/cubit/appointment/widgets/cancel_appoinment_dialog.dart';
+import 'package:m2health/models/provider.dart';
 import 'package:m2health/route/app_routes.dart';
 import 'package:intl/intl.dart';
+import 'package:m2health/views/book_appointment.dart';
 
 class AppointmentPage extends StatefulWidget {
   static const String route = '/appointment';
@@ -284,11 +286,11 @@ class _AppointmentListItem extends StatelessWidget {
     required this.appointment,
   });
 
-  String _getProviderName(AppointmentProvider? provider) {
+  String _getProviderName(Provider? provider) {
     return provider?.name ?? 'Unknown Provider';
   }
 
-  String? _getAvatarUrl(AppointmentProvider? provider) {
+  String? _getAvatarUrl(Provider? provider) {
     return provider?.avatar;
   }
 
@@ -316,6 +318,122 @@ class _AppointmentListItem extends StatelessWidget {
     final providerName = _getProviderName(appointment.provider);
     final avatarUrl = _getAvatarUrl(appointment.provider);
 
+    final cancelButton = OutlinedButton(
+      onPressed: () {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CancelAppoinmentDialog(onPressYes: () {
+              context
+                  .read<AppointmentCubit>()
+                  .cancelAppointment(appointment.id);
+            });
+          },
+        );
+      },
+      style: OutlinedButton.styleFrom(
+        side: const BorderSide(color: Colors.red),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+      child: const Text(
+        'Cancel Booking',
+        style: TextStyle(
+          color: Colors.red,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+
+    final rescheduleButton = Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        gradient: const LinearGradient(
+          colors: [
+            Color(0xFF35C5CF),
+            Color(0xFF9DCEFF),
+          ],
+          begin: Alignment.bottomRight,
+          end: Alignment.topLeft,
+        ),
+      ),
+      child: OutlinedButton(
+        onPressed: () {
+          GoRouter.of(context).push(
+            AppRoutes.bookAppointment,
+            extra: BookAppointmentPageData(
+              provider: appointment.provider!,
+              appointmentId: appointment.id,
+              initialDate: DateTime.parse(appointment.date),
+              initialTime: DateFormat('HH:mm').parse(appointment.hour),
+            ),
+          );
+        },
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: Colors.transparent),
+          backgroundColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        child: const Text(
+          'Reschedule',
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+    );
+
+    final bookAgainButton = Container(
+      height: 41,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        gradient: const LinearGradient(
+          colors: [
+            Color(0xFF40E0D0), // Tosca color
+            Color(0xFF35C5CF),
+          ],
+          begin: Alignment.bottomRight,
+          end: Alignment.topLeft,
+        ),
+      ),
+      child: OutlinedButton(
+        onPressed: () {
+          // Handle book again
+        },
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: Colors.transparent),
+          backgroundColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        child: const Text(
+          'Book Again',
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+    );
+
+    final ratingButton = OutlinedButton(
+      onPressed: () {
+        // Handle rating
+      },
+      style: OutlinedButton.styleFrom(
+        side: const BorderSide(color: Const.tosca),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+      child: const Text(
+        'Rating',
+        style: TextStyle(
+          color: Const.tosca,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+
     return GestureDetector(
       onTap: () {
         // Navigate to detail page, passing only the ID
@@ -323,6 +441,7 @@ class _AppointmentListItem extends StatelessWidget {
       },
       child: Card(
         margin: const EdgeInsets.all(10),
+        elevation: 2,
         child: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Column(
@@ -380,214 +499,23 @@ class _AppointmentListItem extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   if (appointmentStatusLower == 'completed') ...[
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          // Handle rating
-                        },
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Const.tosca),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: const Text(
-                          'Rating',
-                          style: TextStyle(
-                            color: Const.tosca,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
+                    Expanded(child: ratingButton),
                     const SizedBox(width: 10),
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          gradient: const LinearGradient(
-                            colors: [
-                              Color(0xFF40E0D0), // Tosca color
-                              Color(0xFF35C5CF),
-                            ],
-                            begin: Alignment.bottomRight,
-                            end: Alignment.topLeft,
-                          ),
-                        ),
-                        child: OutlinedButton(
-                          onPressed: () {
-                            // Handle book again
-                          },
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colors.transparent),
-                            backgroundColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: const Text(
-                            'Book Again',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ),
+                    Expanded(child: bookAgainButton),
                   ],
                   if (appointmentStatusLower == 'cancelled')
-                    Expanded(
-                      child: Container(
-                        height: 41,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          gradient: const LinearGradient(
-                            colors: [
-                              Color(0xFF40E0D0), // Tosca color
-                              Color(0xFF35C5CF),
-                            ],
-                            begin: Alignment.bottomRight,
-                            end: Alignment.topLeft,
-                          ),
-                        ),
-                        child: OutlinedButton(
-                          onPressed: () {
-                            // Handle book again
-                          },
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colors.transparent),
-                            backgroundColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: const Text(
-                            'Book Again',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ),
+                    Expanded(child: bookAgainButton),
                   if (appointmentStatusLower == 'missed') ...[
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          context
-                              .read<AppointmentCubit>()
-                              .deleteAppointment(appointment.id);
-                        },
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.red),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: const Text(
-                          'Cancel Bookings',
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
+                    Expanded(child: cancelButton),
                     const SizedBox(width: 10),
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          gradient: const LinearGradient(
-                            colors: [
-                              Color(0xFF35C5CF),
-                              Color(0xFF9DCEFF),
-                            ],
-                            begin: Alignment.bottomRight,
-                            end: Alignment.topLeft,
-                          ),
-                        ),
-                        child: OutlinedButton(
-                          onPressed: () {
-                            // Reschedule logic - needs provider data
-                            // This logic needs to be re-evaluated
-                          },
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colors.transparent),
-                            backgroundColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: const Text(
-                            'Reschedule',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ),
+                    Expanded(child: rescheduleButton),
                   ],
                   if (appointmentStatusLower == 'pending' ||
                       appointmentStatusLower == 'accepted' ||
                       appointmentStatusLower == 'upcoming') ...[
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return CancelAppoinmentDialog(onPressYes: () {
-                                context
-                                    .read<AppointmentCubit>()
-                                    .cancelAppointment(appointment.id);
-                              });
-                            },
-                          );
-                        },
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.red),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: const Text(
-                          'Cancel Booking',
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
+                    Expanded(child: cancelButton),
                     const SizedBox(width: 10),
-                    Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          gradient: const LinearGradient(
-                            colors: [
-                              Color(0xFF35C5CF),
-                              Color(0xFF9DCEFF),
-                            ],
-                            begin: Alignment.bottomRight,
-                            end: Alignment.topLeft,
-                          ),
-                        ),
-                        child: OutlinedButton(
-                          onPressed: () {
-                            // Reschedule logic needs re-evaluation
-                            // We may need to pass provider info differently
-                          },
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colors.transparent),
-                            backgroundColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: const Text(
-                            'Reschedule',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ),
+                    Expanded(child: rescheduleButton),
                   ],
                 ],
               ),

@@ -30,31 +30,31 @@ class AppointmentManager {
   }
 
   /// Navigate to appropriate appointment page based on user role
-  static Future<void> navigateToAppointmentPage(BuildContext context) async {
-    try {
-      final isUserProvider = await isProvider();
+  // static Future<void> navigateToAppointmentPage(BuildContext context) async {
+  //   try {
+  //     final isUserProvider = await isProvider();
 
-      if (isUserProvider) {
-        final providerType = await getProviderType();
-        if (providerType != null) {
-          // Navigate to provider appointment page
-          context.push('${AppRoutes.providerAppointment}/$providerType');
-        }
-      } else {
-        // Navigate to patient appointment page
-        context.push(AppRoutes.appointment);
-      }
-    } catch (e) {
-      print('Error navigating to appointment page: $e');
-      // Show error to user
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error accessing appointments: ${e.toString()}'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
+  //     if (isUserProvider) {
+  //       final providerType = await getProviderType();
+  //       if (providerType != null) {
+  //         // Navigate to provider appointment page
+  //         context.push('${AppRoutes.providerAppointment}/$providerType');
+  //       }
+  //     } else {
+  //       // Navigate to patient appointment page
+  //       context.push(AppRoutes.appointment);
+  //     }
+  //   } catch (e) {
+  //     print('Error navigating to appointment page: $e');
+  //     // Show error to user
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text('Error accessing appointments: ${e.toString()}'),
+  //         backgroundColor: Colors.red,
+  //       ),
+  //     );
+  //   }
+  // }
 
   /// Create appropriate appointment widget based on user role
   static Future<Widget> createAppointmentWidget() async {

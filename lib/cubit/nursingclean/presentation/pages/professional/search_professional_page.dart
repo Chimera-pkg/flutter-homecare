@@ -27,9 +27,9 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Search ${widget.serviceType}',
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        title: const Text(
+          'Search Nurse',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
       body: Padding(
@@ -39,7 +39,7 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
             TextField(
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.search),
-                hintText: 'Search ${widget.serviceType}',
+                hintText: 'Search Nurse',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
@@ -137,7 +137,7 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      Text(widget.serviceType),
+                                      Text(professional.jobTitle),
                                       Row(
                                         children: [
                                           TextButton(
@@ -149,8 +149,8 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
                                                       ProfessionalDetailsPage(
                                                     professionalId:
                                                         professional.id,
-                                                    serviceType: professional
-                                                        .providerType,
+                                                    serviceType:
+                                                        widget.serviceType,
                                                   ),
                                                 ),
                                               );

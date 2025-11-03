@@ -34,14 +34,8 @@ class NursingAppointmentFormBloc
       status: 'pending',
       date: event.selectedDate,
       hour: DateFormat('HH:mm:ss').format(event.selectedTime),
-      summary: 'Appointment booking with ${event.professional.name}',
+      summary: event.nursingCase.addOnServices.map((e) => e.name).join(', '),
       payTotal: event.nursingCase.estimatedBudget,
-      profileServicesData: {
-        'id': event.professional.id,
-        'name': event.professional.name,
-        'avatar': event.professional.avatar,
-        'role': event.professional.role,
-      },
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );

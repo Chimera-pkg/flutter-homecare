@@ -8,7 +8,7 @@ class ProviderAppointmentDetailInitial extends ProviderAppointmentDetailState {}
 class ProviderAppointmentDetailLoading extends ProviderAppointmentDetailState {}
 
 class ProviderAppointmentDetailLoaded extends ProviderAppointmentDetailState {
-  final ProviderAppointment appointment;
+  final Appointment appointment;
 
   ProviderAppointmentDetailLoaded(this.appointment);
 }

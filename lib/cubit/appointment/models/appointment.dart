@@ -1,7 +1,7 @@
-import 'dart:convert';
-
 import 'package:m2health/models/personal_case.dart';
 import 'package:m2health/models/payment.dart';
+import 'package:m2health/models/profile.dart';
+import 'package:m2health/models/provider.dart';
 
 class Appointment {
   final int id;
@@ -14,9 +14,10 @@ class Appointment {
   final int userId;
   final String createdAt;
   final String updatedAt;
-  final AppointmentProvider? provider;
+  final Provider? provider;
   final PersonalCase? personalCase;
   final Payment? payment;
+  final Profile? patient;
 
   Appointment({
     required this.id,
@@ -32,30 +33,32 @@ class Appointment {
     this.provider,
     this.personalCase,
     this.payment,
+    this.patient,
   });
 
   factory Appointment.fromJson(Map<String, dynamic> json) {
     return Appointment(
-      id: json['id'] ?? 0,
-      type: json['type'] ?? '',
-      status: json['status'] ?? '',
-      date: json['date'] ?? '',
-      hour: json['hour'] ?? '',
-      summary: json['summary'] ?? '',
-      // Handle payTotal being a String or num
-      payTotal: double.tryParse(json['payTotal']?.toString() ?? '0.0') ?? 0.0,
-      userId: json['user_id'] ?? 0,
-      createdAt: json['created_at'] ?? '',
-      updatedAt: json['updated_at'] ?? '',
-      provider: json['provider'] != null
-          ? AppointmentProvider.fromJson(json['provider'])
-          : null,
-      personalCase: json['personalCase'] != null
-          ? PersonalCase.fromJson(json['personalCase'])
-          : null,
-      payment:
-          json['payment'] != null ? Payment.fromJson(json['payment']) : null,
-    );
+        id: json['id'] ?? 0,
+        type: json['type'] ?? '',
+        status: json['status'] ?? '',
+        date: json['date'] ?? '',
+        hour: json['hour'] ?? '',
+        summary: json['summary'] ?? '',
+        payTotal:
+            double.tryParse(json['pay_total']?.toString() ?? '0.0') ?? 0.0,
+        userId: json['user_id'] ?? 0,
+        createdAt: json['created_at'] ?? '',
+        updatedAt: json['updated_at'] ?? '',
+        provider: json['provider'] != null
+            ? Provider.fromJson(json['provider'])
+            : null,
+        personalCase: json['personalCase'] != null
+            ? PersonalCase.fromJson(json['personalCase'])
+            : null,
+        payment:
+            json['payment'] != null ? Payment.fromJson(json['payment']) : null,
+        patient:
+            json['patient'] != null ? Profile.fromJson(json['patient']) : null);
   }
 
   Map<String, dynamic> toJson() {
@@ -86,9 +89,10 @@ class Appointment {
     int? userId,
     String? createdAt,
     String? updatedAt,
-    AppointmentProvider? provider,
+    Provider? provider,
     PersonalCase? personalCase,
     Payment? payment,
+    Profile? patient,
   }) {
     return Appointment(
       id: id ?? this.id,
@@ -104,32 +108,7 @@ class Appointment {
       provider: provider ?? this.provider,
       personalCase: personalCase ?? this.personalCase,
       payment: payment ?? this.payment,
-    );
-  }
-}
-
-class AppointmentProvider {
-  final int id;
-  final String name;
-  final String? avatar;
-  final String? jobTitle;
-  final String? role;
-
-  AppointmentProvider({
-    required this.id,
-    required this.name,
-    this.avatar,
-    this.jobTitle,
-    this.role,
-  });
-
-  factory AppointmentProvider.fromJson(Map<String, dynamic> json) {
-    return AppointmentProvider(
-      id: json['id'] ?? 0,
-      name: json['name'] ?? 'Unknown Provider',
-      avatar: json['avatar'],
-      jobTitle: json['jobTitle'],
-      role: json['role'],
+      patient: patient ?? this.patient,
     );
   }
 }
