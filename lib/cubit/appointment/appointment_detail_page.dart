@@ -6,7 +6,7 @@ import 'package:m2health/cubit/appointment/appointment_cubit.dart';
 import 'package:m2health/cubit/appointment/appointment_detail.dart';
 import 'package:m2health/main.dart';
 import 'package:m2health/route/app_routes.dart';
-import 'package:m2health/views/appointment/appointment_detail_page.dart';
+import 'package:m2health/cubit/appointment/appointment_detail_page.dart';
 import 'package:m2health/cubit/appointment/appointment_manager.dart';
 import 'package:m2health/models/appointment.dart';
 import 'package:m2health/services/provider_service.dart';

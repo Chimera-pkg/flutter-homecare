@@ -5,7 +5,7 @@ import 'package:m2health/const.dart';
 import 'package:m2health/cubit/appointment/appointment_cubit.dart';
 import 'package:m2health/main.dart';
 import 'package:m2health/route/app_routes.dart';
-import 'package:m2health/views/appointment/appointment_detail_page.dart';
+import 'package:m2health/cubit/appointment/appointment_detail_page.dart';
 
 class PaymentPage extends StatefulWidget {
   final int appointmentId;

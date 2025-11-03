@@ -13,5 +13,5 @@ export 'provider_appointment_cubit.dart';
 export 'appointment_manager.dart';
 
 // UI Components
-export '../../views/appointment/provider_appointment_page.dart';
-export '../../views/appointment/unified_appointment_page.dart';
+export 'provider_appointment_page.dart';
+export 'unified_appointment_page.dart';
