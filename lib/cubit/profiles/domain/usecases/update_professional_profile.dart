@@ -16,12 +16,13 @@ class UpdateProfessionalProfile {
 }
 
 class UpdateProfessionalProfileParams extends Equatable {
-  final String role; // Role is needed to determine endpoint
+  final String role;
   final String? name;
   final String? about;
   final String? jobTitle;
   final String? workHours;
   final String? workPlace;
+  final int? experience;
   final File? avatar;
 
   const UpdateProfessionalProfileParams({
@@ -31,13 +32,14 @@ class UpdateProfessionalProfileParams extends Equatable {
     this.jobTitle,
     this.workHours,
     this.workPlace,
+    this.experience,
     this.avatar,
   });
 
   @override
   List<Object?> get props =>
-      [role, name, about, jobTitle, workHours, workPlace, avatar];
-      
+      [role, name, about, jobTitle, workHours, workPlace, experience, avatar];
+
   UpdateProfessionalProfileParams copyWith({
     String? role,
     String? name,
@@ -45,6 +47,7 @@ class UpdateProfessionalProfileParams extends Equatable {
     String? jobTitle,
     String? workHours,
     String? workPlace,
+    int? experience,
     File? avatar,
   }) {
     return UpdateProfessionalProfileParams(
@@ -54,6 +57,7 @@ class UpdateProfessionalProfileParams extends Equatable {
       jobTitle: jobTitle ?? this.jobTitle,
       workHours: workHours ?? this.workHours,
       workPlace: workPlace ?? this.workPlace,
+      experience: experience ?? this.experience,
       avatar: avatar ?? this.avatar,
     );
   }

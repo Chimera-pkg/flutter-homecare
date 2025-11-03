@@ -75,6 +75,7 @@ class ProfileRepositoryImpl extends ProfileRepository {
         'job_title': params.jobTitle,
         'working_hours': params.workHours,
         'workplace': params.workPlace,
+        'experience': params.experience,
       };
 
       await remoteDatasource.updateProfessionalProfile(
