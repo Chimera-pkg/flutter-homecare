@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:m2health/cubit/appointment/appointment_cubit.dart';
+import 'package:m2health/cubit/appointment/bloc/appointment_cubit.dart';
 import 'package:m2health/cubit/nursingclean/domain/entities/add_on_service.dart';
 import 'package:m2health/cubit/nursingclean/domain/entities/appointment_entity.dart';
 import 'package:m2health/cubit/nursingclean/domain/entities/nursing_case.dart';

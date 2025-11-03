@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:m2health/const.dart';
-import 'package:m2health/cubit/appointment/appointment_cubit.dart';
+import 'package:m2health/cubit/appointment/bloc/appointment_cubit.dart';
 import 'package:m2health/cubit/appointment/widgets/cancel_appoinment_dialog.dart';
 import 'package:m2health/route/app_routes.dart';
 import 'package:m2health/utils.dart';

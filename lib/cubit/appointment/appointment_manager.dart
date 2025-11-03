@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:m2health/cubit/appointment/appointment_page.dart';
+import 'package:m2health/cubit/appointment/pages/appointment_page.dart';
 import 'package:m2health/route/app_routes.dart';
-import 'package:m2health/cubit/appointment/provider_appointment_page.dart';
+import 'package:m2health/cubit/appointment/pages/provider_appointment_page.dart';
 import 'package:m2health/utils.dart';
 import 'package:m2health/const.dart';
 

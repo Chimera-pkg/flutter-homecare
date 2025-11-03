@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:m2health/const.dart';
-import 'package:m2health/cubit/appointment/appointment_cubit.dart';
+import 'package:m2health/cubit/appointment/bloc/appointment_cubit.dart';
 import 'package:m2health/cubit/nursingclean/domain/entities/add_on_service.dart';
 import 'package:m2health/cubit/nursingclean/domain/entities/appointment_entity.dart';
 import 'package:m2health/cubit/nursingclean/domain/entities/nursing_case.dart';
 import 'package:m2health/cubit/nursingclean/domain/entities/payment_method.dart';
 import 'package:m2health/cubit/nursingclean/domain/entities/professional_entity.dart';
 import 'package:m2health/main.dart';
-import 'package:m2health/cubit/appointment/appointment_page.dart';
+import 'package:m2health/cubit/appointment/pages/appointment_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2health/route/app_routes.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

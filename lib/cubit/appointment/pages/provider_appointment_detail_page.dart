@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:m2health/const.dart';
-import 'package:m2health/cubit/appointment/provider_appointment_cubit.dart';
-import 'package:m2health/cubit/appointment/provider_appointment_detail_cubit.dart';
+import 'package:m2health/cubit/appointment/bloc/provider_appointment_cubit.dart';
+import 'package:m2health/cubit/appointment/bloc/provider_appointment_detail_cubit.dart';
 import 'package:m2health/models/provider_appointment.dart';
 
 class ProviderAppointmentDetailPage extends StatelessWidget {

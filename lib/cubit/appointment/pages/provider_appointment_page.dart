@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:m2health/cubit/appointment/provider_appointment_cubit.dart';
+import 'package:m2health/cubit/appointment/bloc/provider_appointment_cubit.dart';
 import 'package:m2health/models/provider_appointment.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/route/app_routes.dart';

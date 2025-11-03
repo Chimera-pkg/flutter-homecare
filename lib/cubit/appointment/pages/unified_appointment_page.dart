@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/cubit/appointment/appointment_manager.dart';
-import 'package:m2health/cubit/appointment/appointment_cubit.dart';
-import 'package:m2health/cubit/appointment/provider_appointment_cubit.dart';
-import 'package:m2health/cubit/appointment/appointment_page.dart';
-import 'package:m2health/cubit/appointment/provider_appointment_page.dart';
+import 'package:m2health/cubit/appointment/bloc/appointment_cubit.dart';
+import 'package:m2health/cubit/appointment/bloc/provider_appointment_cubit.dart';
+import 'package:m2health/cubit/appointment/pages/appointment_page.dart';
+import 'package:m2health/cubit/appointment/pages/provider_appointment_page.dart';
 
 /// Unified appointment entry widget that automatically routes to appropriate view
 class UnifiedAppointmentPage extends StatefulWidget {
