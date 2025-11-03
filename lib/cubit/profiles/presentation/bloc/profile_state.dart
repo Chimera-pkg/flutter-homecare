@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:m2health/cubit/profiles/domain/entities/professional_profile.dart';
 import 'package:m2health/cubit/profiles/domain/entities/profile.dart';
 
 abstract class ProfileState extends Equatable {
@@ -14,10 +15,19 @@ class ProfileLoading extends ProfileState {}
 
 class ProfileSaving extends ProfileState {}
 
-class ProfileLoaded extends ProfileState {
+class PatientProfileLoaded extends ProfileState {
   final Profile profile;
 
-  const ProfileLoaded(this.profile);
+  const PatientProfileLoaded(this.profile);
+
+  @override
+  List<Object?> get props => [profile];
+}
+
+class ProfessionalProfileLoaded extends ProfileState {
+  final ProfessionalProfile profile;
+
+  const ProfessionalProfileLoaded(this.profile);
 
   @override
   List<Object?> get props => [profile];

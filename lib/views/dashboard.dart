@@ -21,7 +21,6 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   String? userName;
-  String? userAvatar; // Add this field
   int currentPage = 1;
   int limitItem = 3;
   String keyword = "";
@@ -107,13 +106,27 @@ class _DashboardState extends State<Dashboard> {
                 builder: (context, state) {
                   Widget avatarWidget;
                   String displayName = userName ?? 'User';
+                  String? avatarUrl;
 
-                  if (state is ProfileLoaded) {
-                    displayName = state.profile.username.isNotEmpty
-                        ? state.profile.username
+                  if (state is PatientProfileLoaded) {
+                    displayName = state.profile.name.isNotEmpty
+                        ? state.profile.name
                         : userName ?? 'User';
+                    avatarUrl = state.profile.avatar;
+                  } else if (state is ProfessionalProfileLoaded) {
+                    displayName = state.profile.name != null &&
+                            state.profile.name!.isNotEmpty
+                        ? state.profile.name!
+                        : userName ?? 'User';
+                    avatarUrl = state.profile.avatar;
+                  } else {
+                    displayName = userName ?? 'User';
+                    avatarUrl = null;
+                  }
+
+                  if (avatarUrl != null && avatarUrl.isNotEmpty) {
                     avatarWidget = Image.network(
-                      state.profile.avatar ?? '',
+                      avatarUrl,
                       width: 56,
                       height: 56,
                       fit: BoxFit.cover,
@@ -147,8 +160,7 @@ class _DashboardState extends State<Dashboard> {
                       },
                     );
                   } else {
-                    // For Loading, Error, or Unauthenticated states
-                    displayName = userName ?? 'User';
+                    // Default avatar
                     avatarWidget = Container(
                       width: 56,
                       height: 56,

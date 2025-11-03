@@ -173,7 +173,7 @@ class ReviewAppointmentPage extends StatelessWidget {
           return Center(
               child: Text('Could not load profile: ${profileState.message}'));
         }
-        if (profileState is ProfileLoaded) {
+        if (profileState is PatientProfileLoaded) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -269,7 +269,7 @@ class ReviewAppointmentPage extends StatelessWidget {
         nursingCase.issues.map((issue) => issue.description).join('\n\n');
     return Column(
       children: [
-        _buildPatientInfoRow('Full Name', patientProfile.username),
+        _buildPatientInfoRow('Full Name', patientProfile.name),
         _buildPatientInfoRow('Age', patientProfile.age?.toString() ?? 'N/A'),
         _buildPatientInfoRow('Gender', patientProfile.gender ?? 'N/A'),
         _buildPatientInfoRow('Problem', problem),

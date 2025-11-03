@@ -68,6 +68,9 @@ void main() async {
             create: (context) => ProfileCubit(
                   getProfileUseCase: sl<GetProfile>(),
                   updateProfileUseCase: sl<UpdateProfile>(),
+                  getProfessionalProfileUseCase: sl<GetProfessionalProfile>(),
+                  updateProfessionalProfileUseCase:
+                      sl<UpdateProfessionalProfile>(),
                 )),
         BlocProvider(
           create: (context) => CertificateCubit(
