@@ -8,7 +8,7 @@ import 'package:m2health/cubit/medical_record/domain/entities/medical_record.dar
 import 'package:m2health/cubit/medical_record/presentation/bloc/medical_record_bloc.dart';
 import 'package:m2health/cubit/medical_record/presentation/bloc/medical_record_event.dart';
 import 'package:m2health/cubit/medical_record/presentation/bloc/medical_record_state.dart';
-import 'package:m2health/cubit/nursing/const.dart';
+import 'package:m2health/cubit/nursingclean/const.dart';
 import 'package:m2health/cubit/nursing/pages/details/nursing_add_on.dart';
 import 'package:m2health/cubit/nursing/personal/nursing_personal_state.dart';
 import 'package:m2health/utils.dart';

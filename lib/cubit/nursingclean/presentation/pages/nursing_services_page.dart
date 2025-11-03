@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/app_localzations.dart';
+import 'package:m2health/cubit/nursingclean/const.dart';
+import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/nursing_case_bloc.dart';
+import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/nursing_case_event.dart';
 import 'package:m2health/cubit/nursingclean/presentation/pages/nursing_case/nursing_concerns_page.dart';
 import 'package:m2health/route/app_routes.dart';
 
 class NursingService extends StatefulWidget {
+  const NursingService({super.key});
   @override
-  _NursingState createState() => _NursingState();
+  State<NursingService> createState() => _NursingState();
 }
 
 class NursingCard extends StatelessWidget {
@@ -14,7 +19,10 @@ class NursingCard extends StatelessWidget {
   final Color color;
 
   const NursingCard(
-      {required this.pharma, required this.onTap, required this.color});
+      {super.key,
+      required this.pharma,
+      required this.onTap,
+      required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -115,6 +123,17 @@ class _NursingState extends State<NursingService> {
     },
   ];
 
+  void _navigateToType(NurseServiceType serviceType) {
+    context.read<NursingCaseBloc>().add(SelectServiceTypeEvent(serviceType));
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const NursingConcernsPage(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -135,38 +154,16 @@ class _NursingState extends State<NursingService> {
                   return NursingCard(
                     pharma: tender,
                     onTap: () {
-                      String route;
                       switch (index) {
                         case 0:
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const NursingConcernsPage(
-                                title: 'Nurse Service Case',
-                                serviceType: 'PRIMARY',
-                              ),
-                            ),
-                          );
-                          return;
+                          _navigateToType(NurseServiceType.primaryNurse);
+                          break;
                         case 1:
-                          // navbarVisibility(true);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const NursingConcernsPage(
-                                title: 'Nurse Service Case',
-                                serviceType: 'SPECIALIZED',
-                              ),
-                            ),
-                          ).then((_) {
-                            // Show the bottom navigation bar when returning
-                            // navbarVisibility(false);
-                          });
-                          return;
+                          _navigateToType(NurseServiceType.specializedNurse);
+                          break;
                         default:
-                          route = AppRoutes.home;
+                          Navigator.pushNamed(context, AppRoutes.home);
                       }
-                      Navigator.pushNamed(context, route);
                     },
                     color: Color(int.parse('0xFF${tender['color']}'))
                         .withOpacity(tender['opacity'] != null

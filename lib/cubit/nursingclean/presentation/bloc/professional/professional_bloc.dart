@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/cubit/nursingclean/domain/usecases/get_professionals.dart';
 import 'package:m2health/cubit/nursingclean/domain/usecases/toggle_favorite.dart';
@@ -16,6 +18,7 @@ class ProfessionalBloc extends Bloc<ProfessionalEvent, ProfessionalState> {
       emit(ProfessionalLoading());
       try {
         final professionals = await getProfessionals(event.serviceType);
+        log('Fetched professionals: $professionals');
         emit(ProfessionalLoaded(professionals));
       } catch (e) {
         emit(ProfessionalError(e.toString()));

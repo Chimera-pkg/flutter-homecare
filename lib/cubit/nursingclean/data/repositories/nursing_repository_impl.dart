@@ -1,10 +1,13 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:m2health/core/error/failures.dart';
+import 'package:m2health/cubit/nursingclean/const.dart';
 import 'package:m2health/cubit/nursingclean/data/datasources/nursing_remote_datasource.dart';
 import 'package:m2health/cubit/nursingclean/data/mappers/nursing_case_mapper.dart';
+import 'package:m2health/cubit/nursingclean/data/models/nursing_personal_case.dart';
 import 'package:m2health/cubit/nursingclean/domain/entities/add_on_service.dart';
 import 'package:m2health/cubit/nursingclean/domain/entities/nursing_case.dart';
+import 'package:m2health/cubit/nursingclean/domain/entities/nursing_issue.dart';
 import 'package:m2health/cubit/nursingclean/domain/entities/nursing_service_entity.dart';
 import 'package:m2health/cubit/nursingclean/domain/entities/professional_entity.dart';
 import 'package:m2health/cubit/nursingclean/domain/repositories/nursing_repository.dart';
@@ -44,7 +47,6 @@ class NursingRepositoryImpl implements NursingRepository {
     try {
       final nursingCaseModels = mapper.mapEntityToModels(nursingCase);
 
-      // NOTE: This is suboptimal. The API should ideally support batch creation.
       for (final model in nursingCaseModels) {
         await remoteDataSource.createNursingCase(model);
       }
@@ -67,28 +69,13 @@ class NursingRepositoryImpl implements NursingRepository {
   @override
   Future<List<ProfessionalEntity>> getProfessionals(String serviceType) async {
     final professionals = await remoteDataSource.getProfessionals(serviceType);
-    return professionals
-        .map((professional) => ProfessionalEntity(
-              id: professional['id'] ?? 0,
-              name: professional['name'] ?? 'Unknown Provider',
-              avatar: professional['avatar'] ?? '',
-              experience: professional['experience'] ?? 0,
-              rating: (professional['rating'] ?? 0.0).toDouble(),
-              about: professional['about'] ?? 'No description available',
-              workingInformation: professional['working_information'] ?? '',
-              daysHour: professional['days_hour'] ?? 'Not specified',
-              mapsLocation:
-                  professional['maps_location'] ?? 'Location not available',
-              certification: professional['certification'] ?? '',
-              userId: professional['user_id'] ?? 0,
-              user: professional['user'],
-              createdAt: professional['created_at'] ?? '',
-              updatedAt: professional['updated_at'] ?? '',
-              isFavorite: professional['isFavorite'] ?? false,
-              role: professional['role'] ?? 'nurse',
-              providerType: professional['provider_type'] ?? 'nurse',
-            ))
-        .toList();
+    return professionals;
+  }
+
+  @override
+  Future<ProfessionalEntity> getProfessionalDetail(
+      String serviceType, int id) async {
+    return await remoteDataSource.getProfessionalDetail(serviceType, id);
   }
 
   @override
@@ -97,10 +84,52 @@ class NursingRepositoryImpl implements NursingRepository {
   }
 
   @override
-  Future<Either<Failure, List<AddOnService>>> getNursingAddOnServices() async {
+  Future<Either<Failure, List<AddOnService>>> getNursingAddOnServices(
+      NurseServiceType serviceType) async {
     try {
-      final addOnServices = await remoteDataSource.getAddOnServices();
+      final addOnServices =
+          await remoteDataSource.getAddOnServices(serviceType.apiValue);
       return Right(addOnServices);
+    } on Exception catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, NursingIssue>> addNursingIssue(
+      NursingIssue issue, NursingCase currentCase) async {
+    try {
+      final model = NursingPersonalCaseModel(
+        title: issue.title,
+        description: issue.description,
+        images: issue.images,
+        mobilityStatus: currentCase.mobilityStatus?.apiValue,
+        careType: currentCase.careType,
+        addOn: currentCase.addOnServices,
+        estimatedBudget: currentCase.estimatedBudget,
+        relatedHealthRecordId: currentCase.relatedHealthRecordId,
+      );
+
+      final createdModel = await remoteDataSource.createNursingCase(model);
+
+      final createdIssue = NursingIssue(
+        id: createdModel.id,
+        title: createdModel.title,
+        description: createdModel.description ?? '',
+        images: createdModel.images ?? [],
+        imageUrls: createdModel.imageUrls ?? [],
+      );
+      return Right(createdIssue);
+    } on Exception catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> deleteNursingIssue(int issueId) async {
+    try {
+      await remoteDataSource.deleteNursingIssue(issueId);
+      return const Right(unit);
     } on Exception catch (e) {
       return Left(ServerFailure(e.toString()));
     }

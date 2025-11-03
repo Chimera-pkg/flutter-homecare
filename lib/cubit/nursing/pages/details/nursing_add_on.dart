@@ -5,7 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/const.dart';
-import 'package:m2health/cubit/nursing/const.dart';
+import 'package:m2health/cubit/nursingclean/const.dart';
 import 'package:m2health/cubit/nursing/pages/search_professional_page.dart';
 import 'package:m2health/cubit/nursing/personal/nursing_personal_state.dart';
 import 'package:m2health/models/service_config.dart';

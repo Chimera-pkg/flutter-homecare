@@ -1,9 +1,12 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/cubit/nursingclean/domain/entities/professional_entity.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_appointment_form/nursing_appointment_form_bloc.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/nursing_case_bloc.dart';
+import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/nursing_case_event.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/nursing_case_state.dart';
 import 'package:m2health/cubit/nursingclean/presentation/pages/appointment/review_appointment_page.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -42,7 +45,8 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
     }
 
     final nursingCaseState = context.read<NursingCaseBloc>().state;
-    if (nursingCaseState is! NursingCaseLoaded) {
+    log('nursingCaseState: $nursingCaseState', name: 'BookAppointmentPage');
+    if (nursingCaseState.nursingCaseStatus != NursingCaseStatus.success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Nursing case details are not ready.')),
       );
@@ -66,6 +70,14 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
         if (state is NursingAppointmentFormSubmissionSuccess) {
           debugPrint('Appointment booked successfully');
           debugPrint('Appointment Details: ${state.appointment}');
+
+          context.read<NursingCaseBloc>().add(
+                UpdateCaseWithAppointment(
+                  appointmentId: state.appointment.id!,
+                  nursingCase: state.nursingCase,
+                ),
+              );
+
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -187,7 +199,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          professional.mapsLocation,
+                          professional.workplace,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -234,15 +246,15 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
         ),
         calendarStyle: CalendarStyle(
           selectedDecoration: const BoxDecoration(
-            color: Const.tosca,
+            color: Const.aqua,
             shape: BoxShape.circle,
           ),
           todayDecoration: BoxDecoration(
-            color: Const.tosca.withOpacity(0.5),
+            color: Const.aqua.withOpacity(0.5),
             shape: BoxShape.circle,
           ),
           markerDecoration: const BoxDecoration(
-            color: Const.tosca,
+            color: Const.aqua,
             shape: BoxShape.circle,
           ),
           weekendTextStyle: const TextStyle(color: Colors.black),
@@ -253,44 +265,40 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
   }
 
   Widget _buildBottomButton(bool isSubmitting) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: SizedBox(
-        width: double.infinity,
-        height: 50,
-        child: ElevatedButton(
-          onPressed: isSubmitting ? null : _submitAppointment,
-          style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.white,
-            backgroundColor: isSubmitting
-                ? const Color(0xFF35C5CF).withOpacity(0.6)
-                : const Color(0xFF35C5CF),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
+    return BottomAppBar(
+      color: Colors.white,
+      elevation: 8,
+      child: ElevatedButton(
+        onPressed: isSubmitting ? null : _submitAppointment,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF35C5CF),
+          foregroundColor: Colors.white,
+          disabledBackgroundColor: Colors.grey,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-          child: isSubmitting
-              ? const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    ),
-                    SizedBox(width: 12),
-                    Text('Submitting...',
-                        style: TextStyle(color: Colors.white)),
-                  ],
-                )
-              : const Text(
-                  'Book Appointment',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-                ),
         ),
+        child: isSubmitting
+            ? const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Text('Submitting...', style: TextStyle(color: Colors.white)),
+                ],
+              )
+            : const Text(
+                'Book Appointment',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+              ),
       ),
     );
   }

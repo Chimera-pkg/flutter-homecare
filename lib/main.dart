@@ -20,8 +20,8 @@ import 'package:m2health/cubit/profiles/presentation/bloc/profile_cubit.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:m2health/route/app_router.dart';
 import 'package:m2health/service_locator.dart';
-import 'package:m2health/cubit/appointment/appointment_cubit.dart';
-import 'package:m2health/cubit/appointment/provider_appointment_cubit.dart';
+import 'package:m2health/cubit/appointment/bloc/appointment_cubit.dart';
+import 'package:m2health/cubit/appointment/bloc/provider_appointment_cubit.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -97,6 +97,9 @@ void main() async {
             getNursingCase: sl<GetNursingCase>(),
             createNursingCase: sl<CreateNursingCase>(),
             getNursingAddOnServices: sl<GetNursingAddOnServices>(),
+            addNursingIssue: sl(),
+            deleteNursingIssue: sl(),
+            updateNursingCase: sl(),
           ),
         ),
         BlocProvider(
@@ -108,7 +111,6 @@ void main() async {
         BlocProvider(
           create: (context) => NursingAppointmentFormBloc(
             appointmentRepository: sl<NursingAppointmentRepository>(),
-            createNursingCase: sl<CreateNursingCase>(),
           ),
         ),
         // Medical Record Module

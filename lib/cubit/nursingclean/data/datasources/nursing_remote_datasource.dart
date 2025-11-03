@@ -1,23 +1,29 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/cubit/nursingclean/data/models/add_on_service_model.dart';
-import 'package:m2health/cubit/nursingclean/data/models/nursing_case.dart';
 import 'package:m2health/cubit/nursingclean/data/models/nursing_personal_case.dart';
 import 'package:m2health/cubit/nursingclean/data/models/nursing_service.dart';
+import 'package:m2health/cubit/nursingclean/data/models/professional_model.dart';
 import 'package:m2health/utils.dart';
 
 abstract class NursingRemoteDataSource {
   Future<List<NursingServiceModel>> getNursingServices();
+
+  Future<List<Map<String, dynamic>>> getMedicalRecords();
+  Future<List<AddOnServiceModel>> getAddOnServices(String serviceType);
+
   Future<List<NursingPersonalCaseModel>> getNursingPersonalCases();
   Future<NursingPersonalCaseModel> createNursingCase(
       NursingPersonalCaseModel data);
-  Future<List<Map<String, dynamic>>> getMedicalRecords();
   Future<void> updateNursingCase(String id, Map<String, dynamic> data);
-  Future<List<Map<String, dynamic>>> getProfessionals(String serviceType);
+  Future<void> deleteNursingIssue(int issueId);
+
+  Future<List<ProfessionalModel>> getProfessionals(String serviceType);
+  Future<ProfessionalModel> getProfessionalDetail(String serviceType, int id);
   Future<void> toggleFavorite(int professionalId, bool isFavorite);
-  Future<List<AddOnServiceModel>> getAddOnServices();
 }
 
 class NursingRemoteDataSourceImpl implements NursingRemoteDataSource {
@@ -123,18 +129,23 @@ class NursingRemoteDataSourceImpl implements NursingRemoteDataSource {
 
   @override
   Future<void> updateNursingCase(String id, Map<String, dynamic> data) async {
+    log('Updating nursing case with id $id and data: $data',
+        name: 'NursingRemoteDataSourceImpl');
     final token = await Utils.getSpString(Const.TOKEN);
-    final url = '${Const.API_PERSONAL_CASES}/$id';
+    final url = '${Const.API_NURSING_PERSONAL_CASES}/$id';
+    final payload = FormData.fromMap(data);
 
     final response = await dio.put(
       url,
-      data: data,
+      data: payload,
       options: Options(
         headers: {
           'Authorization': 'Bearer $token',
         },
       ),
     );
+    log('Response status: ${response.statusCode}, data: ${response.data}',
+        name: 'NursingRemoteDataSourceImpl');
 
     if (response.statusCode != 200) {
       throw Exception('Failed to update issue: ${response.statusMessage}');
@@ -142,23 +153,10 @@ class NursingRemoteDataSourceImpl implements NursingRemoteDataSource {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getProfessionals(
-      String serviceType) async {
+  Future<List<ProfessionalModel>> getProfessionals(String serviceType) async {
     final token = await Utils.getSpString(Const.TOKEN);
-    String apiEndpoint;
-    if (serviceType.toLowerCase() == "pharma" ||
-        serviceType.toLowerCase() == "pharmacist") {
-      apiEndpoint = Const.API_PHARMACIST_SERVICES;
-    } else if (serviceType.toLowerCase() == "nurse") {
-      apiEndpoint = Const.API_NURSE_SERVICES;
-    } else if (serviceType.toLowerCase() == "radiologist") {
-      apiEndpoint = Const.API_RADIOLOGIST_SERVICES;
-    } else {
-      throw Exception('Unknown service type: $serviceType');
-    }
-
     final response = await dio.get(
-      apiEndpoint,
+      _getProfessionalEndpoint(serviceType),
       options: Options(
         headers: {
           'Authorization': 'Bearer $token',
@@ -166,22 +164,49 @@ class NursingRemoteDataSourceImpl implements NursingRemoteDataSource {
       ),
     );
 
-    if (response.statusCode == 200) {
-      final responseData = response.data;
-      List<dynamic> professionalList = [];
-
-      if (responseData is Map<String, dynamic>) {
-        if (responseData.containsKey('data')) {
-          professionalList = responseData['data'] ?? [];
-        } else {
-          professionalList = [responseData];
-        }
-      } else if (responseData is List) {
-        professionalList = responseData;
-      }
-      return professionalList.cast<Map<String, dynamic>>();
+    if (response.statusCode == 200 && response.data['data'] != null) {
+      final professionals = response.data['data'] as List;
+      return professionals
+          .map((prof) => ProfessionalModel.fromJson(prof))
+          .toList();
     } else {
-      throw Exception('Failed to load data: HTTP ${response.statusCode}');
+      throw Exception('Failed to load professionals');
+    }
+  }
+
+  @override
+  Future<ProfessionalModel> getProfessionalDetail(
+      String serviceType, int id) async {
+    final token = await Utils.getSpString(Const.TOKEN);
+
+    final response = await dio.get(
+      '${_getProfessionalEndpoint(serviceType)}/$id',
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      ),
+    );
+
+    if (response.statusCode == 200 && response.data['data'] != null) {
+      final data = response.data['data'];
+      return ProfessionalModel.fromJson(data);
+    } else {
+      throw Exception('Failed to load professional detail');
+    }
+  }
+
+  String _getProfessionalEndpoint(String serviceType) {
+    if (serviceType.toLowerCase() == "pharma" ||
+        serviceType.toLowerCase() == "pharmacist") {
+      return Const.API_PHARMACIST_SERVICES;
+    } else if (serviceType.toLowerCase() == "nurse" ||
+        serviceType.toLowerCase() == "specialized_nurse") {
+      return Const.API_NURSE_SERVICES;
+    } else if (serviceType.toLowerCase() == "radiologist") {
+      return Const.API_RADIOLOGIST_SERVICES;
+    } else {
+      throw Exception('Unknown service type: $serviceType');
     }
   }
 
@@ -231,10 +256,14 @@ class NursingRemoteDataSourceImpl implements NursingRemoteDataSource {
   }
 
   @override
-  Future<List<AddOnServiceModel>> getAddOnServices() async {
+  Future<List<AddOnServiceModel>> getAddOnServices(String serviceType) async {
     final token = await Utils.getSpString(Const.TOKEN);
+    log('Fetching add-on services for $serviceType',
+        name: 'NursingRemoteDataSourceImpl');
+
     final response = await dio.get(
-      '${Const.URL_API}/service-titles/nurse',
+      '${Const.URL_API}/service-titles',
+      queryParameters: {'service_type': serviceType},
       options: Options(
         headers: {
           'Authorization': 'Bearer $token',
@@ -242,13 +271,27 @@ class NursingRemoteDataSourceImpl implements NursingRemoteDataSource {
       ),
     );
 
-    if (response.statusCode == 200) {
-      final services = (response.data['data'] as List)
-          .map((service) => AddOnServiceModel.fromJson(service))
-          .toList();
-      return services;
-    } else {
-      throw Exception('Failed to load add-on services');
+    log('Response data: ${response.data}', name: 'NursingRemoteDataSourceImpl');
+
+    final services = (response.data as List)
+        .map((service) => AddOnServiceModel.fromJson(service))
+        .toList();
+    return services;
+  }
+
+  @override
+  Future<void> deleteNursingIssue(int issueId) async {
+    final token = await Utils.getSpString(Const.TOKEN);
+    final response = await dio.delete(
+      '${Const.API_NURSING_PERSONAL_CASES}/$issueId',
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      ),
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete nursing issue');
     }
   }
 }

@@ -11,7 +11,7 @@ class SearchProfessionalPage extends StatefulWidget {
   const SearchProfessionalPage({super.key, required this.serviceType});
 
   @override
-  _SearchProfessionalPageState createState() => _SearchProfessionalPageState();
+  State<SearchProfessionalPage> createState() => _SearchProfessionalPageState();
 }
 
 class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
@@ -27,9 +27,9 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Search ${widget.serviceType}',
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        title: const Text(
+          'Search Nurse',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
       body: Padding(
@@ -39,7 +39,7 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
             TextField(
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.search),
-                hintText: 'Search ${widget.serviceType}',
+                hintText: 'Search Nurse',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
@@ -65,6 +65,7 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
                                 Column(
                                   children: [
                                     Stack(
+                                      clipBehavior: Clip.none,
                                       children: [
                                         Container(
                                           width: 50,
@@ -103,12 +104,12 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
                                           ),
                                         ),
                                         const Positioned(
-                                          bottom: 36,
-                                          right: 3,
+                                          top: -6,
+                                          right: -6,
                                           child: Icon(
                                             Icons.circle,
-                                            color: Colors.green,
-                                            size: 14,
+                                            color: Color(0xFF8EF4BC),
+                                            size: 12,
                                           ),
                                         ),
                                       ],
@@ -136,7 +137,7 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      Text(widget.serviceType),
+                                      Text(professional.jobTitle),
                                       Row(
                                         children: [
                                           TextButton(
@@ -146,7 +147,10 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
                                                 MaterialPageRoute(
                                                   builder: (context) =>
                                                       ProfessionalDetailsPage(
-                                                    professional: professional,
+                                                    professionalId:
+                                                        professional.id,
+                                                    serviceType:
+                                                        widget.serviceType,
                                                   ),
                                                 ),
                                               );

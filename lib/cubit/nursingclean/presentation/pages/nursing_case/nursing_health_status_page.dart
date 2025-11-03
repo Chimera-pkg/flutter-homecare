@@ -45,114 +45,128 @@ class _NursingHealthStatusPageState extends State<NursingHealthStatusPage> {
       ),
       body: BlocBuilder<NursingCaseBloc, NursingCaseState>(
         builder: (context, nursingState) {
-          if (nursingState is! NursingCaseLoaded) {
+          if (nursingState.nursingCaseStatus == NursingCaseStatus.loading ||
+              nursingState.nursingCaseStatus == NursingCaseStatus.initial) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final nursingCase = nursingState.nursingCase;
+          if (nursingState.nursingCaseStatus == NursingCaseStatus.failure) {
+            return Center(
+                child: Text(
+                    nursingState.nursingCaseError ?? 'Failed to load case'));
+          }
 
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Select your mobility status',
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                ...MobilityStatus.values.map((status) {
-                  return RadioListTile<MobilityStatus>(
-                    title: Text(status.displayName),
-                    value: status,
-                    groupValue: nursingCase.mobilityStatus,
-                    onChanged: (value) {
-                      if (value != null) {
-                        context
-                            .read<NursingCaseBloc>()
-                            .add(UpdateHealthStatusNursingCaseEvent(
-                              mobilityStatus: value,
-                              relatedHealthRecordId:
-                                  nursingCase.relatedHealthRecordId,
-                            ));
+          if (nursingState.nursingCaseStatus == NursingCaseStatus.success) {
+            final nursingCase = nursingState.nursingCase;
+
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Select your mobility status',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  ...MobilityStatus.values.map((status) {
+                    return RadioListTile<MobilityStatus>(
+                      title: Text(status.displayName),
+                      value: status,
+                      groupValue: nursingCase.mobilityStatus,
+                      onChanged: (value) {
+                        if (value != null) {
+                          context
+                              .read<NursingCaseBloc>()
+                              .add(UpdateHealthStatusNursingCaseEvent(
+                                mobilityStatus: value,
+                                relatedHealthRecordId:
+                                    nursingCase.relatedHealthRecordId,
+                              ));
+                        }
+                      },
+                      activeColor: const Color(0xFF35C5CF),
+                    );
+                  }),
+                  const SizedBox(height: 20),
+                  const Text('Select a related health record',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 10.0),
+                  BlocBuilder<MedicalRecordBloc, MedicalRecordState>(
+                    builder: (context, medicalState) {
+                      if (medicalState.listStatus == ListStatus.loading) {
+                        return const Center(child: CircularProgressIndicator());
                       }
-                    },
-                    activeColor: const Color(0xFF35C5CF),
-                  );
-                }),
-                const SizedBox(height: 20),
-                const Text('Select a related health record',
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 10.0),
-                BlocBuilder<MedicalRecordBloc, MedicalRecordState>(
-                  builder: (context, medicalState) {
-                    if (medicalState.listStatus == ListStatus.loading) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    if (medicalState.listStatus == ListStatus.failure) {
-                      return Center(child: Text(medicalState.listError ?? 'Error loading records'));
-                    }
-                    if (medicalState.listStatus == ListStatus.success) {
-                      if (medicalState.medicalRecords.isEmpty) {
-                        return const Text('No medical records available.');
+                      if (medicalState.listStatus == ListStatus.failure) {
+                        return Center(
+                            child: Text(medicalState.listError ??
+                                'Error loading records'));
                       }
-                      return Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<int?>(
-                            value: nursingCase.relatedHealthRecordId,
-                            hint: const Text('Please select a record'),
-                            items: [
-                              const DropdownMenuItem<int?>(
-                                value: null,
-                                child: Text('None'),
-                              ),
-                              ...medicalState.medicalRecords
-                                  .map((MedicalRecord record) {
-                                return DropdownMenuItem<int?>(
-                                  value: record.id,
-                                  child: Text(record.title),
-                                );
-                              })
-                            ],
-                            onChanged: (newValue) {
-                              context
-                                  .read<NursingCaseBloc>()
-                                  .add(UpdateHealthStatusNursingCaseEvent(
-                                    mobilityStatus: nursingCase.mobilityStatus,
-                                    relatedHealthRecordId: newValue,
-                                  ));
-                            },
-                            isExpanded: true,
+                      if (medicalState.listStatus == ListStatus.success) {
+                        if (medicalState.medicalRecords.isEmpty) {
+                          return const Text('No medical records available.');
+                        }
+                        return Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                        ),
-                      );
-                    }
-                    return const Text('Select a status');
-                  },
-                ),
-                const Spacer(),
-                SizedBox(
-                  width: double.infinity,
-                  height: 58,
-                  child: ElevatedButton(
-                    onPressed: _onClickNext,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF35C5CF),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    ),
-                    child: const Text('Next',
-                        style: TextStyle(color: Colors.white, fontSize: 20)),
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<int?>(
+                              value: nursingCase.relatedHealthRecordId,
+                              hint: const Text('Please select a record'),
+                              items: [
+                                const DropdownMenuItem<int?>(
+                                  value: null,
+                                  child: Text('None'),
+                                ),
+                                ...medicalState.medicalRecords
+                                    .map((MedicalRecord record) {
+                                  return DropdownMenuItem<int?>(
+                                    value: record.id,
+                                    child: Text(record.title),
+                                  );
+                                })
+                              ],
+                              onChanged: (newValue) {
+                                context
+                                    .read<NursingCaseBloc>()
+                                    .add(UpdateHealthStatusNursingCaseEvent(
+                                      mobilityStatus:
+                                          nursingCase.mobilityStatus,
+                                      relatedHealthRecordId: newValue,
+                                    ));
+                              },
+                              isExpanded: true,
+                            ),
+                          ),
+                        );
+                      }
+                      return const Text('Select a status');
+                    },
                   ),
-                ),
-              ],
-            ),
-          );
+                  const Spacer(),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 58,
+                    child: ElevatedButton(
+                      onPressed: _onClickNext,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF35C5CF),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                      child: const Text('Next',
+                          style: TextStyle(color: Colors.white, fontSize: 20)),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+          // Fallback
+          return const Center(child: CircularProgressIndicator());
         },
       ),
     );

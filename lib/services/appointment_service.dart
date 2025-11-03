@@ -1,6 +1,11 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:m2health/const.dart';
-import 'package:m2health/models/appointment.dart';
+import 'package:m2health/cubit/appointment/models/appointment.dart';
+import 'package:m2health/cubit/appointment/models/paginated_appointment_response.dart';
+import 'package:m2health/cubit/profiles/data/models/profile_model.dart';
+import 'package:m2health/cubit/profiles/domain/entities/profile.dart';
 import 'package:m2health/models/provider_appointment.dart';
 import 'package:m2health/utils.dart';
 
@@ -244,16 +249,26 @@ class AppointmentService {
 
   // Other existing methods...
 
-  Future<List<Appointment>> fetchPatientAppointments() async {
+  Future<PaginatedAppointmentsResponse> fetchPatientAppointments({
+    String? status,
+    int page = 1,
+    int limit = 10,
+  }) async {
     try {
       final token = await Utils.getSpString(Const.TOKEN);
 
-      print('=== FETCHING PATIENT APPOINTMENTS ===');
-      print('API Endpoint: ${Const.API_APPOINTMENT}');
-      print('Token: ${token?.substring(0, 20)}...');
+      Map<String, dynamic> queryParameters = {
+        'page': page,
+        'limit': limit,
+      };
+
+      if (status != null && status.isNotEmpty) {
+        queryParameters['status'] = status;
+      }
 
       final response = await _dio.get(
         Const.API_APPOINTMENT,
+        queryParameters: queryParameters,
         options: Options(
           headers: {
             'Authorization': 'Bearer $token',
@@ -262,33 +277,73 @@ class AppointmentService {
         ),
       );
 
-      print('Response Status: ${response.statusCode}');
-      print('Raw Response Data: ${response.data}');
-
-      if (response.data == null || response.data['data'] == null) {
-        print('No appointment data found in response');
-        return [];
+      if (response.statusCode == 200 && response.data != null) {
+        return PaginatedAppointmentsResponse.fromJson(response.data);
+      } else {
+        throw Exception('Failed to load appointments: ${response.statusCode}');
       }
+    } catch (e, stackTrace) {
+      log('Error fetching patient appointments: $e',
+          stackTrace: stackTrace, name: 'AppointmentService');
+      rethrow;
+    }
+  }
 
-      final data = response.data['data'] as List;
-      print('Number of appointments: ${data.length}');
+  /// Fetches the detail for an appointment.
+  Future<Appointment> fetchAppointmentDetail(int appointmentId) async {
+    try {
+      final token = await Utils.getSpString(Const.TOKEN);
+      final response = await _dio.get(
+        '${Const.API_APPOINTMENT}/$appointmentId',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
 
-      // // Debug each appointment
-      // for (int i = 0; i < data.length; i++) {
-      //   print('=== APPOINTMENT $i DEBUG ===');
-      //   print('Raw appointment data: ${data[i]}');
-      //   final appointment = Appointment.fromJson(data[i]);
-      //   print('Parsed appointment ID: ${appointment.id}');
-      //   print('Parsed profileServiceData: ${appointment.profileServiceData}');
-      //   print(
-      //       'ProfileServiceData type: ${appointment.profileServiceData.runtimeType}');
-      //   print(
-      //       'ProfileServiceData keys: ${appointment.profileServiceData.keys.toList()}');
-      // }
-
-      return data.map((json) => Appointment.fromJson(json)).toList();
+      if (response.statusCode == 200 && response.data['data'] != null) {
+        return Appointment.fromJson(response.data['data']);
+      } else {
+        throw Exception(
+            'Failed to load appointment detail: ${response.statusCode}');
+      }
     } catch (e) {
       rethrow;
+    }
+  }
+
+  Future<Profile> fetchProfile() async {
+    try {
+      final token = await Utils.getSpString(Const.TOKEN);
+      if (token == null) {
+        throw Exception('Token is null');
+      }
+
+      final response = await Dio().get(
+        '${Const.URL_API}/profiles', // Assuming this is the correct endpoint
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final profileData = response.data['data'];
+        if (profileData is Map<String, dynamic>) {
+          return ProfileModel.fromJson(profileData);
+        } else {
+          throw Exception('Unexpected profile response format');
+        }
+      } else {
+        throw Exception('Failed to load profile: ${response.statusCode}');
+      }
+    } catch (e, stackTrace) {
+      log('Error fetching profile: $e',
+          error: e, stackTrace: stackTrace, name: 'AppointmentService');
+      throw Exception('Failed to load profile: $e');
     }
   }
 
@@ -429,13 +484,9 @@ class AppointmentService {
       int appointmentId, Map<String, dynamic> appointmentData) async {
     try {
       final token = await Utils.getSpString(Const.TOKEN);
-      final userId = await Utils.getSpString(Const.USER_ID);
 
       // Ensure user_id is included and is a number
-      final dataToSend = {
-        ...appointmentData,
-        'user_id': int.tryParse(userId ?? '1') ?? 1, // Convert to int
-      };
+      final dataToSend = appointmentData;
 
       print('Updating appointment $appointmentId with data: $dataToSend');
 

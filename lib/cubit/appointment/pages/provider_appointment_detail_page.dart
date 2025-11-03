@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:m2health/const.dart';
-import 'package:m2health/cubit/appointment/provider_appointment_cubit.dart';
-import 'package:m2health/cubit/appointment/provider_appointment_detail_cubit.dart';
-import 'package:m2health/models/provider_appointment.dart';
+import 'package:m2health/cubit/appointment/bloc/provider_appointment_cubit.dart';
+import 'package:m2health/cubit/appointment/bloc/provider_appointment_detail_cubit.dart';
+import 'package:m2health/cubit/appointment/models/appointment.dart';
+import 'package:m2health/service_locator.dart';
 
 class ProviderAppointmentDetailPage extends StatelessWidget {
   final int appointmentId;
@@ -13,7 +14,7 @@ class ProviderAppointmentDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ProviderAppointmentDetailCubit()
+      create: (context) => ProviderAppointmentDetailCubit(sl())
         ..fetchProviderAppointmentById(appointmentId),
       child: const ProviderAppointmentDetailView(),
     );
@@ -50,7 +51,7 @@ class ProviderAppointmentDetailView extends StatelessWidget {
   }
 
   Widget _buildAppointmentDetails(
-      BuildContext context, ProviderAppointment appointment) {
+      BuildContext context, Appointment appointment) {
     return Column(
       children: [
         Expanded(
@@ -92,7 +93,7 @@ class ProviderAppointmentDetailView extends StatelessWidget {
 }
 
 class _PatientHeader extends StatelessWidget {
-  final ProviderAppointment appointment;
+  final Appointment appointment;
   const _PatientHeader({required this.appointment});
 
   Color _getStatusColor(String status) {
@@ -115,8 +116,7 @@ class _PatientHeader extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 30,
-          backgroundImage:
-              NetworkImage(appointment.patientData['avatar'] ?? ''),
+          backgroundImage: NetworkImage(appointment.patient?.avatar ?? ''),
         ),
         const SizedBox(width: 16),
         Expanded(
@@ -124,7 +124,7 @@ class _PatientHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                appointment.patientData['username'] ?? 'Patient Name',
+                appointment.patient?.name ?? 'Patient Name',
                 style:
                     const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
               ),
@@ -136,7 +136,7 @@ class _PatientHeader extends StatelessWidget {
                   const SizedBox(width: 4),
                   Expanded(
                     child: Text(
-                      appointment.patientData['address'] ?? 'Unknown Location',
+                      appointment.patient?.homeAddress ?? 'Unknown Location',
                       style: const TextStyle(fontSize: 12),
                     ),
                   ),
@@ -187,19 +187,19 @@ class _InfoRow extends StatelessWidget {
 }
 
 class _PatientInfoTable extends StatelessWidget {
-  final ProviderAppointment appointment;
+  final Appointment appointment;
   const _PatientInfoTable({required this.appointment});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _buildInfoRow('Full Name', appointment.patientData['full_name']),
-        _buildInfoRow('Age', appointment.patientData['age']?.toString()),
-        _buildInfoRow('Gender', appointment.patientData['gender']),
-        _buildInfoRow('Weight', '${appointment.patientData['weight']} kg'),
-        _buildInfoRow('Height', '${appointment.patientData['height']} cm'),
-        _buildInfoRow('Address', appointment.patientData['address']),
+        _buildInfoRow('Full Name', appointment.patient!.name),
+        _buildInfoRow('Age', appointment.patient!.age.toString()),
+        _buildInfoRow('Gender', appointment.patient!.gender),
+        _buildInfoRow('Weight', '${appointment.patient!.weight} kg'),
+        _buildInfoRow('Height', '${appointment.patient!.height} cm'),
+        _buildInfoRow('Address', appointment.patient!.homeAddress),
       ],
     );
   }
@@ -223,13 +223,13 @@ class _PatientInfoTable extends StatelessWidget {
 }
 
 class _PersonalCaseInfo extends StatelessWidget {
-  final ProviderAppointment appointment;
+  final Appointment appointment;
   const _PersonalCaseInfo({required this.appointment});
 
   @override
   Widget build(BuildContext context) {
-    final personalCase = appointment.personalCase ?? {};
-    final images = personalCase['images'] as List<dynamic>? ?? [];
+    final personalCase = appointment.personalCase;
+    final images = personalCase?.images ?? [];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -240,7 +240,7 @@ class _PersonalCaseInfo extends StatelessWidget {
             style: const TextStyle(fontWeight: FontWeight.w500),
             children: [
               TextSpan(
-                text: personalCase['services'] ?? '-',
+                text: personalCase?.addOn.map((e) => e.name,).join(', '),
                 style: const TextStyle(
                     color: Colors.black, fontWeight: FontWeight.w600),
               )
@@ -254,7 +254,7 @@ class _PersonalCaseInfo extends StatelessWidget {
             style: const TextStyle(fontWeight: FontWeight.w500),
             children: [
               TextSpan(
-                text: personalCase['description'] ?? '-',
+                text: personalCase?.description ?? 'No description provided.',
                 style: const TextStyle(color: Colors.black, height: 1.5),
               )
             ],
@@ -287,7 +287,7 @@ class _PersonalCaseInfo extends StatelessWidget {
 }
 
 class _ActionButtons extends StatelessWidget {
-  final ProviderAppointment appointment;
+  final Appointment appointment;
   const _ActionButtons({required this.appointment});
 
   @override

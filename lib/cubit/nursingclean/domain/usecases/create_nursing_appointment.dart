@@ -22,14 +22,8 @@ class CreateNursingAppointment {
       status: 'pending',
       date: params.selectedDate,
       hour: DateFormat('HH:mm:ss').format(params.selectedTime),
-      summary: 'Appointment booking with ${params.professional.name}',
+      summary: params.nursingCase.addOnServices.map((e) => e.name).join(', '),
       payTotal: params.nursingCase.estimatedBudget,
-      profileServicesData: {
-        'id': params.professional.id,
-        'name': params.professional.name,
-        'avatar': params.professional.avatar,
-        'role': params.professional.role,
-      },
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );

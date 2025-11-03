@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:m2health/cubit/nursingclean/const.dart';
 import 'package:m2health/cubit/nursingclean/domain/entities/nursing_case.dart';
-import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/add_on_services_state.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/nursing_case_bloc.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/nursing_case_event.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/nursing_case_state.dart';
@@ -15,41 +15,53 @@ class NursingAddOnPage extends StatefulWidget {
 }
 
 class _NursingAddOnPageState extends State<NursingAddOnPage> {
+  late NurseServiceType selectedServiceType;
   @override
   void initState() {
     super.initState();
-    context.read<NursingCaseBloc>().add(FetchNursingAddOnServices());
+    final nursingState = context.read<NursingCaseBloc>().state;
+    selectedServiceType =
+        nursingState.serviceType ?? NurseServiceType.primaryNurse;
+    context
+        .read<NursingCaseBloc>()
+        .add(FetchNursingAddOnServices(selectedServiceType));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Nursing Add-On Services',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        title: Text(
+          selectedServiceType == NurseServiceType.primaryNurse
+              ? 'Nursing Procedures'
+              : 'Specialized Nursing Procedures',
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
       body: BlocBuilder<NursingCaseBloc, NursingCaseState>(
         builder: (context, state) {
-          if (state is! NursingCaseLoaded) {
+          if (state.nursingCaseStatus == NursingCaseStatus.loading ||
+              state.nursingCaseStatus == NursingCaseStatus.initial) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final addOnState = state.addOnServicesState;
+          if (state.nursingCaseStatus == NursingCaseStatus.failure) {
+            return Center(
+                child: Text(state.nursingCaseError ?? 'Failed to load case'));
+          }
 
+          // We should be in a success state here
           return Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
                 Expanded(
-                  child:
-                      _buildAddOnList(context, addOnState, state.nursingCase),
+                  child: _buildAddOnList(context, state, state.nursingCase),
                 ),
                 const SizedBox(height: 10),
                 _buildBudgetSection(state.nursingCase),
                 const SizedBox(height: 10),
-                _buildBookButton(context),
+                _buildBookButton(context, state.serviceType),
               ],
             ),
           );
@@ -58,62 +70,79 @@ class _NursingAddOnPageState extends State<NursingAddOnPage> {
     );
   }
 
-  Widget _buildAddOnList(BuildContext context, AddOnServicesState addOnState,
-      NursingCase nursingCase) {
-    if (addOnState is AddOnServicesLoading ||
-        addOnState is AddOnServicesInitial) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (addOnState is AddOnServicesError) {
-      return Center(child: Text('Error: ${addOnState.message}'));
-    }
-
-    if (addOnState is AddOnServicesLoaded) {
-      if (addOnState.services.isEmpty) {
-        return const Center(child: Text('No add-on services available.'));
+  Widget _buildAddOnList(
+      BuildContext context, NursingCaseState state, NursingCase nursingCase) {
+    Future<void> refreshAddOnServices() async {
+      final nursingState = context.read<NursingCaseBloc>().state;
+      if (nursingState.serviceType != null) {
+        context
+            .read<NursingCaseBloc>()
+            .add(FetchNursingAddOnServices(nursingState.serviceType!));
       }
-
-      final availableServices = addOnState.services;
-      return ListView.builder(
-        itemCount: availableServices.length,
-        itemBuilder: (context, index) {
-          final service = availableServices[index];
-          final isSelected =
-              nursingCase.addOnServices.any((s) => s.id == service.id);
-
-          return Card(
-            child: ListTile(
-              leading: Checkbox(
-                value: isSelected,
-                onChanged: (bool? value) {
-                  context
-                      .read<NursingCaseBloc>()
-                      .add(ToggleAddOnService(service));
-                },
-                activeColor: const Color(0xFF35C5CF),
-              ),
-              title: Text(
-                service.name,
-                style:
-                    const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-              ),
-              subtitle: Text(
-                '\$${service.price}',
-                style: const TextStyle(
-                  color: Color(0xFF35C5CF),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              trailing:
-                  const Icon(Icons.info_outline_rounded, color: Colors.grey),
-            ),
-          );
-        },
-      );
     }
-    // Fallback
-    return const SizedBox.shrink();
+
+    return RefreshIndicator(
+      onRefresh: refreshAddOnServices,
+      child: Builder(
+        builder: (context) {
+          if (state.addOnServicesStatus == NursingCaseStatus.loading ||
+              state.addOnServicesStatus == NursingCaseStatus.initial) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state.addOnServicesStatus == NursingCaseStatus.failure) {
+            return Center(child: Text(state.addOnServicesError ?? 'Error'));
+          }
+
+          if (state.addOnServicesStatus == NursingCaseStatus.success) {
+            if (state.addOnServices.isEmpty) {
+              return const Center(child: Text('No add-on services available.'));
+            }
+
+            final availableServices = state.addOnServices;
+            return ListView.builder(
+              itemCount: availableServices.length,
+              itemBuilder: (context, index) {
+                final service = availableServices[index];
+                final isSelected =
+                    nursingCase.addOnServices.any((s) => s.id == service.id);
+
+                return Card(
+                  child: ListTile(
+                    leading: Checkbox(
+                      value: isSelected,
+                      onChanged: (bool? value) {
+                        context
+                            .read<NursingCaseBloc>()
+                            .add(ToggleAddOnService(service));
+                      },
+                      activeColor: const Color(0xFF35C5CF),
+                    ),
+                    title: Text(
+                      service.name,
+                      style: const TextStyle(
+                          fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text(
+                      '\$${service.price.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        color: Color(0xFF35C5CF),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    trailing: const Icon(Icons.info_outline_rounded,
+                        color: Colors.grey),
+                  ),
+                );
+              },
+            );
+          }
+
+          // Fallback
+          return const SizedBox.shrink();
+        },
+      ),
+    );
   }
 
   Widget _buildBudgetSection(NursingCase nursingCase) {
@@ -132,7 +161,7 @@ class _NursingAddOnPageState extends State<NursingAddOnPage> {
     );
   }
 
-  Widget _buildBookButton(BuildContext context) {
+  Widget _buildBookButton(BuildContext context, NurseServiceType? serviceType) {
     return SizedBox(
       width: double.infinity,
       height: 58,
@@ -141,8 +170,10 @@ class _NursingAddOnPageState extends State<NursingAddOnPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  const SearchProfessionalPage(serviceType: 'Nurse'),
+              builder: (context) => SearchProfessionalPage(
+                serviceType: serviceType?.apiValue ??
+                    NurseServiceType.primaryNurse.apiValue,
+              ),
             ),
           );
         },

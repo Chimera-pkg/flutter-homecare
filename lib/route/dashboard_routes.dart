@@ -1,6 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:m2health/cubit/diabetes/diabetic_care_routes.dart';
-import 'package:m2health/cubit/nursing/pages/nursing_services.dart';
+import 'package:m2health/cubit/nursingclean/presentation/pages/nursing_services_page.dart';
 import 'package:m2health/cubit/precision/precision_nutrition_routes.dart';
 import 'package:m2health/route/navigator_keys.dart';
 import 'package:m2health/views/pharmacist_services.dart';
@@ -17,14 +17,14 @@ class DashboardRoutes {
       parentNavigatorKey: rootNavigatorKey,
       path: AppRoutes.pharmaServices,
       builder: (context, state) {
-        return PharmaServices();
+        return const PharmaServices();
       },
     ),
     GoRoute(
       path: AppRoutes.nursingServices,
       parentNavigatorKey: rootNavigatorKey,
       builder: (context, state) {
-        return NursingService(); // From nursing module
+        return const NursingService(); // From nursing module
       },
     ),
     GoRoute(

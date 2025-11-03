@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:m2health/models/provider.dart';
 import 'package:m2health/views/book_appointment.dart';
 import 'package:m2health/const.dart';
 
@@ -320,22 +321,39 @@ class ProfessionalProfilePage extends StatelessWidget {
         child: ElevatedButton(
           onPressed: () {
             // Create complete provider data including ID and role
-            final providerData = {
-              'id': providerId, // Include provider ID
-              'name': name,
-              'avatar': avatar,
-              'role': role.toLowerCase(), // pharmacist or nurse
-              'provider_type':
-                  role.toLowerCase(), // Ensure provider_type is included
-              'experience': experience,
-              'rating': rating,
-              'about': about,
-              'working_information': professional['working_information'] ?? '',
-              'days_hour': daysHour,
-              'maps_location': mapsLocation,
-              'certification': professional['certification'] ?? '',
-              'user_id': professional['user_id'] ?? 0,
-            };
+            // final providerData = {
+            //   'id': providerId, // Include provider ID
+            //   'name': name,
+            //   'avatar': avatar,
+            //   'role': role.toLowerCase(), // pharmacist or nurse
+            //   'provider_type':
+            //       role.toLowerCase(), // Ensure provider_type is included
+            //   'experience': experience,
+            //   'rating': rating,
+            //   'about': about,
+            //   'working_information': professional['working_information'] ?? '',
+            //   'days_hour': daysHour,
+            //   'maps_location': mapsLocation,
+            //   'certification': professional['certification'] ?? '',
+            //   'user_id': professional['user_id'] ?? 0,
+            // };
+            final providerData = Provider(
+              id: providerId,
+              name: name,
+              avatar: avatar,
+              experience: experience,
+              rating: rating,
+              about: about,
+              workingInformation:
+                  professional['working_information']?.toString() ?? '',
+              workingHours: daysHour,
+              workplace: mapsLocation,
+              jobTitle: professional['job_title']?.toString() ?? '',
+              userId: _safeIntConversion(professional['user_id']),
+              providerType: role.toLowerCase(),
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
+            );
 
             print(
                 'Navigating to book appointment with provider data: $providerData');
@@ -345,7 +363,7 @@ class ProfessionalProfilePage extends StatelessWidget {
               MaterialPageRoute(
                 builder: (context) => BookAppointmentPage(
                   data: BookAppointmentPageData(
-                      pharmacist: providerData), // Pass complete provider data
+                      provider: providerData), // Pass complete provider data
                 ),
               ),
             );

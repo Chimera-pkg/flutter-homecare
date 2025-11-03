@@ -9,7 +9,6 @@ class AppointmentEntity extends Equatable {
   final String hour;
   final String summary;
   final double payTotal;
-  final Map<String, dynamic> profileServicesData;
   final DateTime createdAt;
   final DateTime updatedAt;
   final int? providerId;
@@ -25,7 +24,6 @@ class AppointmentEntity extends Equatable {
     required this.hour,
     required this.summary,
     required this.payTotal,
-    required this.profileServicesData,
     required this.createdAt,
     required this.updatedAt,
     this.providerId,
@@ -42,7 +40,6 @@ class AppointmentEntity extends Equatable {
         hour,
         summary,
         payTotal,
-        profileServicesData,
         createdAt,
         updatedAt,
         providerId,
