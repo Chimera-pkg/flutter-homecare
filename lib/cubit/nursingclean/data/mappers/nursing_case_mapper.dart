@@ -30,12 +30,7 @@ class NursingCaseMapper {
 
     final firstModel = models.first;
 
-    final List<AddOnService> addOnServices = firstModel.addOn != null
-        ? firstModel.addOn!
-            .split(',')
-            .map((e) => AddOnService(name: e.trim(), price: 0.0))
-            .toList()
-        : [];
+    final List<AddOnService> addOnServices = firstModel.addOn;
 
     return NursingCase(
       appointmentId: firstModel.appointmentId,
@@ -58,7 +53,7 @@ class NursingCaseMapper {
         description: issue.description,
         mobilityStatus: entity.mobilityStatus?.apiValue,
         careType: entity.careType,
-        addOn: entity.addOnServices.map((e) => e.name).join(', '),
+        addOn: entity.addOnServices,
         estimatedBudget: entity.estimatedBudget,
         relatedHealthRecordId: entity.relatedHealthRecordId,
         images: issue.images, // Pass local files for upload

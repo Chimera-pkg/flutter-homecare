@@ -1,12 +1,16 @@
+import 'dart:convert';
+
+import 'package:m2health/cubit/nursingclean/data/models/add_on_service_model.dart';
+import 'package:m2health/cubit/nursingclean/domain/entities/add_on_service.dart';
+
 class PersonalCase {
   final int id;
   final String title;
   final String description;
-  final List<String> images; // Change to list of strings
+  final List<String> images;
   final String mobilityStatus;
-  // final String relatedHealthRecord;
   final Map<String, dynamic> relatedHealthRecord;
-  final String addOn;
+  final List<AddOnService> addOn;
   final double estimatedBudget;
   final int userId;
 
@@ -23,21 +27,25 @@ class PersonalCase {
   });
 
   factory PersonalCase.fromJson(Map<String, dynamic> json) {
+    final List<dynamic> addOnData = json['add_on'] ?? [];
+    final List<AddOnService> addOns =
+        addOnData.map((item) => AddOnServiceModel.fromJson(item)).toList();
     return PersonalCase(
       id: json['id'] ?? 0,
       userId: json['user_id'] ?? 0,
       title: json['title'] ?? '',
       description: json['description'] ?? '',
       images: json['images'] is String
-          ? [json['images']]
+          ? List<String>.from(jsonDecode(json['images']))
           : List<String>.from(json['images'] ?? []),
       mobilityStatus: json['mobility_status'] ?? '',
       // relatedHealthRecord: json['related_health_record'] ?? '',
       relatedHealthRecord: json['related_health_record'] is Map
           ? Map<String, dynamic>.from(json['related_health_record'])
           : {},
-      addOn: json['add_on'] ?? '',
-      estimatedBudget: double.tryParse(json['estimated_budget']?.toString() ?? '') ?? 0.0,
+      addOn: addOns,
+      estimatedBudget:
+          double.tryParse(json['estimated_budget']?.toString() ?? '') ?? 0.0,
     );
   }
 
@@ -49,7 +57,7 @@ class PersonalCase {
       'images': images, // Change to list of strings
       'mobility_status': mobilityStatus,
       'related_health_record': relatedHealthRecord,
-      'add_on': addOn,
+      // 'add_on': addOn,
       'estimated_budget': estimatedBudget,
       'user_id': userId,
     };

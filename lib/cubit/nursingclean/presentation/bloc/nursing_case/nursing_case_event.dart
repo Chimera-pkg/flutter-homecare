@@ -80,3 +80,16 @@ class ToggleAddOnService extends NursingCaseEvent {
   final AddOnService service;
   const ToggleAddOnService(this.service);
 }
+
+class UpdateCaseWithAppointment extends NursingCaseEvent {
+  final int appointmentId;
+  final NursingCase nursingCase; // Pass the case data to be saved
+
+  const UpdateCaseWithAppointment({
+    required this.appointmentId,
+    required this.nursingCase,
+  });
+
+  @override
+  List<Object?> get props => [appointmentId, nursingCase];
+}

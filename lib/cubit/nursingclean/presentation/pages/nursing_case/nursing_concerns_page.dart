@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/const.dart';
-import 'package:m2health/cubit/nursingclean/const.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/nursing_case_bloc.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/nursing_case_event.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/nursing_case_state.dart';
@@ -11,11 +10,8 @@ import 'package:m2health/cubit/nursingclean/presentation/pages/nursing_case/nurs
 import 'package:m2health/widgets/auth_guard_dialog.dart';
 
 class NursingConcernsPage extends StatefulWidget {
-  final NurseServiceType serviceType;
-
   const NursingConcernsPage({
     super.key,
-    required this.serviceType,
   });
 
   @override
@@ -70,15 +66,25 @@ class _NursingConcernsPageState extends State<NursingConcernsPage> {
             ),
             Expanded(
               child: BlocConsumer<NursingCaseBloc, NursingCaseState>(
-                listener: (context, state) => {
-                  if (state is NursingCaseUnauthenticated)
-                    showAuthGuardDialog(context)
+                listener: (context, state) {
+                  if (state.nursingCaseStatus ==
+                      NursingCaseStatus.unauthenticated) {
+                    showAuthGuardDialog(context);
+                  }
                 },
                 builder: (context, state) {
-                  if (state is NursingCaseLoading ||
-                      state is NursingCaseInitial) {
+                  if (state.nursingCaseStatus == NursingCaseStatus.loading ||
+                      state.nursingCaseStatus == NursingCaseStatus.initial) {
                     return const Center(child: CircularProgressIndicator());
-                  } else if (state is NursingCaseLoaded) {
+                  }
+
+                  if (state.nursingCaseStatus == NursingCaseStatus.failure) {
+                    return Center(
+                        child: Text(
+                            'Failed to load issues: ${state.nursingCaseError}'));
+                  }
+
+                  if (state.nursingCaseStatus == NursingCaseStatus.success) {
                     final issues = state.nursingCase.issues;
                     return RefreshIndicator(
                       color: Const.aqua,
@@ -201,19 +207,17 @@ class _NursingConcernsPageState extends State<NursingConcernsPage> {
                               },
                             ),
                     );
-                  } else if (state is NursingCaseError) {
-                    return Center(
-                        child: Text('Failed to load issues: ${state.message}'));
-                  } else {
-                    return const Center(child: Text('Failed to load issues'));
                   }
+                  // Fallback
+                  return const Center(child: Text('Failed to load issues'));
                 },
               ),
             ),
             BlocBuilder<NursingCaseBloc, NursingCaseState>(
               builder: (context, state) {
-                final bool hasIssues = state is NursingCaseLoaded &&
-                    state.nursingCase.issues.isNotEmpty;
+                final bool hasIssues =
+                    state.nursingCaseStatus == NursingCaseStatus.success &&
+                        state.nursingCase.issues.isNotEmpty;
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -250,7 +254,8 @@ class _NursingConcernsPageState extends State<NursingConcernsPage> {
                             hasIssues ? () => _onClickNext(context) : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor:
-                              hasIssues ? Const.aqua : const Color(0xFFB2B9C4),
+                              hasIssues ? Const.aqua : const Color(0xFFB2B2B2),
+                          disabledBackgroundColor: const Color(0xFFB2B9C4),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15),
                           ),

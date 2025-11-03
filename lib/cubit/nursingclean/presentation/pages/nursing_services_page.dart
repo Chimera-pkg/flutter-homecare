@@ -129,9 +129,7 @@ class _NursingState extends State<NursingService> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => NursingConcernsPage(
-          serviceType: serviceType,
-        ),
+        builder: (context) => const NursingConcernsPage(),
       ),
     );
   }
@@ -161,8 +159,7 @@ class _NursingState extends State<NursingService> {
                           _navigateToType(NurseServiceType.primaryNurse);
                           break;
                         case 1:
-                          _navigateToType(
-                              NurseServiceType.specializedNurse);
+                          _navigateToType(NurseServiceType.specializedNurse);
                           break;
                         default:
                           Navigator.pushNamed(context, AppRoutes.home);

@@ -4,15 +4,15 @@ class AddOnService extends Equatable {
   final int? id;
   final String name;
   final double price;
-  final String? description;
+  final String serviceType;
 
   const AddOnService({
     this.id,
     required this.name,
     required this.price,
-    this.description,
+    this.serviceType = 'nursing',
   });
 
   @override
-  List<Object?> get props => [id, name, description, price];
+  List<Object?> get props => [id, name, price, serviceType];
 }

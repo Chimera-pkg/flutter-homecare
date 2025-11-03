@@ -136,7 +136,7 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
             images: [],
             mobilityStatus: '',
             relatedHealthRecord: {},
-            addOn: addOns.isNotEmpty ? addOns.last : '',
+            addOn: [],
             estimatedBudget: 0.0,
             userId: 0,
           );
@@ -317,7 +317,7 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
       profile = {};
     }
 
-    final addOnServices = _personalCase?.addOn ?? 'No additional services';
+    final addOnServices = _personalCase?.addOn.join(', ') ?? 'No services selected';
     final serviceCost = 10; // Dummy cost for each service
     final totalCost =
         serviceCost; // Since add_on is a single string, total cost is serviceCost

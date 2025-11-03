@@ -15,8 +15,8 @@ class AppointmentRoutes {
     GoRoute(
       path: AppRoutes.appointmentDetail,
       builder: (context, state) {
-        final appointmentData = state.extra as Map<String, dynamic>;
-        return DetailAppointmentPage(appointmentData: appointmentData);
+        final appointmentId = state.extra as int;
+        return DetailAppointmentPage(appointmentId: appointmentId);
       },
     ),
     GoRoute(

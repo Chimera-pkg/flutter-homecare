@@ -63,14 +63,14 @@ class ProfessionalDetailsPage extends StatelessWidget {
       child: Column(
         children: [
           _buildProfileHeader(professional),
-          const SizedBox(height: 32),
+          const SizedBox(height: 16),
           _buildStatsRow(professional),
           const SizedBox(height: 32),
           _buildAboutMe(professional),
           const SizedBox(height: 32),
           _buildWorkingInfo(professional),
           const SizedBox(height: 32),
-          _buildCertifications(professional),
+          _buildCertificates(professional),
           const SizedBox(height: 32),
           _buildReviews(professional.reviews),
           const SizedBox(height: 80), // Padding for bottom nav bar
@@ -83,6 +83,7 @@ class ProfessionalDetailsPage extends StatelessWidget {
     return Column(
       children: [
         Stack(
+          clipBehavior: Clip.none,
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8.0),
@@ -101,12 +102,12 @@ class ProfessionalDetailsPage extends StatelessWidget {
               ),
             ),
             const Positioned(
-              bottom: 0,
-              right: 0,
+              top: -8,
+              right: -8,
               child: Icon(
                 Icons.circle,
-                color: Colors.green,
-                size: 20,
+                color: Color(0xFF8EF4BC),
+                size: 16,
               ),
             ),
           ],
@@ -135,6 +136,7 @@ class ProfessionalDetailsPage extends StatelessWidget {
       children: [
         const Expanded(
           child: Card(
+            elevation: 4,
             child: Padding(
               padding: EdgeInsets.all(8.0),
               child: Column(
@@ -155,12 +157,13 @@ class ProfessionalDetailsPage extends StatelessWidget {
         ),
         Expanded(
           child: Card(
+            elevation: 4,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
                   Text(
-                    '${professional.experience} Year',
+                    '${professional.experience} Y+',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -175,6 +178,7 @@ class ProfessionalDetailsPage extends StatelessWidget {
         ),
         Expanded(
           child: Card(
+            elevation: 4,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
@@ -182,6 +186,10 @@ class ProfessionalDetailsPage extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      const Icon(
+                        Icons.star_rounded,
+                        color: Color(0xFFEEB854),
+                      ),
                       Text(
                         professional.rating.toString(),
                         style: const TextStyle(
@@ -189,10 +197,6 @@ class ProfessionalDetailsPage extends StatelessWidget {
                           fontSize: 16,
                           color: Const.tosca,
                         ),
-                      ),
-                      const Icon(
-                        Icons.star,
-                        color: Colors.yellow,
                       ),
                     ],
                   ),
@@ -268,21 +272,25 @@ class ProfessionalDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCertifications(ProfessionalEntity professional) {
+  Widget _buildCertificates(ProfessionalEntity professional) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Professional Certification',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
+        const Row(
+          children: [
+            Text(
+              'Professional Certificate',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+          ],
         ),
         if (professional.certificates.isEmpty)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 8.0),
-            child: Text('No certifications available.'),
+            child: Text('No certificate available.'),
           )
         else
           Column(
@@ -355,7 +363,7 @@ class ProfessionalDetailsPage extends StatelessWidget {
           )
         else
           Column(
-            children: reviews.take(3).map((review) {
+            children: reviews.map((review) {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Column(

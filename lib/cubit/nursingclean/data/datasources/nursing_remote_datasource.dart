@@ -129,18 +129,23 @@ class NursingRemoteDataSourceImpl implements NursingRemoteDataSource {
 
   @override
   Future<void> updateNursingCase(String id, Map<String, dynamic> data) async {
+    log('Updating nursing case with id $id and data: $data',
+        name: 'NursingRemoteDataSourceImpl');
     final token = await Utils.getSpString(Const.TOKEN);
-    final url = '${Const.API_PERSONAL_CASES}/$id';
+    final url = '${Const.API_NURSING_PERSONAL_CASES}/$id';
+    final payload = FormData.fromMap(data);
 
     final response = await dio.put(
       url,
-      data: data,
+      data: payload,
       options: Options(
         headers: {
           'Authorization': 'Bearer $token',
         },
       ),
     );
+    log('Response status: ${response.statusCode}, data: ${response.data}',
+        name: 'NursingRemoteDataSourceImpl');
 
     if (response.statusCode != 200) {
       throw Exception('Failed to update issue: ${response.statusMessage}');

@@ -3,15 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/cubit/appointment/bloc/appointment_cubit.dart';
-import 'package:m2health/main.dart';
 import 'package:m2health/route/app_routes.dart';
-import 'package:m2health/cubit/appointment/appointment_detail_page.dart';
 
 class PaymentPage extends StatefulWidget {
   final int appointmentId;
   final Map<String, dynamic> profileServiceData;
 
-  PaymentPage({required this.appointmentId, required this.profileServiceData});
+  const PaymentPage({super.key, required this.appointmentId, required this.profileServiceData});
 
   @override
   _PaymentPageState createState() => _PaymentPageState();
@@ -223,7 +221,7 @@ class PaymentSuccessDialog extends StatelessWidget {
   final int totalCost;
   final String pharmacistName;
 
-  PaymentSuccessDialog({required this.totalCost, required this.pharmacistName});
+  const PaymentSuccessDialog({super.key, required this.totalCost, required this.pharmacistName});
 
   @override
   Widget build(BuildContext context) {
@@ -317,7 +315,7 @@ class PaymentSuccessDialog extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () {
                 context.go(AppRoutes.appointment);
-                context.read<AppointmentCubit>().fetchAppointments();
+                context.read<AppointmentCubit>().refreshAllTabs();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Const.tosca,
@@ -341,7 +339,7 @@ class PaymentSuccessDialog extends StatelessWidget {
 class FeedbackForm extends StatefulWidget {
   final String pharmacistName;
 
-  FeedbackForm({required this.pharmacistName});
+  const FeedbackForm({super.key, required this.pharmacistName});
 
   @override
   _FeedbackFormState createState() => _FeedbackFormState();
@@ -543,6 +541,8 @@ class _FeedbackFormState extends State<FeedbackForm> {
 }
 
 class FeedbackDetails extends StatelessWidget {
+  const FeedbackDetails({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

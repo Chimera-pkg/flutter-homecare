@@ -15,12 +15,14 @@ import 'package:m2health/cubit/nursingclean/domain/usecases/get_nursing_services
 import 'package:m2health/cubit/nursingclean/domain/usecases/get_professional_detail.dart';
 import 'package:m2health/cubit/nursingclean/domain/usecases/get_professionals.dart';
 import 'package:m2health/cubit/nursingclean/domain/usecases/toggle_favorite.dart';
+import 'package:m2health/cubit/nursingclean/domain/usecases/update_nursing_case.dart';
 
 void initNursingModule(GetIt sl) {
   // Use cases
   sl.registerLazySingleton(() => GetNursingServices(sl()));
   sl.registerLazySingleton(() => GetNursingCase(sl()));
   sl.registerLazySingleton(() => CreateNursingCase(sl()));
+  sl.registerLazySingleton(() => UpdateNursingCase(sl()));
   sl.registerLazySingleton(() => GetProfessionals(sl()));
   sl.registerLazySingleton(() => GetProfessionalDetail(sl()));
   sl.registerLazySingleton(() => ToggleFavorite(sl()));

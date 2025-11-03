@@ -1,527 +1,131 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/cubit/appointment/bloc/appointment_cubit.dart';
+import 'package:m2health/cubit/appointment/bloc/appointment_detail_cubit.dart';
+import 'package:m2health/cubit/appointment/models/appointment.dart';
 import 'package:m2health/cubit/appointment/widgets/cancel_appoinment_dialog.dart';
-import 'package:m2health/route/app_routes.dart';
-import 'package:m2health/utils.dart';
 import 'package:dio/dio.dart';
-import 'package:m2health/views/payment.dart';
-import 'package:m2health/models/profile.dart';
+import 'package:m2health/cubit/profiles/domain/entities/profile.dart';
 import 'package:m2health/models/personal_case.dart';
-import 'dart:convert';
-import 'package:provider/provider.dart';
+import 'package:m2health/widgets/gradient_button.dart'; // Assuming you have this
 
 class DetailAppointmentPage extends StatefulWidget {
-  final Map<String, dynamic> appointmentData;
+  final int appointmentId;
 
-  const DetailAppointmentPage({super.key, required this.appointmentData});
+  const DetailAppointmentPage({super.key, required this.appointmentId});
 
   @override
   State<DetailAppointmentPage> createState() => _DetailAppointmentPageState();
 }
 
 class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
-  bool _isExpanded = false;
-  Profile? _profile;
-  PersonalCase? _personalCase;
-  String? _errorMessage;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchProfile();
-    _fetchPersonalCase();
-  }
-
-  Future<void> _fetchProfile() async {
-    try {
-      final token = await Utils.getSpString(Const.TOKEN);
-      if (token == null) {
-        throw Exception('Token is null');
-      }
-
-      final response = await Dio().get(
-        '${Const.URL_API}/profiles',
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-          },
-        ),
-      );
-
-      if (response.statusCode == 200) {
-        final profileData = response.data['data'];
-        if (profileData is Map<String, dynamic>) {
-          final profile = Profile.fromJson(profileData);
-          setState(() {
-            _profile = profile;
-          });
-        } else {
-          throw Exception('Unexpected response format');
-        }
-      } else if (response.statusCode == 401) {
-        throw Exception('Unauthorized');
-      } else {
-        throw Exception('Failed to load profile');
-      }
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Failed to load profile: $e';
-      });
-      print('Error: $e');
-    }
-  }
-
-  Future<void> _fetchPersonalCase() async {
-    try {
-      final token = await Utils.getSpString(Const.TOKEN);
-      if (token == null) {
-        throw Exception('Token is null');
-      }
-
-      final response = await Dio().get(
-        Const.API_PERSONAL_CASES,
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-          },
-        ),
-      );
-
-      if (response.statusCode == 200) {
-        // Ensure response.data is a Map before accessing 'data'
-        if (response.data is! Map<String, dynamic>) {
-          throw Exception('Unexpected response format');
-        }
-
-        final Map<String, dynamic> responseData = response.data;
-        final List<dynamic> data =
-            responseData['data'] ?? []; // Handle missing 'data' key safely
-
-        final descriptions = data
-            .whereType<Map<String, dynamic>>() // Ensure every item is a map
-            .map((item) =>
-                item['description'] as String? ??
-                'No description') // Handle null safely
-            .toList();
-
-        final addOns = data
-            .whereType<Map<String, dynamic>>() // Ensure every item is a map
-            .map((item) =>
-                item['add_on'] as String? ?? 'No add-on') // Handle null safely
-            .toList();
-
-        setState(() {
-          _personalCase = PersonalCase(
-            id: 0,
-            title: '',
-            description: descriptions.join(', '),
-            images: [],
-            mobilityStatus: '',
-            relatedHealthRecord: {},
-            addOn: addOns.isNotEmpty ? addOns.last : '',
-            estimatedBudget: 0.0,
-            userId: 0,
-          );
-        });
-
-        print('Personal case data: ${descriptions.join(', ')}');
-      } else {
-        throw Exception('Failed to load personal case: ${response.statusCode}');
-      }
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Failed to load personal case: $e';
-      });
-      print('Error: $e');
-    }
-  }
-
-  Future<void> _submitAppointment() async {
-    try {
-      final token = await Utils.getSpString(Const.TOKEN);
-      if (token == null) {
-        throw Exception('Token is null');
-      }
-
-      // Print the data being submitted
-      print('Data being submitted: ${jsonEncode(widget.appointmentData)}');
-
-      final response = await Dio().post(
-        Const.API_APPOINTMENT,
-        data: jsonEncode(widget.appointmentData), // Convert to JSON string
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Content-Type': 'application/json', // Set content type to JSON
-          },
-        ),
-      );
-
-      if (response.statusCode == 200) {
-        final responseData = response.data;
-        if (responseData != null && responseData['data'] != null) {
-          // Handle successful submission
-          print('Appointment created successfully');
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PaymentPage(
-                appointmentId: responseData['data']['id'],
-                profileServiceData:
-                    widget.appointmentData['profile_services_data'],
-              ),
-            ),
-          );
-        } else {
-          throw Exception('Invalid response data');
-        }
-      } else {
-        print('Error: ${response.statusCode} - ${response.statusMessage}');
-        throw Exception('Failed to create appointment');
-      }
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Failed to create appointment: $e';
-      });
-      print('Error: $e');
-    }
-  }
+  bool _isConcernExpanded = false;
 
   @override
   Widget build(BuildContext context) {
-    final profile = widget.appointmentData['profile_services_data'];
-    final addOnServices = _personalCase?.addOn ?? '';
-    final serviceCost = 10; // Dummy cost for each service
-    final totalCost =
-        serviceCost; // Since add_on is a single string, total cost is serviceCost
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(profile['name']),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (_errorMessage != null)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  _errorMessage!,
-                  style: const TextStyle(color: Colors.red),
-                ),
-              ),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8.0),
-                        image: DecorationImage(
-                          image: NetworkImage(profile['avatar']),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          profile['name'],
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            const Icon(Icons.location_on, color: Colors.blue),
-                            const SizedBox(width: 4),
-                            Text(profile['maps_location']),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.yellow),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            widget.appointmentData['status'],
-                            style: const TextStyle(color: Colors.orange),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Schedule Appointment',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Icon(Icons.calendar_today, color: Colors.grey),
-                const SizedBox(width: 8),
-                Text(
-                  _formatDate(
-                      widget.appointmentData['date']), // Use the formatted date
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Icon(Icons.access_time, color: Colors.grey),
-                const SizedBox(width: 8),
-                Text(widget.appointmentData['hour']),
-              ],
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Patient Information',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(height: 8),
-            if (_profile != null) ...[
-              ListTile(
-                title: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(
-                      width: 100, // Set a fixed width for the label
-                      child: Text('Full Name: '),
-                    ),
-                    Flexible(
-                      child: Text(_profile!.username),
-                    ),
-                  ],
-                ),
-              ),
-              ListTile(
-                title: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(
-                      width: 100, // Set a fixed width for the label
-                      child: Text('Age: '),
-                    ),
-                    Flexible(
-                      child: Text(_profile!.age.toString()),
-                    ),
-                  ],
-                ),
-              ),
-              ListTile(
-                title: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(
-                      width: 100, // Set a fixed width for the label
-                      child: Text('Gender: '),
-                    ),
-                    Flexible(
-                      child: Text(_profile!.gender),
-                    ),
-                  ],
-                ),
-              ),
-              ListTile(
-                title: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(
-                          width: 100, // Set a fixed width for the label
-                          child: Text('Problem: '),
-                        ),
-                        Flexible(
-                          child: Text(
-                            _isExpanded
-                                ? '${_personalCase?.description ?? ''} '
-                                : '${_personalCase?.description ?? ''} ',
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (!_isExpanded)
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _isExpanded = true;
-                          });
-                        },
-                        child: const Text(
-                          'View More',
-                          style: TextStyle(color: Colors.blue),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              ListTile(
-                title: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(
-                      width: 100, // Set a fixed width for the label
-                      child: Text('Address: '),
-                    ),
-                    Flexible(
-                      child: Text(_profile!.homeAddress),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-            const SizedBox(height: 16),
-            const Card(
-              child: SizedBox(
-                height: 200,
-                child: Center(
-                  child: Text('Google Map Placeholder'),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Services',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              addOnServices,
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 16),
-            const SizedBox(height: 16),
-            const Row(
-              children: [
-                Text(
-                  'Estimated Budget',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-                SizedBox(width: 8),
-                Icon(Icons.info_outline_rounded, color: Colors.grey),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Column(
-              children: [
-                Row(
-                  children: [
-                    const SizedBox(width: 8),
-                    Text(addOnServices),
-                    const Spacer(),
-                    Text('\$$serviceCost'),
-                  ],
-                ),
-                const Divider(),
-                Row(
-                  children: [
-                    const Text(
-                      'Total',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                    const Spacer(),
-                    const Icon(Icons.attach_money, color: Colors.green),
-                    Text(
-                      '\$$totalCost',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
+    return BlocProvider(
+      // Use context.read<Dio>() assuming Dio is provided in your main app
+      create: (context) => AppointmentDetailCubit(context.read<Dio>())
+        ..fetchAppointmentDetail(widget.appointmentId),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'Appointment Detail',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        ),
+        body: BlocConsumer<AppointmentDetailCubit, AppointmentDetailState>(
+          listener: (context, state) {
+            // You can show SnackBars here on error if needed
+          },
+          builder: (context, state) {
+            if (state is AppointmentDetailLoading ||
+                state is AppointmentDetailInitial) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (state is AppointmentDetailError) {
+              return Center(child: Text('Error: ${state.message}'));
+            }
+            if (state is AppointmentDetailLoaded) {
+              return _buildContent(context, state.appointment, state.profile);
+            }
+            return const Center(child: Text('Something went wrong.'));
+          },
+        ),
+        // Use bottomNavigationBar for the action buttons
+        bottomNavigationBar:
+            BlocBuilder<AppointmentDetailCubit, AppointmentDetailState>(
+          builder: (context, state) {
+            if (state is AppointmentDetailLoaded) {
+              return _buildActionButtons(context, state.appointment);
+            }
+            return const SizedBox.shrink();
+          },
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+    );
+  }
+
+  Widget _buildContent(
+      BuildContext context, Appointment appointment, Profile profile) {
+    final personalCase = appointment.personalCase;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildProviderCard(appointment.provider, appointment.status),
+          const SizedBox(height: 16),
+          _buildScheduleCard(appointment),
+          const SizedBox(height: 16),
+          _buildPatientInfo(profile),
+          const SizedBox(height: 16),
+          _buildConcernInfo(personalCase),
+          const SizedBox(height: 16),
+          _buildPaymentSummary(appointment),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProviderCard(AppointmentProvider? provider, String status) {
+    if (provider == null) return const SizedBox.shrink();
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
           children: [
-            SizedBox(
-              width: double.infinity, // Set the width to fill the parent
-              height: 50, // Set a fixed height
-              child: ElevatedButton(
-                onPressed: _submitAppointment,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF35C5CF),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                ),
-                child: const Text(
-                  'Submit',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
+            CircleAvatar(
+              radius: 30,
+              backgroundImage:
+                  (provider.avatar != null && provider.avatar!.isNotEmpty)
+                      ? NetworkImage(provider.avatar!)
+                      : null,
+              child: (provider.avatar == null || provider.avatar!.isEmpty)
+                  ? const Icon(Icons.person, size: 30, color: Colors.grey)
+                  : null,
             ),
-            const SizedBox(height: 8),
-            SizedBox(
-              width: double.infinity, // Set the width to fill the parent
-              height: 50, // Set a fixed height
-              child: ElevatedButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return CancelAppoinmentDialog(onPressYes: () {
-                        context
-                            .read<AppointmentCubit>()
-                            .cancelAppointment(widget.appointmentData['id']);
-                        GoRouter.of(context).go(AppRoutes.appointment);
-                      });
-                    },
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      Colors.red, // Set the background color to red
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    provider.name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
-                ),
-                child: const Text(
-                  'Cancel',
-                  style: TextStyle(color: Colors.white),
-                ),
+                  if (provider.jobTitle != null) Text(provider.jobTitle!),
+                  const SizedBox(height: 8),
+                  _StatusTag(status: status),
+                ],
               ),
             ),
           ],
@@ -529,15 +133,438 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
       ),
     );
   }
+
+  Widget _buildScheduleCard(Appointment appointment) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Schedule Appointment',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+          const SizedBox(height: 16),
+          _InfoRow(
+            icon: Icons.calendar_today,
+            text: _formatDate(appointment.date),
+          ),
+          const SizedBox(height: 12),
+          _InfoRow(
+            icon: Icons.access_time,
+            text: appointment.hour,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPatientInfo(Profile profile) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Patient Information',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+          const SizedBox(height: 16),
+          _InfoRow(label: 'Full name', text: profile.name),
+          const SizedBox(height: 12),
+          _InfoRow(label: 'Age', text: '${profile.age} years old'),
+          const SizedBox(height: 12),
+          _InfoRow(label: 'Gender', text: profile.gender ?? 'N/A'),
+          const SizedBox(height: 12),
+          _InfoRow(
+            label: 'Address',
+            text: profile.homeAddress ?? 'N/A',
+            isFlexible: true,
+          ),
+          const SizedBox(height: 12),
+          // Placeholder for map
+          const Card(
+            child: SizedBox(
+              height: 200,
+              child: Center(
+                child: Text('Google Map Placeholder'),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildConcernInfo(PersonalCase? personalCase) {
+    if (personalCase == null) return const SizedBox.shrink();
+    final description = personalCase.description;
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Patient Problem',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            personalCase.title,
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+            ),
+          ),
+          Text(
+            description,
+            maxLines: _isConcernExpanded ? null : 2,
+            overflow: _isConcernExpanded
+                ? TextOverflow.visible
+                : TextOverflow.ellipsis,
+          ),
+          if (_isConcernExpanded)
+            Row(
+              children: personalCase.images.map((imageUrl) {
+                return Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Image.network(
+                    imageUrl,
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.cover,
+                  ),
+                );
+              }).toList(),
+            ),
+          InkWell(
+            onTap: () {
+              setState(() {
+                _isConcernExpanded = !_isConcernExpanded;
+              });
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(top: 4.0),
+              child: Text(
+                _isConcernExpanded ? 'View Less' : 'View More',
+                style: const TextStyle(
+                  color: Const.aqua,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPaymentSummary(Appointment appointment) {
+    final addOns = appointment.personalCase?.addOn ?? [];
+    final total = appointment.payTotal;
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Payment Details',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+          const SizedBox(height: 8),
+          if (appointment.payment != null) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Text('Payment Method'),
+                const Spacer(),
+                Text(appointment.payment!.method),
+              ],
+            ),
+          ],
+          const Divider(height: 16),
+          const Text(
+            'Services',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          if (addOns.isEmpty)
+            const Text('No add-on services selected.')
+          else
+            ...addOns.map(
+              (addOn) => Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Row(
+                  children: [
+                    Expanded(child: Text(addOn.name)),
+                    const SizedBox(width: 16),
+                    Text('${addOn.price}'),
+                  ],
+                ),
+              ),
+            ),
+          const Divider(height: 16),
+          Row(
+            children: [
+              const Text(
+                'Total',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '$total',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: Const.aqua,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- ACTION BUTTONS ---
+
+  Widget _buildActionButtons(BuildContext context, Appointment appointment) {
+    final status = appointment.status.toLowerCase();
+
+    // Define Buttons
+    Widget bookAgainButton = Expanded(
+      child: GradientButton(
+        text: 'Book Again',
+        onPressed: () {
+          // TODO: Handle Book Again logic
+          // This should likely navigate to the nursing flow
+          // context.push(AppRoutes.nursingFlowStart);
+        },
+      ),
+    );
+
+    Widget cancelButton = Expanded(
+      child: OutlinedButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext dialogContext) {
+              return CancelAppoinmentDialog(
+                onPressYes: () {
+                  // Call the list cubit to update the list
+                  context
+                      .read<AppointmentCubit>()
+                      .cancelAppointment(appointment.id);
+                  // Pop dialog
+                  Navigator.of(dialogContext).pop();
+                  // Pop detail page
+                  context.pop();
+                },
+              );
+            },
+          );
+        },
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: Colors.red),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+        ),
+        child: const Text(
+          'Cancel Booking',
+          style: TextStyle(
+            color: Colors.red,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+
+    Widget rescheduleButton = Expanded(
+      child: GradientButton(
+        text: 'Reschedule',
+        gradient: const LinearGradient(
+          colors: [Color(0xFF35C5CF), Color(0xFF9DCEFF)],
+          begin: Alignment.bottomRight,
+          end: Alignment.topLeft,
+        ),
+        onPressed: () {
+          // TODO: Handle Reschedule logic
+          // This should navigate to the booking page with provider info
+        },
+      ),
+    );
+
+    Widget rateButton = Expanded(
+      child: OutlinedButton(
+        onPressed: () {
+          // TODO: Handle Rating logic
+          // This should show a rating dialog or page
+        },
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: Const.tosca),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+        ),
+        child: const Text(
+          'Rating',
+          style: TextStyle(
+            color: Const.tosca,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+
+    // Logic to select buttons
+    List<Widget> buttons;
+    switch (status) {
+      case 'pending':
+      case 'accepted': // "Upcoming"
+        buttons = [cancelButton, const SizedBox(width: 16), rescheduleButton];
+        break;
+      case 'completed':
+        buttons = [rateButton, const SizedBox(width: 16), bookAgainButton];
+        break;
+      case 'cancelled':
+        buttons = [bookAgainButton]; // Only "Book Again"
+        break;
+      default:
+        buttons = [];
+    }
+
+    if (buttons.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    // Return the button bar
+    return Container(
+      padding: const EdgeInsets.all(8.0).copyWith(
+        top: 16.0,
+        bottom: 16.0 +
+            MediaQuery.of(context).padding.bottom, // Respect the safe area
+      ),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10,
+            offset: Offset(0, -2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: buttons,
+      ),
+    );
+  }
+
+  // --- HELPER WIDGETS ---
+
+  String _formatDate(String date) {
+    try {
+      final DateTime parsedDate = DateTime.parse(date);
+      return DateFormat('EEEE, MMMM dd, yyyy').format(parsedDate);
+    } catch (e) {
+      return date; // Fallback to original string
+    }
+  }
 }
 
-String _formatDate(String date) {
-  try {
-    final DateTime parsedDate = DateTime.parse(date); // Parse the date string
-    return DateFormat('EEEE, dd MMMM yyyy')
-        .format(parsedDate); // Format as "Day, Date"
-  } catch (e) {
-    print('Error parsing date: $e');
-    return 'Invalid Date'; // Fallback in case of an error
+class _InfoRow extends StatelessWidget {
+  final String text;
+  final IconData? icon;
+  final String? label;
+  final bool isFlexible;
+
+  const _InfoRow({
+    required this.text,
+    this.icon,
+    this.label,
+    this.isFlexible = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Widget textWidget = Text(text, style: const TextStyle(fontSize: 14));
+
+    return Row(
+      crossAxisAlignment:
+          isFlexible ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+      children: [
+        if (icon != null) ...[
+          Icon(icon, color: Const.aqua, size: 20),
+          const SizedBox(width: 16),
+        ],
+        if (label != null) ...[
+          SizedBox(
+            width: 80,
+            child: Text(label!),
+          ),
+          const SizedBox(width: 8, child: Text(':')),
+          const SizedBox(width: 2),
+        ],
+        isFlexible ? Flexible(child: textWidget) : textWidget,
+      ],
+    );
+  }
+}
+
+class _StatusTag extends StatelessWidget {
+  final String status;
+  const _StatusTag({required this.status});
+
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return Colors.green;
+      case 'cancelled':
+        return Colors.red;
+      case 'pending':
+      case 'accepted':
+        return const Color(0xFFE59500); // Orange
+      default:
+        return Colors.grey;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _getStatusColor(status);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        status,
+        style: TextStyle(
+          color: color,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
   }
 }

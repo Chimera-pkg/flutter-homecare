@@ -65,6 +65,7 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
                                 Column(
                                   children: [
                                     Stack(
+                                      clipBehavior: Clip.none,
                                       children: [
                                         Container(
                                           width: 50,
@@ -103,12 +104,12 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
                                           ),
                                         ),
                                         const Positioned(
-                                          bottom: 36,
-                                          right: 3,
+                                          top: -6,
+                                          right: -6,
                                           child: Icon(
                                             Icons.circle,
-                                            color: Colors.green,
-                                            size: 14,
+                                            color: Color(0xFF8EF4BC),
+                                            size: 12,
                                           ),
                                         ),
                                       ],

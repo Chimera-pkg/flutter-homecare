@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2health/cubit/appointment/appointment_module.dart';
 import 'package:m2health/main.dart';

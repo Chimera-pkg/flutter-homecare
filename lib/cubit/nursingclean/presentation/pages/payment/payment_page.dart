@@ -350,7 +350,7 @@ class PaymentSuccessDialog extends StatelessWidget {
             height: 50,
             child: ElevatedButton(
               onPressed: () {
-                context.read<AppointmentCubit>().fetchAppointments();
+                context.read<AppointmentCubit>().refreshAllTabs();
                 context.go(AppRoutes.appointment);
               },
               style: ElevatedButton.styleFrom(

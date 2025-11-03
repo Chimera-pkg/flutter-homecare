@@ -131,7 +131,7 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
             images: [],
             mobilityStatus: '',
             relatedHealthRecord: {},
-            addOn: addOns.isNotEmpty ? addOns.last : '',
+            addOn: [],
             estimatedBudget: 0.0,
             userId: 0,
           );
@@ -293,7 +293,9 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
       profile = {};
     }
 
-    final addOnServices = _personalCase?.addOn ?? 'No additional services';
+    final addOnServices =
+        _personalCase?.addOn.map((e) => e.toString()).join(', ') ??
+            'No additional services selected';
     final serviceCost = 10;
     final totalCost = serviceCost;
 

@@ -99,6 +99,7 @@ void main() async {
             getNursingAddOnServices: sl<GetNursingAddOnServices>(),
             addNursingIssue: sl(),
             deleteNursingIssue: sl(),
+            updateNursingCase: sl(),
           ),
         ),
         BlocProvider(

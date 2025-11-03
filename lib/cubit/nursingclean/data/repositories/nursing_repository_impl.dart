@@ -105,7 +105,7 @@ class NursingRepositoryImpl implements NursingRepository {
         images: issue.images,
         mobilityStatus: currentCase.mobilityStatus?.apiValue,
         careType: currentCase.careType,
-        addOn: currentCase.addOnServices.map((e) => e.name).join(', '),
+        addOn: currentCase.addOnServices,
         estimatedBudget: currentCase.estimatedBudget,
         relatedHealthRecordId: currentCase.relatedHealthRecordId,
       );
