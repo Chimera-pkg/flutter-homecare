@@ -1,22 +1,32 @@
 import 'package:equatable/equatable.dart';
 import 'package:m2health/cubit/profiles/domain/entities/certificate.dart';
 
-class ProfessionalDetail extends Equatable {
+class ProfessionalProfile extends Equatable {
   final int id;
-  final String jobTitle;
-  final String aboutMe;
-  final String workingHours;
-  final String workPlace;
+  final int userId;
+  final String? name;
+  final String? avatar;
+  final int? experience;
+  final double? rating;
+  final String? about;
+  final String? jobTitle;
+  final String? workingHours;
+  final String? workPlace;
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final List<Certificate> certificates;
 
-  const ProfessionalDetail({
+  const ProfessionalProfile({
     required this.id,
-    required this.jobTitle,
-    required this.aboutMe,
-    required this.workingHours,
-    required this.workPlace,
+    required this.userId,
+    this.name,
+    this.avatar,
+    this.experience,
+    this.rating,
+    this.about,
+    this.jobTitle,
+    this.workingHours,
+    this.workPlace,
     this.createdAt,
     this.updatedAt,
     this.certificates = const [],
@@ -25,30 +35,46 @@ class ProfessionalDetail extends Equatable {
   @override
   List<Object?> get props => [
         id,
+        userId,
+        name,
+        avatar,
+        experience,
+        rating,
+        about,
         jobTitle,
-        aboutMe,
         workingHours,
         workPlace,
         createdAt,
         updatedAt,
+        certificates,
       ];
 
-  ProfessionalDetail copyWith({
+  ProfessionalProfile copyWith({
     int? id,
+    int? userId,
+    String? name,
+    String? avatar,
+    int? experience,
+    double? rating,
+    String? about,
     String? jobTitle,
-    String? aboutMe,
     String? workingHours,
     String? workPlace,
     DateTime? createdAt,
     DateTime? updatedAt,
     List<Certificate>? certificates,
   }) {
-    return ProfessionalDetail(
+    return ProfessionalProfile(
       id: id ?? this.id,
+      name: name ?? this.name,
+      avatar: avatar ?? this.avatar,
+      experience: experience ?? this.experience,
+      rating: rating ?? this.rating,
+      about: about ?? this.about,
       jobTitle: jobTitle ?? this.jobTitle,
-      aboutMe: aboutMe ?? this.aboutMe,
       workingHours: workingHours ?? this.workingHours,
       workPlace: workPlace ?? this.workPlace,
+      userId: userId ?? this.userId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       certificates: certificates ?? this.certificates,

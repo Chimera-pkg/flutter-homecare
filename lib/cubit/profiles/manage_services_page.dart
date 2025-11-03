@@ -147,6 +147,7 @@ class _ManageServicesPageState extends State<ManageServicesPage>
           isScrollable: true,
           labelColor: Const.aqua,
           indicatorColor: Const.aqua,
+          tabAlignment: TabAlignment.start,
           tabs: serviceTabs.map((tab) => Tab(text: tab['display'])).toList(),
         ),
       ),

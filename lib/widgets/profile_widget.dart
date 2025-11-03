@@ -23,7 +23,7 @@ class ProfileAvatarWidget extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(borderRadius),
         child: Image.network(
-          avatarUrl!,
+          avatarUrl ?? '',
           width: size,
           height: size,
           fit: BoxFit.cover,

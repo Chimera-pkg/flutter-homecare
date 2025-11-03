@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:m2health/cubit/pharmacogenomics/presentation/pharmagenomical_pages.dart';
+import 'package:m2health/cubit/profiles/domain/entities/professional_profile.dart';
 import 'package:m2health/cubit/profiles/domain/entities/profile.dart';
 import 'package:m2health/cubit/profiles/manage_services_page.dart';
 import 'package:m2health/cubit/profiles/presentation/pages/edit_lifestyle_n_selfcare_page.dart';
@@ -67,7 +68,7 @@ class ProfileDetailRoutes {
     GoRoute(
       path: AppRoutes.editProfessionalProfile,
       builder: (context, state) {
-        Profile profile = state.extra as Profile;
+        ProfessionalProfile profile = state.extra as ProfessionalProfile;
         return EditProfessionalProfilePage(profile: profile);
       },
     ),

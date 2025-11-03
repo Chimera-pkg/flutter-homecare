@@ -6,7 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/cubit/profiles/domain/entities/certificate.dart';
-import 'package:m2health/cubit/profiles/domain/entities/profile.dart';
+import 'package:m2health/cubit/profiles/domain/entities/professional_profile.dart';
 import 'package:m2health/cubit/profiles/domain/usecases/index.dart';
 import 'package:m2health/cubit/profiles/presentation/bloc/certificate_cubit.dart';
 import 'package:m2health/cubit/profiles/presentation/bloc/certificate_state.dart';
@@ -15,7 +15,7 @@ import 'package:m2health/cubit/profiles/presentation/bloc/profile_state.dart';
 import 'package:m2health/cubit/profiles/presentation/widgets/add_edit_certificate_dialog.dart';
 
 class EditProfessionalProfilePage extends StatefulWidget {
-  final Profile profile;
+  final ProfessionalProfile profile;
   const EditProfessionalProfilePage({super.key, required this.profile});
 
   @override
@@ -29,7 +29,7 @@ class _EditProfessionalProfilePageState
   File? _selectedAvatar;
 
   // Controllers
-  late TextEditingController _usernameController;
+  late TextEditingController _nameController;
   late TextEditingController _aboutMeController;
   late TextEditingController _workHoursController;
   late TextEditingController _workplaceController;
@@ -39,19 +39,16 @@ class _EditProfessionalProfilePageState
   void initState() {
     super.initState();
     final p = widget.profile;
-    _usernameController = TextEditingController(text: p.username);
-    _aboutMeController =
-        TextEditingController(text: p.professionalDetail?.aboutMe ?? '');
-    _workHoursController =
-        TextEditingController(text: p.professionalDetail?.workingHours ?? '');
-    _workplaceController =
-        TextEditingController(text: p.professionalDetail?.workPlace ?? '');
-    _selectedJobTitle = p.professionalDetail?.jobTitle;
+    _nameController = TextEditingController(text: p.name ?? '');
+    _aboutMeController = TextEditingController(text: p.about ?? '');
+    _workHoursController = TextEditingController(text: p.workingHours ?? '');
+    _workplaceController = TextEditingController(text: p.workPlace ?? '');
+    _selectedJobTitle = p.jobTitle;
   }
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    _nameController.dispose();
     _aboutMeController.dispose();
     _workHoursController.dispose();
     _workplaceController.dispose();
@@ -68,25 +65,21 @@ class _EditProfessionalProfilePageState
 
   void _onSavePressed() {
     if (_formKey.currentState!.validate()) {
-      final params = UpdateProfileParams(
-        // Basic info
-        username: _usernameController.text,
+      final params = UpdateProfessionalProfileParams(
+        role: '', // Role will be injected by the cubit
+        name: _nameController.text,
         avatar: _selectedAvatar,
-        // Professional info
         jobTitle: _selectedJobTitle,
-        aboutMe: _aboutMeController.text,
+        about: _aboutMeController.text,
         workHours: _workHoursController.text,
         workPlace: _workplaceController.text,
       );
-      context.read<ProfileCubit>().updateProfile(params);
+      context.read<ProfileCubit>().updateProfessionalProfile(params);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final profile = widget.profile;
-    final professionalDetail = profile.professionalDetail;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -137,16 +130,15 @@ class _EditProfessionalProfilePageState
             padding: const EdgeInsets.all(16.0),
             children: [
               _AvatarSection(
-                avatarUrl: profile.avatar,
+                avatarUrl: widget.profile.avatar,
                 selectedImage: _selectedAvatar,
                 onTap: _pickImage,
               ),
               const SizedBox(height: 24),
-              _TextFieldWidget(
-                  controller: _usernameController, label: 'Full Name'),
+              _TextFieldWidget(controller: _nameController, label: 'Full Name'),
               const SizedBox(height: 16),
               _JobTitleDropdown(
-                currentJobTitle: professionalDetail?.jobTitle,
+                currentJobTitle: widget.profile.jobTitle,
                 onChanged: (value) {
                   setState(() {
                     _selectedJobTitle = value;
@@ -177,11 +169,14 @@ class _EditProfessionalProfilePageState
               const SizedBox(height: 24),
               BlocBuilder<ProfileCubit, ProfileState>(
                   builder: (context, state) {
-                final certifications = (state is ProfileLoaded)
-                    ? state.profile.professionalDetail?.certificates
-                    : widget.profile.professionalDetail?.certificates;
+                List<Certificate> certifications = [];
+                if (state is ProfessionalProfileLoaded) {
+                  certifications = state.profile.certificates;
+                } else {
+                  certifications = widget.profile.certificates;
+                }
                 return _CertificatesSection(
-                  certifications: certifications ?? [],
+                  certifications: certifications,
                   onAdd: _showAddCertificateDialog,
                   onEdit: _showEditCertificateDialog,
                   onRemove: _showDeleteConfirmationDialog,

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,12 +22,13 @@ class _EditBasicInfoPageState extends State<EditBasicInfoPage> {
   late Profile? profile;
   File? _selectedImage;
 
-  late TextEditingController _usernameController;
+  late TextEditingController _nameController;
   late TextEditingController _ageController;
   late TextEditingController _weightController;
   late TextEditingController _heightController;
   late TextEditingController _phoneController;
   late TextEditingController _addressController;
+  late TextEditingController _drugAllergyController;
   String? _selectedGender;
 
   final List<String> genderItems = ['Male', 'Female'];
@@ -33,10 +36,10 @@ class _EditBasicInfoPageState extends State<EditBasicInfoPage> {
   @override
   void initState() {
     super.initState();
-    profile = context.read<ProfileCubit>().state is ProfileLoaded
-        ? (context.read<ProfileCubit>().state as ProfileLoaded).profile
+    profile = context.read<ProfileCubit>().state is PatientProfileLoaded
+        ? (context.read<ProfileCubit>().state as PatientProfileLoaded).profile
         : null;
-    _usernameController = TextEditingController(text: profile?.username);
+    _nameController = TextEditingController(text: profile?.name);
     _ageController = TextEditingController(text: profile?.age?.toString());
     _weightController =
         TextEditingController(text: profile?.weight?.toString());
@@ -44,18 +47,20 @@ class _EditBasicInfoPageState extends State<EditBasicInfoPage> {
         TextEditingController(text: profile?.height?.toString());
     _phoneController = TextEditingController(text: profile?.phoneNumber);
     _addressController = TextEditingController(text: profile?.homeAddress);
+    _drugAllergyController = TextEditingController(text: profile?.drugAllergy);
     _selectedGender =
         genderItems.contains(profile?.gender) ? profile?.gender : null;
   }
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    _nameController.dispose();
     _ageController.dispose();
     _weightController.dispose();
     _heightController.dispose();
     _phoneController.dispose();
     _addressController.dispose();
+    _drugAllergyController.dispose();
     super.dispose();
   }
 
@@ -77,13 +82,14 @@ class _EditBasicInfoPageState extends State<EditBasicInfoPage> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       final params = UpdateProfileParams(
-        username: _usernameController.text,
+        name: _nameController.text,
         age: int.tryParse(_ageController.text),
         weight: double.tryParse(_weightController.text),
         height: double.tryParse(_heightController.text),
         phoneNumber: _phoneController.text,
         homeAddress: _addressController.text,
         gender: _selectedGender,
+        drugAllergy: _drugAllergyController.text,
         avatar: _selectedImage,
       );
       context.read<ProfileCubit>().updateProfile(params);
@@ -208,6 +214,16 @@ class _EditBasicInfoPageState extends State<EditBasicInfoPage> {
                   ),
                 const SizedBox(height: 30),
                 TextFormField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Name',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
                   controller: _ageController,
                   decoration: InputDecoration(
                     labelText: 'Age',
@@ -231,6 +247,7 @@ class _EditBasicInfoPageState extends State<EditBasicInfoPage> {
                       child: Text(value),
                     );
                   }).toList(),
+                  initialValue: _selectedGender,
                   onChanged: (newValue) {
                     setState(() {
                       _selectedGender = newValue;
@@ -279,6 +296,18 @@ class _EditBasicInfoPageState extends State<EditBasicInfoPage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: _drugAllergyController,
+                  decoration: InputDecoration(
+                    labelText: 'Drug Allergies',
+                    hintText: 'e.g. Penicillin, Aspirin',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  maxLines: 3,
                 ),
                 const SizedBox(height: 36),
               ],

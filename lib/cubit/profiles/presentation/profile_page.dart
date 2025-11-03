@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:m2health/const.dart';
+import 'package:m2health/cubit/profiles/domain/entities/professional_profile.dart';
 import 'package:m2health/cubit/profiles/domain/entities/profile.dart';
 import 'package:m2health/cubit/profiles/presentation/bloc/profile_cubit.dart';
 import 'package:m2health/cubit/profiles/presentation/bloc/profile_state.dart';
@@ -73,7 +74,10 @@ class _ProfilePageState extends State<ProfilePage> {
             builder: (context, state) {
               if (state is ProfileLoading) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (state is ProfileLoaded) {
+              }
+
+              //  --- Patient Profile ---
+              else if (state is PatientProfileLoaded) {
                 final Profile profile = state.profile;
                 return RefreshIndicator(
                   onRefresh: () async {
@@ -85,18 +89,50 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: Column(
                       children: [
                         _ProfileHeader(
-                          profile: profile,
+                          name: profile.name, // Updated
+                          avatarUrl: profile.avatar,
                           lastUpdated: formatDateTime(profile.updatedAt),
                         ),
                         const SizedBox(height: 16),
+                        if (isAdmin) ...[
+                          const _AdminSection(),
+                          const SizedBox(height: 16),
+                        ],
                         if (isPatient) ...[
                           const _ProfileInformationSection(),
                           const SizedBox(height: 16),
                           const _HealthRecordsSection(),
-                        ] else if (isProfessional)
-                          _ProfessionalProfileSection(profile: profile)
-                        else if (isAdmin)
-                          const _AdminSection(),
+                          const SizedBox(height: 16),
+                          const _AppointmentSection(),
+                          const SizedBox(height: 16),
+                        ],
+                        const _LogoutButton(),
+                        const SizedBox(height: 80)
+                      ],
+                    ),
+                  ),
+                );
+              }
+
+              // --- Professional Profile ---
+              else if (state is ProfessionalProfileLoaded) {
+                final ProfessionalProfile profile = state.profile;
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    _fetchData();
+                  },
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        _ProfileHeader(
+                          name: profile.name ?? 'N/A',
+                          avatarUrl: profile.avatar,
+                          lastUpdated: formatDateTime(profile.updatedAt),
+                        ),
+                        const SizedBox(height: 16),
+                        _ProfessionalProfileSection(profile: profile),
                         const SizedBox(height: 16),
                         const _AppointmentSection(),
                         const SizedBox(height: 16),
@@ -120,17 +156,22 @@ class _ProfilePageState extends State<ProfilePage> {
 }
 
 class _ProfileHeader extends StatelessWidget {
-  final Profile profile;
+  final String name;
+  final String? avatarUrl;
   final String lastUpdated;
 
-  const _ProfileHeader({required this.profile, required this.lastUpdated});
+  const _ProfileHeader({
+    required this.name,
+    this.avatarUrl,
+    required this.lastUpdated,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         ProfileAvatarWidget(
-          avatarUrl: profile.avatar,
+          avatarUrl: avatarUrl,
           size: 100,
           borderRadius: 10,
         ),
@@ -140,7 +181,7 @@ class _ProfileHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                profile.username,
+                name,
                 style:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
@@ -297,7 +338,7 @@ class _AppointmentSection extends StatelessWidget {
 }
 
 class _ProfessionalProfileSection extends StatelessWidget {
-  final Profile profile;
+  final ProfessionalProfile profile;
   const _ProfessionalProfileSection({required this.profile});
 
   @override
