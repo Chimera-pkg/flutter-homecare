@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/const.dart';
@@ -6,19 +5,18 @@ import 'package:m2health/cubit/nursingclean/domain/entities/nursing_issue.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/nursing_case_bloc.dart';
 import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/nursing_case_event.dart';
 import 'package:m2health/cubit/personal/personal_cubit.dart';
-import 'package:m2health/cubit/personal/personal_page.dart';
 import 'package:m2health/widgets/image_preview.dart';
-import 'package:m2health/utils.dart'; // Assuming Utils contains the method to get the token
 import 'dart:io';
 
 class AddConcernPage extends StatefulWidget {
+  const AddConcernPage({super.key});
   @override
-  _AddConcernPageState createState() => _AddConcernPageState();
+  State<AddConcernPage> createState() => _AddConcernPageState();
 }
 
 class _AddConcernPageState extends State<AddConcernPage> {
-  TextEditingController _issueTitleController = TextEditingController();
-  TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _issueTitleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
 
   final List<File?> _images = List.filled(3, null); // To hold up to 3 images
 
@@ -46,6 +44,7 @@ class _AddConcernPageState extends State<AddConcernPage> {
       title: issueTitle,
       description: description,
       images: _images.whereType<File>().toList(),
+      imageUrls: const [], // Set imageUrls to empty list
     );
 
     context.read<NursingCaseBloc>().add(AddNursingIssueEvent(newIssue));
@@ -98,7 +97,7 @@ class _AddConcernPageState extends State<AddConcernPage> {
               child: TextField(
                 controller: _issueTitleController,
                 decoration: InputDecoration(
-                  hintText: 'Issue Titless',
+                  hintText: 'Issue Title',
                   hintStyle:
                       const TextStyle(color: Color(0xFFD0D0D0), fontSize: 12),
                   border: OutlineInputBorder(
@@ -128,6 +127,7 @@ class _AddConcernPageState extends State<AddConcernPage> {
                 expands: true,
               ),
             ),
+            const SizedBox(height: 16.0),
             Padding(
               padding: const EdgeInsets.only(left: 12.0),
               child: Column(
@@ -147,17 +147,22 @@ class _AddConcernPageState extends State<AddConcernPage> {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
+        color: Colors.white,
         child: SizedBox(
           width: 352,
           height: 58,
           child: ElevatedButton(
             onPressed: _submitData,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF35C5CF),
+              backgroundColor: Const.aqua,
             ),
             child: const Text(
               'Add',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
@@ -172,7 +177,7 @@ void showAddConcernPage(BuildContext context) {
     isScrollControlled: true,
     builder: (context) => BlocProvider.value(
       value: context.read<PersonalCubit>(),
-      child: AddConcernPage(),
+      child: const AddConcernPage(),
     ),
   );
 }

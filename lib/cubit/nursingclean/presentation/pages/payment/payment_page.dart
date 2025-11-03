@@ -259,7 +259,8 @@ class PaymentSuccessDialog extends StatelessWidget {
   final double totalCost;
   final String pharmacistName;
 
-  const PaymentSuccessDialog({super.key, required this.totalCost, required this.pharmacistName});
+  const PaymentSuccessDialog(
+      {super.key, required this.totalCost, required this.pharmacistName});
 
   @override
   Widget build(BuildContext context) {
@@ -614,14 +615,7 @@ class FeedbackDetails extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context);
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AppointmentPage(),
-                      ),
-                    ).then((_) {
-                      MyApp.showBottomAppBar(context);
-                    });
+                    GoRouter.of(context).go(AppRoutes.appointment);
                   },
                   child: const Text(
                     'View Detail',

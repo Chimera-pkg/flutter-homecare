@@ -11,9 +11,9 @@ class AddOnServiceModel extends AddOnService {
   factory AddOnServiceModel.fromJson(Map<String, dynamic> json) {
     return AddOnServiceModel(
       id: json['id'],
-      name: json['name'],
-      description: json['description'],
+      name: json['title'],
       price: (json['price'] as num).toDouble(),
+      description: json['description'],
     );
   }
 }

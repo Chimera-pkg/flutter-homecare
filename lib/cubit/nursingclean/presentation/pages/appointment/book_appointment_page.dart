@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/const.dart';
@@ -42,6 +44,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
     }
 
     final nursingCaseState = context.read<NursingCaseBloc>().state;
+    log('nursingCaseState: $nursingCaseState', name: 'BookAppointmentPage');
     if (nursingCaseState is! NursingCaseLoaded) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Nursing case details are not ready.')),
@@ -187,7 +190,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          professional.mapsLocation,
+                          professional.workplace,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),

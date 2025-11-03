@@ -1,4 +1,6 @@
 import 'package:equatable/equatable.dart';
+import 'package:m2health/cubit/nursingclean/domain/entities/reviewer.dart';
+import 'package:m2health/cubit/profiles/domain/entities/certificate.dart';
 
 class ProfessionalEntity extends Equatable {
   final int id;
@@ -7,12 +9,13 @@ class ProfessionalEntity extends Equatable {
   final int experience;
   final double rating;
   final String about;
+  final String jobTitle;
   final String workingInformation;
-  final String daysHour;
-  final String mapsLocation;
-  final String certification;
+  final String workingHours;
+  final String workplace;
+  final List<Certificate> certificates;
+  final List<ReviewEntity> reviews;
   final int userId;
-  final dynamic user;
   final String createdAt;
   final String updatedAt;
   final bool isFavorite;
@@ -27,11 +30,12 @@ class ProfessionalEntity extends Equatable {
     required this.rating,
     required this.about,
     required this.workingInformation,
-    required this.daysHour,
-    required this.mapsLocation,
-    required this.certification,
+    required this.jobTitle,
+    required this.workingHours,
+    required this.workplace,
+    required this.certificates,
+    required this.reviews,
     required this.userId,
-    required this.user,
     required this.createdAt,
     required this.updatedAt,
     required this.isFavorite,
@@ -48,11 +52,12 @@ class ProfessionalEntity extends Equatable {
         rating,
         about,
         workingInformation,
-        daysHour,
-        mapsLocation,
-        certification,
+        jobTitle,
+        workingHours,
+        workplace,
+        certificates,
+        reviews,
         userId,
-        user,
         createdAt,
         updatedAt,
         isFavorite,

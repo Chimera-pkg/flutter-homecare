@@ -78,9 +78,8 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
           'rating': widget.professional.rating,
           'about': widget.professional.about,
           'working_information': widget.professional.workingInformation,
-          'days_hour': widget.professional.daysHour,
-          'maps_location': widget.professional.mapsLocation,
-          'certification': widget.professional.certification,
+          'working_hours': widget.professional.workingHours,
+          'workplace': widget.professional.workplace,
           'user_id': widget.professional.userId,
         },
       };
@@ -194,7 +193,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                             children: [
                               Icon(Icons.location_on, color: Colors.teal),
                               SizedBox(width: 4),
-                              Text(professional.mapsLocation),
+                              Text(professional.workplace),
                             ],
                           ),
                         ],

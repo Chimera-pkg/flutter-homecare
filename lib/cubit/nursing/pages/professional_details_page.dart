@@ -181,7 +181,7 @@ class ProfessionalDetailsPage extends StatelessWidget {
               children: [
                 const Icon(Icons.calendar_today, color: Colors.grey),
                 const SizedBox(width: 8),
-                Text(professional.daysHour),
+                Text(professional.workingHours),
               ],
             ),
             const SizedBox(height: 8),
@@ -192,7 +192,7 @@ class ProfessionalDetailsPage extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  professional.mapsLocation,
+                  professional.workplace,
                   style: const TextStyle(color: Colors.blue),
                 ),
               ],
@@ -317,9 +317,8 @@ class ProfessionalDetailsPage extends StatelessWidget {
               'rating': professional.rating,
               'about': professional.about,
               'working_information': professional.workingInformation,
-              'days_hour': professional.daysHour,
-              'maps_location': professional.mapsLocation,
-              'certification': professional.certification,
+              'working_hours': professional.workingHours,
+              'workplace': professional.workplace,
               'user_id': professional.userId,
             };
 

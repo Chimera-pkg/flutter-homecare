@@ -11,7 +11,7 @@ class SearchProfessionalPage extends StatefulWidget {
   const SearchProfessionalPage({super.key, required this.serviceType});
 
   @override
-  _SearchProfessionalPageState createState() => _SearchProfessionalPageState();
+  State<SearchProfessionalPage> createState() => _SearchProfessionalPageState();
 }
 
 class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
@@ -146,7 +146,10 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
                                                 MaterialPageRoute(
                                                   builder: (context) =>
                                                       ProfessionalDetailsPage(
-                                                    professional: professional,
+                                                    professionalId:
+                                                        professional.id,
+                                                    serviceType: professional
+                                                        .providerType,
                                                   ),
                                                 ),
                                               );

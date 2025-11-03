@@ -18,9 +18,13 @@ class NursingCaseMapper {
 
     final List<NursingIssue> allIssues = models
         .map((model) => NursingIssue(
+              id: model.id,
               title: model.title,
               description: model.description ?? '',
-              images: model.images ?? [],
+              images: model.images ?? [], // Will be empty from JSON
+              imageUrls: model.imageUrls ?? [], // Populated from JSON
+              createdAt: model.createdAt,
+              updatedAt: model.updatedAt,
             ))
         .toList();
 
@@ -48,6 +52,7 @@ class NursingCaseMapper {
   List<NursingPersonalCaseModel> mapEntityToModels(NursingCase entity) {
     return entity.issues.map((issue) {
       return NursingPersonalCaseModel(
+        id: issue.id,
         appointmentId: entity.appointmentId,
         title: issue.title,
         description: issue.description,
@@ -56,7 +61,7 @@ class NursingCaseMapper {
         addOn: entity.addOnServices.map((e) => e.name).join(', '),
         estimatedBudget: entity.estimatedBudget,
         relatedHealthRecordId: entity.relatedHealthRecordId,
-        images: issue.images,
+        images: issue.images, // Pass local files for upload
       );
     }).toList();
   }

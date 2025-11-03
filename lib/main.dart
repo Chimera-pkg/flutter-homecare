@@ -97,6 +97,8 @@ void main() async {
             getNursingCase: sl<GetNursingCase>(),
             createNursingCase: sl<CreateNursingCase>(),
             getNursingAddOnServices: sl<GetNursingAddOnServices>(),
+            addNursingIssue: sl(),
+            deleteNursingIssue: sl(),
           ),
         ),
         BlocProvider(
@@ -108,7 +110,6 @@ void main() async {
         BlocProvider(
           create: (context) => NursingAppointmentFormBloc(
             appointmentRepository: sl<NursingAppointmentRepository>(),
-            createNursingCase: sl<CreateNursingCase>(),
           ),
         ),
         // Medical Record Module

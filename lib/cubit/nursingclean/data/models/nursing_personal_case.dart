@@ -18,6 +18,8 @@ class NursingPersonalCaseModel {
   final int? relatedHealthRecordId;
   final List<File>? images;
   final List<String>? imageUrls;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   NursingPersonalCaseModel({
     this.id,
@@ -31,6 +33,8 @@ class NursingPersonalCaseModel {
     this.relatedHealthRecordId,
     this.images,
     this.imageUrls,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory NursingPersonalCaseModel.fromJson(Map<String, dynamic> json) {
@@ -42,11 +46,14 @@ class NursingPersonalCaseModel {
       mobilityStatus: json['mobility_status'],
       careType: json['care_type'],
       addOn: json['add_on'],
-      estimatedBudget: (json['estimated_budget'] ?? 0).toDouble(),
+      estimatedBudget:
+          double.tryParse(json['estimated_budget']?.toString() ?? '') ?? 0.0,
       relatedHealthRecordId: json['related_health_record_id'],
       imageUrls: json['images'] != null
           ? List<String>.from(jsonDecode(json['images']))
-          : null, 
+          : null,
+      createdAt: DateTime.tryParse(json['created_at'] ?? ''),
+      updatedAt: DateTime.tryParse(json['updated_at'] ?? ''),
     );
   }
 
