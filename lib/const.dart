@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Const {
-  // static const String BASE_URL = 'http://192.168.1.2:3333';
+  // static const String BASE_URL = 'http://192.168.0.114:3333';
   static const String BASE_URL = 'https://homecare-api.med-map.org';
   static const String URL_API = BASE_URL + '/v1';
   static const String URL_IMG_PLACEHOLDER = 'https://placehold.co/100x100';
@@ -49,6 +49,12 @@ class Const {
 
   static const String API_NUTRITION_ASSESSMENT =
       '$URL_API/nutrition-assessments';
+
+  // Schedule Management
+  static const String API_SCHEDULE_AVAILABILITY = '$URL_API/schedule/availability';
+  static const String API_SCHEDULE_OVERRIDES = '$URL_API/schedule/overrides';
+  static const String API_SCHEDULE_PREVIEW_SLOTS = '$URL_API/schedule/preview-slots';
+  static const String API_SCHEDULE_SLOTS = '$URL_API/schedule/slots';
 
   static const String ROLE = 'role';
   static const String IS_LOGED_IN = 'is_logged_in';

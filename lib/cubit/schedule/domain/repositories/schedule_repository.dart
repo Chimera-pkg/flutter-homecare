@@ -1,0 +1,25 @@
+import 'package:dartz/dartz.dart';
+import 'package:m2health/core/error/failures.dart';
+import 'package:m2health/cubit/schedule/domain/entities/provider_availability.dart';
+import 'package:m2health/cubit/schedule/domain/entities/provider_availability_override.dart';
+import 'package:m2health/cubit/schedule/domain/entities/time_slot.dart';
+import 'package:m2health/cubit/schedule/domain/usecases/index.dart';
+
+abstract class ScheduleRepository {
+  Future<Either<Failure, List<ProviderAvailability>>> getAvailabilities();
+  Future<Either<Failure, ProviderAvailability>> addAvailability(
+      AddAvailabilityParams params);
+  Future<Either<Failure, ProviderAvailability>> updateAvailability(
+      UpdateAvailabilityParams params);
+  Future<Either<Failure, Unit>> deleteAvailability(int id);
+
+  Future<Either<Failure, List<ProviderAvailabilityOverride>>> getOverrides();
+  Future<Either<Failure, ProviderAvailabilityOverride>> addOverride(
+      AddOverrideParams params);
+  Future<Either<Failure, ProviderAvailabilityOverride>> updateOverride(
+      UpdateOverrideParams params);
+  Future<Either<Failure, Unit>> deleteOverride(int id);
+
+  Future<Either<Failure, List<TimeSlot>>> getAvailableSlots(
+      GetAvailableSlotsParams params);
+}

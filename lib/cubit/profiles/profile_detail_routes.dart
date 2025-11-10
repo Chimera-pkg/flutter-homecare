@@ -1,7 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:m2health/cubit/pharmacogenomics/presentation/pharmagenomical_pages.dart';
 import 'package:m2health/cubit/profiles/domain/entities/professional_profile.dart';
-import 'package:m2health/cubit/profiles/domain/entities/profile.dart';
 import 'package:m2health/cubit/profiles/manage_services_page.dart';
 import 'package:m2health/cubit/profiles/presentation/pages/edit_lifestyle_n_selfcare_page.dart';
 import 'package:m2health/cubit/profiles/presentation/pages/edit_medical_history_n_risk_factor_page.dart';
@@ -9,6 +8,7 @@ import 'package:m2health/cubit/profiles/presentation/pages/edit_physical_sign_pa
 import 'package:m2health/cubit/profiles/presentation/pages/edit_professional_profile.dart';
 import 'package:m2health/cubit/profiles/presentation/pages/edit_basic_info_page.dart';
 import 'package:m2health/cubit/medical_record/presentation/pages/medical_records_page.dart';
+import 'package:m2health/cubit/schedule/presentation/pages/working_schedule_page.dart';
 import 'package:m2health/cubit/wellness_genomics/presentation/pages/wellness_genomics_page.dart';
 import 'package:m2health/route/app_routes.dart';
 
@@ -70,6 +70,15 @@ class ProfileDetailRoutes {
       builder: (context, state) {
         ProfessionalProfile profile = state.extra as ProfessionalProfile;
         return EditProfessionalProfilePage(profile: profile);
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.workingSchedule,
+      name: AppRoutes.workingSchedule,
+      builder: (context, state) {
+        // Pass the provider ID and Type from the profile state
+        // This assumes you have access to the ProfileCubit here or pass it as an extra
+        return const WorkingSchedulePage();
       },
     ),
 

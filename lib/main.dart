@@ -25,6 +25,10 @@ import 'package:m2health/cubit/appointment/bloc/provider_appointment_cubit.dart'
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+import 'package:flutter_timezone/flutter_timezone.dart';
+
 // import 'package:navbar_router/navbar_router.dart';
 
 import 'const.dart';
@@ -49,6 +53,13 @@ void main() async {
   await setupLocator();
   AppLanguage appLanguage = AppLanguage();
   await appLanguage.fetchLocale();
+
+  // Timezone setup
+  tz.initializeTimeZones();
+  final String currentTimeZone =
+      (await FlutterTimezone.getLocalTimezone()).identifier;
+  tz.setLocalLocation(tz.getLocation(currentTimeZone));
+
   runApp(
     MultiBlocProvider(
       providers: [
