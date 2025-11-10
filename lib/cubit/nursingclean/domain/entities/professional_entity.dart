@@ -5,14 +5,14 @@ import 'package:m2health/cubit/profiles/domain/entities/certificate.dart';
 class ProfessionalEntity extends Equatable {
   final int id;
   final String name;
-  final String avatar;
-  final int experience;
-  final double rating;
-  final String about;
-  final String jobTitle;
-  final String workingInformation;
-  final String workingHours;
-  final String workplace;
+  final String? avatar;
+  final int? experience;
+  final double? rating;
+  final String? about;
+  final String? jobTitle;
+  final String? workingInformation;
+  final String? workingHours;
+  final String? workplace;
   final List<Certificate> certificates;
   final List<ReviewEntity> reviews;
   final int userId;
@@ -25,14 +25,14 @@ class ProfessionalEntity extends Equatable {
   const ProfessionalEntity({
     required this.id,
     required this.name,
-    required this.avatar,
+    this.avatar,
     required this.experience,
     required this.rating,
-    required this.about,
-    required this.workingInformation,
-    required this.jobTitle,
-    required this.workingHours,
-    required this.workplace,
+    this.about,
+    this.workingInformation,
+    this.jobTitle,
+    this.workingHours,
+    this.workplace,
     required this.certificates,
     required this.reviews,
     required this.userId,

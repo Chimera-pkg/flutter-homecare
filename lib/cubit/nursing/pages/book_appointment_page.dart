@@ -166,7 +166,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(8.0),
                           child: Image.network(
-                            professional.avatar,
+                            professional.avatar ?? '',
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               return Image.asset(
@@ -193,7 +193,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                             children: [
                               Icon(Icons.location_on, color: Colors.teal),
                               SizedBox(width: 4),
-                              Text(professional.workplace),
+                              Text(professional.workplace ?? 'Not specified'),
                             ],
                           ),
                         ],

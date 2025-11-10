@@ -17,7 +17,7 @@ class CreateNursingAppointment {
       CreateAppointmentParams params) async {
     final appointmentEntity = AppointmentEntity(
       providerId: params.professional.id,
-      providerType: params.professional.role.toLowerCase(),
+      providerType: params.professional.role?.toLowerCase(),
       type: params.professional.role,
       status: 'pending',
       date: params.selectedDate,

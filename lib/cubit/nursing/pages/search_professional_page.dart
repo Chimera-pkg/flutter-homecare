@@ -74,32 +74,21 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
                                             color: Colors.grey[300],
                                           ),
                                           child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                            child: professional
-                                                    .avatar.isNotEmpty
-                                                ? Image.network(
-                                                    professional.avatar,
-                                                    width: 50,
-                                                    height: 50,
-                                                    fit: BoxFit.cover,
-                                                  )
-                                                : Container(
-                                                    width: 50,
-                                                    height: 50,
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.grey[300],
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8.0),
-                                                    ),
-                                                    child: Icon(
-                                                      Icons.local_hospital,
-                                                      size: 25,
-                                                      color: Colors.grey[600],
-                                                    ),
-                                                  ),
-                                          ),
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0),
+                                              child: Image.network(
+                                                professional.avatar ?? '',
+                                                width: 50,
+                                                height: 50,
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error,
+                                                        stackTrace) =>
+                                                    Icon(
+                                                  Icons.person,
+                                                  size: 25,
+                                                  color: Colors.grey[600],
+                                                ),
+                                              )),
                                         ),
                                         const Positioned(
                                           bottom: 36,

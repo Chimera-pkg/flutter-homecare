@@ -92,11 +92,12 @@ class ProfessionalDetailsPage extends StatelessWidget {
                 height: 100,
                 fit: BoxFit.cover,
                 placeholder: 'assets/images/images_budi.png',
-                image: professional.avatar,
+                image: professional.avatar ?? '',
                 imageErrorBuilder: (context, error, stackTrace) {
-                  return Image.asset(
-                    'assets/images/images_budi.png',
-                    fit: BoxFit.cover,
+                  return Icon(
+                    Icons.person,
+                    size: 25,
+                    color: Colors.grey[600],
                   );
                 },
               ),
@@ -121,7 +122,7 @@ class ProfessionalDetailsPage extends StatelessWidget {
           ),
         ),
         Text(
-          professional.jobTitle,
+          professional.jobTitle ?? 'Nurse',
           style: const TextStyle(
             fontSize: 16,
           ),
@@ -223,7 +224,7 @@ class ProfessionalDetailsPage extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          professional.about,
+          professional.about ?? 'No description available.',
           textAlign: TextAlign.justify,
         ),
       ],
@@ -248,7 +249,7 @@ class ProfessionalDetailsPage extends StatelessWidget {
             const Icon(Icons.calendar_today, color: Colors.grey),
             const SizedBox(width: 8),
             Expanded(
-              child: Text(professional.workingHours),
+              child: Text(professional.workingHours ?? 'Not specified'),
             ),
           ],
         ),
@@ -262,7 +263,7 @@ class ProfessionalDetailsPage extends StatelessWidget {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                professional.workplace,
+                professional.workplace ?? 'Not specified',
                 style: const TextStyle(color: Colors.blue),
               ),
             ),

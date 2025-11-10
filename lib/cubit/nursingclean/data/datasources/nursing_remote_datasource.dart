@@ -170,6 +170,8 @@ class NursingRemoteDataSourceImpl implements NursingRemoteDataSource {
           .map((prof) => ProfessionalModel.fromJson(prof))
           .toList();
     } else {
+      log('Error fetching professionals: ${response.statusCode} - ${response.data}',
+          name: 'NursingRemoteDataSourceImpl');
       throw Exception('Failed to load professionals');
     }
   }

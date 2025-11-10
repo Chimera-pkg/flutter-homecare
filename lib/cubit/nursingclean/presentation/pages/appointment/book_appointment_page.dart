@@ -170,12 +170,13 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8.0),
                 child: Image.network(
-                  professional.avatar,
+                  professional.avatar ?? '',
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
-                    return Image.asset(
-                      'assets/images/images_budi.png', // Placeholder image
-                      fit: BoxFit.cover,
+                    return Icon(
+                      Icons.person,
+                      size: 25,
+                      color: Colors.grey[600],
                     );
                   },
                 ),
@@ -199,7 +200,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          professional.workplace,
+                          professional.workplace ?? 'Unknown Location',
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:m2health/const.dart';
@@ -32,6 +34,8 @@ class PersonalCubit extends Cubit<PersonalState> {
         Const.API_PERSONAL_CASES,
         queryParameters: queryParameters,
       );
+
+      log('Personal Details Response: ${response.data}');
 
       final data = response.data['data'] as List;
       final issues = data.map((json) => Issue.fromJson(json)).toList();

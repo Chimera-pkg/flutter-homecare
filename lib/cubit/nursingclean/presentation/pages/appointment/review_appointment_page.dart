@@ -203,7 +203,7 @@ class ReviewAppointmentPage extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 25,
-              backgroundImage: NetworkImage(professional.avatar),
+              backgroundImage: NetworkImage(professional.avatar ?? ''),
               onBackgroundImageError: (_, __) {},
             ),
             const SizedBox(width: 16),

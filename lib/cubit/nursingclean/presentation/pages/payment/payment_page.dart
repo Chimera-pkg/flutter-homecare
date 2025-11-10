@@ -95,7 +95,7 @@ class _PaymentPageState extends State<PaymentPage> {
                   children: [
                     CircleAvatar(
                       radius: 25,
-                      backgroundImage: NetworkImage(profile.avatar),
+                      backgroundImage: NetworkImage(profile.avatar ?? ''),
                       onBackgroundImageError: (_, __) {},
                     ),
                     const SizedBox(width: 16),

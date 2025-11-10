@@ -37,11 +37,12 @@ class ProfessionalDetailsPage extends StatelessWidget {
                         height: 100,
                         fit: BoxFit.cover,
                         placeholder: 'assets/images/images_budi.png',
-                        image: professional.avatar,
+                        image: professional.avatar ?? '',
                         imageErrorBuilder: (context, error, stackTrace) {
-                          return Image.asset(
-                            'assets/images/images_budi.png',
-                            fit: BoxFit.cover,
+                          return Icon(
+                            Icons.local_hospital,
+                            size: 25,
+                            color: Colors.grey[600],
                           );
                         },
                       ),
@@ -162,7 +163,7 @@ class ProfessionalDetailsPage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              professional.about,
+              professional.about ?? '',
               textAlign: TextAlign.justify,
             ),
             const SizedBox(height: 16),
@@ -182,7 +183,7 @@ class ProfessionalDetailsPage extends StatelessWidget {
               children: [
                 const Icon(Icons.calendar_today, color: Colors.grey),
                 const SizedBox(width: 8),
-                Text(professional.workingHours),
+                Text(professional.workingHours ?? 'Not specified'),
               ],
             ),
             const SizedBox(height: 8),
@@ -193,7 +194,7 @@ class ProfessionalDetailsPage extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  professional.workplace,
+                  professional.workplace ?? 'Not specified',
                   style: const TextStyle(color: Colors.blue),
                 ),
               ],
@@ -325,13 +326,13 @@ class ProfessionalDetailsPage extends StatelessWidget {
             final provider = Provider(
               id: professional.id,
               name: professional.name,
-              avatar: professional.avatar,
-              experience: professional.experience,
-              rating: professional.rating,
-              about: professional.about,
-              workingInformation: professional.workingInformation,
-              workingHours: professional.workingHours,
-              workplace: professional.workplace,
+              avatar: professional.avatar ?? '',
+              experience: professional.experience ?? 0,
+              rating: professional.rating ?? 0.0,
+              about: professional.about ?? '',
+              workingInformation: professional.workingInformation ?? '',
+              workingHours: professional.workingHours ?? '',
+              workplace: professional.workplace ?? '',
               jobTitle: professional.role,
               userId: professional.userId,
               providerType: professional.providerType,
