@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -38,7 +40,7 @@ class SignInCubit extends Cubit<SignInState> {
 
       Utils.setSpBool(Const.IS_LOGED_IN, true);
       Utils.setSpString(Const.TOKEN, response.data['token']['token']);
-      Utils.setSpString(Const.EXPIRES_AT, response.data['token']['expires_at']);
+      Utils.setSpString(Const.EXPIRES_AT, response.data['token']['expiresAt']);
       Utils.setSpString(Const.USERNAME, response.data['user']['username']);
       Utils.setSpString(Const.ROLE, response.data['user']['role']);
       Utils.setSpString(Const.USER_ID, response.data['user']['id'].toString());
@@ -53,7 +55,9 @@ class SignInCubit extends Cubit<SignInState> {
       } else {
         getUser(response.data['token']['token'], response.data['user']['role']);
       }
-    } catch (e) {
+    } catch (e, stackStrace) {
+      log('Failed to sign in',
+          error: e, stackTrace: stackStrace, name: 'SignInCubit');
       emit(SignInError(e.toString()));
     }
   }
