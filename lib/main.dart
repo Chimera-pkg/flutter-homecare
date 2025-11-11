@@ -6,7 +6,6 @@ import 'package:m2health/features/medical_record/presentation/bloc/medical_recor
 import 'package:m2health/features/nursing/domain/repositories/nursing_appointment_repository.dart';
 import 'package:m2health/features/nursing/domain/usecases/get_nursing_add_on_services.dart';
 import 'package:m2health/features/nursing/presentation/bloc/nursing_appointment_form/nursing_appointment_form_bloc.dart';
-import 'package:m2health/features/nursing/presentation/bloc/nursing_services/nursing_services_bloc.dart';
 import 'package:m2health/features/personal/personal_cubit.dart';
 import 'package:m2health/features/nursing_legacy/personal/nursing_personal_cubit.dart';
 import 'package:m2health/features/pharmacogenomics/domain/usecases/delete_pharmacogenomics.dart';
@@ -42,7 +41,6 @@ import 'package:flutter/foundation.dart';
 // nursing module
 import 'package:m2health/features/nursing/domain/usecases/create_nursing_case.dart';
 import 'package:m2health/features/nursing/domain/usecases/get_nursing_case.dart';
-import 'package:m2health/features/nursing/domain/usecases/get_nursing_services.dart';
 import 'package:m2health/features/nursing/domain/usecases/get_professionals.dart';
 import 'package:m2health/features/nursing/domain/usecases/toggle_favorite.dart';
 import 'package:m2health/features/nursing/presentation/bloc/nursing_case/nursing_case_bloc.dart';
@@ -98,11 +96,6 @@ void main() async {
           ),
         ),
         // Nursing Module Dependencies
-        BlocProvider(
-          create: (context) => NursingServicesBloc(
-            getNursingServices: sl<GetNursingServices>(),
-          ),
-        ),
         BlocProvider(
           create: (context) => NursingCaseBloc(
             getNursingCase: sl<GetNursingCase>(),

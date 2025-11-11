@@ -5,13 +5,10 @@ import 'package:dio/dio.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/features/nursing/data/models/add_on_service_model.dart';
 import 'package:m2health/features/nursing/data/models/nursing_personal_case.dart';
-import 'package:m2health/features/nursing/data/models/nursing_service.dart';
 import 'package:m2health/features/nursing/data/models/professional_model.dart';
 import 'package:m2health/utils.dart';
 
 abstract class NursingRemoteDataSource {
-  Future<List<NursingServiceModel>> getNursingServices();
-
   Future<List<Map<String, dynamic>>> getMedicalRecords();
   Future<List<AddOnServiceModel>> getAddOnServices(String serviceType);
 
@@ -30,28 +27,6 @@ class NursingRemoteDataSourceImpl implements NursingRemoteDataSource {
   final Dio dio;
 
   NursingRemoteDataSourceImpl({required this.dio});
-
-  @override
-  Future<List<NursingServiceModel>> getNursingServices() async {
-    final token = await Utils.getSpString(Const.TOKEN);
-    final response = await dio.get(
-      Const.API_NURSE_SERVICES,
-      options: Options(
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
-      ),
-    );
-
-    if (response.statusCode == 200) {
-      final services = (response.data['data'] as List)
-          .map((service) => NursingServiceModel.fromMap(service))
-          .toList();
-      return services;
-    } else {
-      throw Exception('Failed to load nursing services');
-    }
-  }
 
   @override
   Future<List<NursingPersonalCaseModel>> getNursingPersonalCases() async {

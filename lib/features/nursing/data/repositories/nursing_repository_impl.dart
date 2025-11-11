@@ -8,7 +8,6 @@ import 'package:m2health/features/nursing/data/models/nursing_personal_case.dart
 import 'package:m2health/features/nursing/domain/entities/add_on_service.dart';
 import 'package:m2health/features/nursing/domain/entities/nursing_case.dart';
 import 'package:m2health/features/nursing/domain/entities/nursing_issue.dart';
-import 'package:m2health/features/nursing/domain/entities/nursing_service_entity.dart';
 import 'package:m2health/features/nursing/domain/entities/professional_entity.dart';
 import 'package:m2health/features/nursing/domain/repositories/nursing_repository.dart';
 
@@ -18,11 +17,6 @@ class NursingRepositoryImpl implements NursingRepository {
 
   NursingRepositoryImpl({required this.remoteDataSource, required this.mapper});
 
-  @override
-  Future<List<NursingServiceEntity>> getNursingServices() async {
-    final nursingServiceModels = await remoteDataSource.getNursingServices();
-    return nursingServiceModels;
-  }
 
   @override
   Future<Either<Failure, NursingCase>> getNursingCase() async {

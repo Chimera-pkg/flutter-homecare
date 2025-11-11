@@ -11,7 +11,6 @@ import 'package:m2health/features/nursing/domain/usecases/create_nursing_case.da
 import 'package:m2health/features/nursing/domain/usecases/delete_nursing_issue.dart';
 import 'package:m2health/features/nursing/domain/usecases/get_nursing_add_on_services.dart';
 import 'package:m2health/features/nursing/domain/usecases/get_nursing_case.dart';
-import 'package:m2health/features/nursing/domain/usecases/get_nursing_services.dart';
 import 'package:m2health/features/nursing/domain/usecases/get_professional_detail.dart';
 import 'package:m2health/features/nursing/domain/usecases/get_professionals.dart';
 import 'package:m2health/features/nursing/domain/usecases/toggle_favorite.dart';
@@ -19,7 +18,6 @@ import 'package:m2health/features/nursing/domain/usecases/update_nursing_case.da
 
 void initNursingModule(GetIt sl) {
   // Use cases
-  sl.registerLazySingleton(() => GetNursingServices(sl()));
   sl.registerLazySingleton(() => GetNursingCase(sl()));
   sl.registerLazySingleton(() => CreateNursingCase(sl()));
   sl.registerLazySingleton(() => UpdateNursingCase(sl()));

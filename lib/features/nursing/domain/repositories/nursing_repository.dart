@@ -4,11 +4,9 @@ import 'package:m2health/features/nursing/const.dart';
 import 'package:m2health/features/nursing/domain/entities/add_on_service.dart';
 import 'package:m2health/features/nursing/domain/entities/nursing_case.dart';
 import 'package:m2health/features/nursing/domain/entities/nursing_issue.dart';
-import 'package:m2health/features/nursing/domain/entities/nursing_service_entity.dart';
 import 'package:m2health/features/nursing/domain/entities/professional_entity.dart';
 
 abstract class NursingRepository {
-  Future<List<NursingServiceEntity>> getNursingServices();
   Future<List<Map<String, dynamic>>> getMedicalRecords();
 
   Future<Either<Failure, NursingCase>> getNursingCase();
