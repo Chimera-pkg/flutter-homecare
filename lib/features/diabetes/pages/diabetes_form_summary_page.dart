@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:m2health/features/diabetes/bloc/diabetes_form_cubit.dart';
 import 'package:m2health/features/diabetes/bloc/diabetes_form_state.dart';
 import 'package:m2health/features/diabetes/widgets/diabetes_form_widget.dart';
-import 'package:m2health/features/nursingclean/const.dart';
-import 'package:m2health/features/nursing/personal/nursing_personal_page.dart';
+import 'package:m2health/features/nursing/const.dart';
+import 'package:m2health/features/nursing_legacy/personal/nursing_personal_page.dart';
 import 'package:m2health/route/app_routes.dart';
 
 class DiabetesFormSummaryPage extends StatelessWidget {

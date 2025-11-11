@@ -3,12 +3,12 @@ import 'package:m2health/features/diabetes/bloc/diabetes_form_cubit.dart';
 import 'package:m2health/features/medical_record/domain/usecases/delete_medical_record.dart';
 import 'package:m2health/features/medical_record/domain/usecases/get_medical_records.dart';
 import 'package:m2health/features/medical_record/presentation/bloc/medical_record_bloc.dart';
-import 'package:m2health/features/nursingclean/domain/repositories/nursing_appointment_repository.dart';
-import 'package:m2health/features/nursingclean/domain/usecases/get_nursing_add_on_services.dart';
-import 'package:m2health/features/nursingclean/presentation/bloc/nursing_appointment_form/nursing_appointment_form_bloc.dart';
-import 'package:m2health/features/nursingclean/presentation/bloc/nursing_services/nursing_services_bloc.dart';
+import 'package:m2health/features/nursing/domain/repositories/nursing_appointment_repository.dart';
+import 'package:m2health/features/nursing/domain/usecases/get_nursing_add_on_services.dart';
+import 'package:m2health/features/nursing/presentation/bloc/nursing_appointment_form/nursing_appointment_form_bloc.dart';
+import 'package:m2health/features/nursing/presentation/bloc/nursing_services/nursing_services_bloc.dart';
 import 'package:m2health/features/personal/personal_cubit.dart';
-import 'package:m2health/features/nursing/personal/nursing_personal_cubit.dart';
+import 'package:m2health/features/nursing_legacy/personal/nursing_personal_cubit.dart';
 import 'package:m2health/features/pharmacogenomics/domain/usecases/delete_pharmacogenomics.dart';
 import 'package:m2health/features/pharmacogenomics/domain/usecases/store_pharmacogenomics.dart';
 import 'package:m2health/features/pharmacogenomics/presentation/bloc/pharmacogenomics_cubit.dart';
@@ -40,13 +40,13 @@ import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 
 // nursing module
-import 'package:m2health/features/nursingclean/domain/usecases/create_nursing_case.dart';
-import 'package:m2health/features/nursingclean/domain/usecases/get_nursing_case.dart';
-import 'package:m2health/features/nursingclean/domain/usecases/get_nursing_services.dart';
-import 'package:m2health/features/nursingclean/domain/usecases/get_professionals.dart';
-import 'package:m2health/features/nursingclean/domain/usecases/toggle_favorite.dart';
-import 'package:m2health/features/nursingclean/presentation/bloc/nursing_case/nursing_case_bloc.dart';
-import 'package:m2health/features/nursingclean/presentation/bloc/professional/professional_bloc.dart';
+import 'package:m2health/features/nursing/domain/usecases/create_nursing_case.dart';
+import 'package:m2health/features/nursing/domain/usecases/get_nursing_case.dart';
+import 'package:m2health/features/nursing/domain/usecases/get_nursing_services.dart';
+import 'package:m2health/features/nursing/domain/usecases/get_professionals.dart';
+import 'package:m2health/features/nursing/domain/usecases/toggle_favorite.dart';
+import 'package:m2health/features/nursing/presentation/bloc/nursing_case/nursing_case_bloc.dart';
+import 'package:m2health/features/nursing/presentation/bloc/professional/professional_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

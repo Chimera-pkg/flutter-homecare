@@ -1,6 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:m2health/features/diabetes/diabetic_care_routes.dart';
-import 'package:m2health/features/nursingclean/presentation/pages/nursing_services_page.dart';
+import 'package:m2health/features/nursing/presentation/pages/nursing_services_page.dart';
 import 'package:m2health/features/precision/precision_nutrition_routes.dart';
 import 'package:m2health/route/navigator_keys.dart';
 import 'package:m2health/core/presentation/views/pharmacist_services.dart';

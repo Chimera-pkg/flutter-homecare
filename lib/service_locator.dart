@@ -1,7 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
 import 'package:m2health/features/medical_record/injection.dart';
-import 'package:m2health/features/nursingclean/injection.dart';
+import 'package:m2health/features/nursing/injection.dart';
 import 'package:m2health/features/pharmacogenomics/injection.dart';
 import 'package:m2health/features/profiles/injection.dart';
 import 'package:m2health/features/schedule/injection.dart';
