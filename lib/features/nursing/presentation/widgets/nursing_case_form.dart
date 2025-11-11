@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:m2health/features/nursing/domain/entities/nursing_issue.dart';
+import 'package:m2health/features/nursing/domain/entities/personal_issue.dart';
 import 'package:m2health/features/nursing/presentation/bloc/nursing_case/nursing_case_bloc.dart';
 import 'package:m2health/features/nursing/presentation/bloc/nursing_case/nursing_case_event.dart';
 

@@ -3,7 +3,7 @@ import 'package:m2health/features/nursing/const.dart';
 import 'package:m2health/features/nursing/domain/entities/add_on_service.dart';
 import 'package:m2health/features/nursing/domain/entities/mobility_status.dart';
 import 'package:m2health/features/nursing/domain/entities/nursing_case.dart';
-import 'package:m2health/features/nursing/domain/entities/nursing_issue.dart';
+import 'package:m2health/features/nursing/domain/entities/personal_issue.dart';
 
 sealed class NursingCaseEvent extends Equatable {
   const NursingCaseEvent();
@@ -34,19 +34,19 @@ class CreateNursingCaseEvent extends NursingCaseEvent {
   List<Object> get props => [nursingCase];
 }
 
-class AddNursingIssueEvent extends NursingCaseEvent {
-  final NursingIssue issue;
+class AddPersonalIssueEvent extends NursingCaseEvent {
+  final PersonalIssue issue;
 
-  const AddNursingIssueEvent(this.issue);
+  const AddPersonalIssueEvent(this.issue);
 
   @override
   List<Object> get props => [issue];
 }
 
-class DeleteNursingIssueEvent extends NursingCaseEvent {
-  final NursingIssue issue;
+class DeletePersonalIssueEvent extends NursingCaseEvent {
+  final PersonalIssue issue;
 
-  const DeleteNursingIssueEvent(this.issue);
+  const DeletePersonalIssueEvent(this.issue);
 
   @override
   List<Object> get props => [issue];

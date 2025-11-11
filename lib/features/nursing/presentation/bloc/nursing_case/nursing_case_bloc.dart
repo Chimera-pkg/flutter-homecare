@@ -6,13 +6,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/core/error/failures.dart';
 import 'package:m2health/features/nursing/domain/entities/add_on_service.dart';
 import 'package:m2health/features/nursing/domain/entities/nursing_case.dart';
-import 'package:m2health/features/nursing/domain/entities/nursing_issue.dart';
-import 'package:m2health/features/nursing/domain/usecases/add_nursing_issue.dart';
+import 'package:m2health/features/nursing/domain/entities/personal_issue.dart';
+import 'package:m2health/features/nursing/domain/usecases/create_personal_issue.dart';
 import 'package:m2health/features/nursing/domain/usecases/create_nursing_case.dart';
-import 'package:m2health/features/nursing/domain/usecases/delete_nursing_issue.dart';
+import 'package:m2health/features/nursing/domain/usecases/delete_personal_issue.dart';
 import 'package:m2health/features/nursing/domain/usecases/get_nursing_add_on_services.dart';
-import 'package:m2health/features/nursing/domain/usecases/get_nursing_case.dart';
-import 'package:m2health/features/nursing/domain/usecases/update_nursing_case.dart';
+import 'package:m2health/features/nursing/domain/usecases/get_personal_issues.dart';
+import 'package:m2health/features/nursing/domain/usecases/update_personal_issue.dart';
 import 'package:m2health/features/nursing/presentation/bloc/nursing_case/nursing_case_event.dart';
 import 'package:m2health/features/nursing/presentation/bloc/nursing_case/nursing_case_state.dart';
 
@@ -20,16 +20,16 @@ class NursingCaseBloc extends Bloc<NursingCaseEvent, NursingCaseState> {
   final GetNursingCase getNursingCase;
   final CreateNursingCase createNursingCase;
   final GetNursingAddOnServices getNursingAddOnServices;
-  final AddNursingIssue addNursingIssue;
-  final DeleteNursingIssue deleteNursingIssue;
+  final AddPersonalIssue addPersonalIssue;
+  final DeletePersonalIssue deletePersonalIssue;
   final UpdateNursingCase updateNursingCase;
 
   NursingCaseBloc({
     required this.getNursingCase,
     required this.createNursingCase,
     required this.getNursingAddOnServices,
-    required this.addNursingIssue,
-    required this.deleteNursingIssue,
+    required this.addPersonalIssue,
+    required this.deletePersonalIssue,
     required this.updateNursingCase,
   }) : super(NursingCaseState.initial()) {
     // Register all event handlers
@@ -38,8 +38,8 @@ class NursingCaseBloc extends Bloc<NursingCaseEvent, NursingCaseState> {
     on<SelectServiceTypeEvent>(_onSelectServiceType);
     on<UpdateHealthStatusNursingCaseEvent>(_onUpdateHealthStatusNursingCase);
     on<CreateNursingCaseEvent>(_onCreateNursingCase);
-    on<AddNursingIssueEvent>(_onAddNursingIssue);
-    on<DeleteNursingIssueEvent>(_onDeleteNursingIssue);
+    on<AddPersonalIssueEvent>(_onAddPersonalIssue);
+    on<DeletePersonalIssueEvent>(_onDeletePersonalIssue);
     on<FetchNursingAddOnServices>(_onFetchNursingAddOnServices);
     on<ToggleAddOnService>(_onToggleAddOnService);
     on<UpdateCaseWithAppointment>(_onUpdateCaseWithAppointment);
@@ -124,13 +124,13 @@ class NursingCaseBloc extends Bloc<NursingCaseEvent, NursingCaseState> {
     );
   }
 
-  Future<void> _onAddNursingIssue(
-    AddNursingIssueEvent event,
+  Future<void> _onAddPersonalIssue(
+    AddPersonalIssueEvent event,
     Emitter<NursingCaseState> emit,
   ) async {
     final currentCase = state.nursingCase;
     final failureOrCreatedIssue =
-        await addNursingIssue(event.issue, currentCase);
+        await addPersonalIssue(event.issue, currentCase);
 
     failureOrCreatedIssue.fold(
       (failure) {
@@ -140,7 +140,7 @@ class NursingCaseBloc extends Bloc<NursingCaseEvent, NursingCaseState> {
         ));
       },
       (createdIssue) {
-        final finalIssues = List<NursingIssue>.from(currentCase.issues)
+        final finalIssues = List<PersonalIssue>.from(currentCase.issues)
           ..add(createdIssue);
         emit(state.copyWith(
             nursingCase: currentCase.copyWith(issues: finalIssues)));
@@ -148,21 +148,21 @@ class NursingCaseBloc extends Bloc<NursingCaseEvent, NursingCaseState> {
     );
   }
 
-  Future<void> _onDeleteNursingIssue(
-    DeleteNursingIssueEvent event,
+  Future<void> _onDeletePersonalIssue(
+    DeletePersonalIssueEvent event,
     Emitter<NursingCaseState> emit,
   ) async {
     if (event.issue.id == null) return;
 
     final currentCase = state.nursingCase;
-    final updatedIssues = List<NursingIssue>.from(currentCase.issues)
+    final updatedIssues = List<PersonalIssue>.from(currentCase.issues)
       ..remove(event.issue);
     final updatedCase = currentCase.copyWith(issues: updatedIssues);
 
     // Optimistic UI update
     emit(state.copyWith(nursingCase: updatedCase));
 
-    final failureOrSuccess = await deleteNursingIssue(event.issue.id!);
+    final failureOrSuccess = await deletePersonalIssue(event.issue.id!);
 
     failureOrSuccess.fold(
       (failure) {

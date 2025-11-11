@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/const.dart';
-import 'package:m2health/features/nursing/domain/entities/nursing_issue.dart';
+import 'package:m2health/features/nursing/domain/entities/personal_issue.dart';
 import 'package:m2health/features/nursing/presentation/bloc/nursing_case/nursing_case_bloc.dart';
 import 'package:m2health/features/nursing/presentation/bloc/nursing_case/nursing_case_event.dart';
 import 'package:m2health/features/personal/personal_cubit.dart';
@@ -40,14 +40,14 @@ class _AddConcernPageState extends State<AddConcernPage> {
       return;
     }
 
-    final newIssue = NursingIssue(
+    final newIssue = PersonalIssue(
       title: issueTitle,
       description: description,
       images: _images.whereType<File>().toList(),
       imageUrls: const [], // Set imageUrls to empty list
     );
 
-    context.read<NursingCaseBloc>().add(AddNursingIssueEvent(newIssue));
+    context.read<NursingCaseBloc>().add(AddPersonalIssueEvent(newIssue));
     Navigator.pop(context);
   }
 

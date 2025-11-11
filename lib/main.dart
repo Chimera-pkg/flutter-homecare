@@ -40,7 +40,7 @@ import 'package:flutter/foundation.dart';
 
 // nursing module
 import 'package:m2health/features/nursing/domain/usecases/create_nursing_case.dart';
-import 'package:m2health/features/nursing/domain/usecases/get_nursing_case.dart';
+import 'package:m2health/features/nursing/domain/usecases/get_personal_issues.dart';
 import 'package:m2health/features/nursing/domain/usecases/get_professionals.dart';
 import 'package:m2health/features/nursing/domain/usecases/toggle_favorite.dart';
 import 'package:m2health/features/nursing/presentation/bloc/nursing_case/nursing_case_bloc.dart';
@@ -101,8 +101,8 @@ void main() async {
             getNursingCase: sl<GetNursingCase>(),
             createNursingCase: sl<CreateNursingCase>(),
             getNursingAddOnServices: sl<GetNursingAddOnServices>(),
-            addNursingIssue: sl(),
-            deleteNursingIssue: sl(),
+            addPersonalIssue: sl(),
+            deletePersonalIssue: sl(),
             updateNursingCase: sl(),
           ),
         ),

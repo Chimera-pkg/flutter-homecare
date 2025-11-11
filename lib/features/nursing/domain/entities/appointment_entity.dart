@@ -1,12 +1,15 @@
 import 'package:equatable/equatable.dart';
+import 'package:m2health/features/nursing/domain/entities/nursing_case.dart';
+import 'package:m2health/features/nursing/domain/entities/professional_entity.dart';
+import 'package:m2health/features/profiles/domain/entities/profile.dart';
 
 class AppointmentEntity extends Equatable {
   final int? id;
   final int? userId;
   final String type;
   final String status;
-  final DateTime date;
-  final String hour;
+  final DateTime startDatetime;
+  final DateTime? endDatetime;
   final String summary;
   final double payTotal;
   final DateTime createdAt;
@@ -14,20 +17,26 @@ class AppointmentEntity extends Equatable {
   final int? providerId;
   final String? providerType;
 
+  final ProfessionalEntity? provider;
+  final NursingCase? nursingCase;
+  final Profile? patientProfile;
 
   const AppointmentEntity({
     this.id,
     this.userId,
     required this.type,
     required this.status,
-    required this.date,
-    required this.hour,
+    required this.startDatetime,
+    this.endDatetime,
     required this.summary,
     required this.payTotal,
     required this.createdAt,
     required this.updatedAt,
     this.providerId,
     this.providerType,
+    this.provider,
+    this.nursingCase,
+    this.patientProfile,
   });
 
   @override
@@ -36,13 +45,14 @@ class AppointmentEntity extends Equatable {
         userId,
         type,
         status,
-        date,
-        hour,
+        startDatetime,
+        endDatetime,
         summary,
         payTotal,
         createdAt,
         updatedAt,
         providerId,
         providerType,
+        provider,
       ];
 }

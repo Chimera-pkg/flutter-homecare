@@ -72,7 +72,7 @@ class ProfessionalDetailsPage extends StatelessWidget {
           const SizedBox(height: 32),
           _buildCertificates(professional),
           const SizedBox(height: 32),
-          _buildReviews(professional.reviews),
+          _buildReviews(professional.reviews ?? []),
           const SizedBox(height: 80), // Padding for bottom nav bar
         ],
       ),

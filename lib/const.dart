@@ -16,6 +16,8 @@ class Const {
   static const String API_CERTIFICATES = URL_API + '/certificates';
   static const String API_DIABETES_PROFILE = '$URL_API/diabetes-profile';
 
+  static const String API_PERSONAL_ISSUES = '$URL_API/personal-issues';
+
   // Personal Cases
   static const String API_NURSING_PERSONAL_CASES =
       URL_API + '/nursing/personal-cases';
@@ -51,9 +53,11 @@ class Const {
       '$URL_API/nutrition-assessments';
 
   // Schedule Management
-  static const String API_SCHEDULE_AVAILABILITY = '$URL_API/schedule/availability';
+  static const String API_SCHEDULE_AVAILABILITY =
+      '$URL_API/schedule/availability';
   static const String API_SCHEDULE_OVERRIDES = '$URL_API/schedule/overrides';
-  static const String API_SCHEDULE_PREVIEW_SLOTS = '$URL_API/schedule/preview-slots';
+  static const String API_SCHEDULE_PREVIEW_SLOTS =
+      '$URL_API/schedule/preview-slots';
   static const String API_SCHEDULE_SLOTS = '$URL_API/schedule/slots';
 
   static const String ROLE = 'role';

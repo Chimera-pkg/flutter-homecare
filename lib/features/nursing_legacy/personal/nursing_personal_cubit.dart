@@ -30,7 +30,7 @@ class NursingPersonalCubit extends Cubit<NursingPersonalState> {
       if (response.statusCode == 200) {
         final dataList = response.data['data']['data'] as List;
         var issues =
-            dataList.map((json) => NursingIssue.fromJson(json)).toList();
+            dataList.map((json) => PersonalIssue.fromJson(json)).toList();
 
         log('Filtered issues for $serviceType: ${issues.length}',
             name: 'NursingPersonalCubit');
@@ -74,10 +74,10 @@ class NursingPersonalCubit extends Cubit<NursingPersonalState> {
   //   }
   // }
 
-  void addIssue(NursingIssue issue) async {
+  void addIssue(PersonalIssue issue) async {
     if (state is NursingPersonalLoaded) {
       final currentState = state as NursingPersonalLoaded;
-      final updatedIssues = List<NursingIssue>.from(currentState.issues)
+      final updatedIssues = List<PersonalIssue>.from(currentState.issues)
         ..add(issue);
       emit(NursingPersonalLoaded(updatedIssues));
 
@@ -114,7 +114,7 @@ class NursingPersonalCubit extends Cubit<NursingPersonalState> {
     if (state is NursingPersonalLoaded) {
       final currentState = state as NursingPersonalLoaded;
       final issue = currentState.issues[index];
-      final updatedIssues = List<NursingIssue>.from(currentState.issues)
+      final updatedIssues = List<PersonalIssue>.from(currentState.issues)
         ..removeAt(index);
       emit(NursingPersonalLoaded(updatedIssues));
 

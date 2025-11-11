@@ -4,6 +4,8 @@ import 'package:dio/dio.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/features/appointment/models/appointment.dart';
 import 'package:m2health/features/appointment/models/paginated_appointment_response.dart';
+import 'package:m2health/features/nursing/data/models/appointment_model.dart';
+import 'package:m2health/features/nursing/domain/usecases/create_nursing_appointment.dart';
 import 'package:m2health/features/profiles/data/models/profile_model.dart';
 import 'package:m2health/features/profiles/domain/entities/profile.dart';
 import 'package:m2health/core/data/models/provider_appointment.dart';
@@ -394,40 +396,22 @@ class AppointmentService {
   }
 
   Future<Map<String, dynamic>> createAppointment(
-      Map<String, dynamic> appointmentData) async {
+      Map<String, dynamic> payload) async {
     try {
       final token = await Utils.getSpString(Const.TOKEN);
-      final userId = await Utils.getSpString(Const.USER_ID);
 
       // Validate required fields before sending
-      if (appointmentData['provider_id'] == null) {
+      if (payload['provider_id'] == null) {
         throw Exception('Provider ID is required');
       }
-      if (appointmentData['provider_type'] == null ||
-          appointmentData['provider_type'].toString().isEmpty) {
+      if (payload['provider_type'] == null ||
+          payload['provider_type'].toString().isEmpty) {
         throw Exception('Provider type is required');
       }
 
-      // Ensure data format is correct
-      final dataToSend = {
-        'user_id': int.tryParse(userId ?? '1') ?? 1,
-        'provider_id': appointmentData['provider_id'],
-        'provider_type':
-            appointmentData['provider_type'].toString().toLowerCase(),
-        'type': appointmentData['type'] ?? appointmentData['provider_type'],
-        'status': appointmentData['status'] ?? 'pending',
-        'date': appointmentData['date'],
-        'hour': appointmentData['hour'],
-        'summary': appointmentData['summary'] ?? 'Appointment booking',
-        'pay_total': (appointmentData['pay_total'] as num?)?.toDouble() ?? 0.0,
-        'profile_services_data': appointmentData['profile_services_data'],
-      };
-
-      print('Creating appointment with validated data: $dataToSend');
-
       final response = await _dio.post(
         Const.API_APPOINTMENT,
-        data: dataToSend,
+        data: payload,
         options: Options(
           headers: {
             'Authorization': 'Bearer $token',
@@ -472,7 +456,6 @@ class AppointmentService {
             final errorDetails = errors
                 .map((error) => '${error['field']}: ${error['message']}')
                 .join(', ');
-            throw Exception('Validation error: $errorDetails');
           }
         }
       }

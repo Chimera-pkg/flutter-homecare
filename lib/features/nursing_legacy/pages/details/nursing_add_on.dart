@@ -110,7 +110,7 @@ class AddOnCubit extends Cubit<AddOnState> {
 }
 
 class AddOn extends StatelessWidget {
-  final NursingIssue issue;
+  final PersonalIssue issue;
   final NurseServiceType serviceType;
 
   const AddOn({super.key, required this.issue, required this.serviceType});
@@ -126,7 +126,7 @@ class AddOn extends StatelessWidget {
 }
 
 class _AddOnView extends StatelessWidget {
-  final NursingIssue issue;
+  final PersonalIssue issue;
   final NurseServiceType serviceType;
 
   const _AddOnView({required this.issue, required this.serviceType});

@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
 
-class NursingIssue {
+class PersonalIssue {
   final int id;
   final int userId;
   final String title;
@@ -18,7 +18,7 @@ class NursingIssue {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  NursingIssue({
+  PersonalIssue({
     required this.id,
     required this.userId,
     required this.title,
@@ -32,8 +32,8 @@ class NursingIssue {
     required this.createdAt,
     required this.updatedAt,
   });
-  factory NursingIssue.fromJson(Map<String, dynamic> json) {
-    return NursingIssue(
+  factory PersonalIssue.fromJson(Map<String, dynamic> json) {
+    return PersonalIssue(
       id: json['id'] ?? 0,
       userId: json['user_id'] ?? 0,
       title: json['title'] ?? '',
@@ -69,7 +69,6 @@ class NursingIssue {
     return [];
   }
 
-
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -87,32 +86,31 @@ class NursingIssue {
     };
   }
 
-  NursingIssue copyWith({
+  PersonalIssue copyWith({
     int? id,
     int? userId,
     String? title,
     String? description,
-    List<String>? images, 
+    List<String>? images,
     String? mobilityStatus,
     Map<String, dynamic>? relatedHealthRecord,
     String? addOn,
     double? estimatedBudget,
-    String? caseType, 
+    String? caseType,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
-    return NursingIssue(
+    return PersonalIssue(
       id: id ?? this.id,
       userId: userId ?? this.userId,
       title: title ?? this.title,
       description: description ?? this.description,
-      images: images ?? this.images, 
+      images: images ?? this.images,
       mobilityStatus: mobilityStatus ?? this.mobilityStatus,
-      relatedHealthRecord:
-          relatedHealthRecord ?? this.relatedHealthRecord,
+      relatedHealthRecord: relatedHealthRecord ?? this.relatedHealthRecord,
       addOn: addOn ?? this.addOn,
       estimatedBudget: estimatedBudget ?? this.estimatedBudget,
-      caseType: caseType ?? this.caseType, 
+      caseType: caseType ?? this.caseType,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -131,7 +129,7 @@ class NursingPersonalInitial extends NursingPersonalState {}
 class NursingPersonalLoading extends NursingPersonalState {}
 
 class NursingPersonalLoaded extends NursingPersonalState {
-  final List<NursingIssue> issues;
+  final List<PersonalIssue> issues;
 
   const NursingPersonalLoaded(this.issues);
 

@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:m2health/features/nursing/domain/entities/nursing_issue.dart';
+import 'package:m2health/features/nursing/domain/entities/personal_issue.dart';
 
 class NursingConcernDetailPage extends StatelessWidget {
-  final NursingIssue issue;
+  final PersonalIssue issue;
 
   const NursingConcernDetailPage({super.key, required this.issue});
 

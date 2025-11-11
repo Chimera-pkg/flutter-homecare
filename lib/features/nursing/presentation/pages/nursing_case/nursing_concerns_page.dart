@@ -145,7 +145,7 @@ class _NursingConcernsPageState extends State<NursingConcernsPage> {
                                                   context
                                                       .read<NursingCaseBloc>()
                                                       .add(
-                                                          DeleteNursingIssueEvent(
+                                                          DeletePersonalIssueEvent(
                                                               issue));
                                                 },
                                               ),

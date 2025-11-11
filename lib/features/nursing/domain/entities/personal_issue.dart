@@ -1,8 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'dart:io';
 
-class NursingIssue extends Equatable {
+class PersonalIssue extends Equatable {
   final int? id;
+  final String type; // nurse, pharmacist
   final String title;
   final String description;
   final List<File> images; // For new images to upload
@@ -10,8 +11,9 @@ class NursingIssue extends Equatable {
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
-  const NursingIssue({
+  const PersonalIssue({
     this.id,
+    required this.type,
     required this.title,
     required this.description,
     this.images = const [],

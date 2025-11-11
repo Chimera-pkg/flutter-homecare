@@ -14,7 +14,7 @@ import 'package:m2health/features/nursing_legacy/personal/nursing_personal_state
 import 'package:m2health/utils.dart';
 
 class NursingAddIssuePage extends StatefulWidget {
-  final NursingIssue? issue;
+  final PersonalIssue? issue;
   final NurseServiceType serviceType;
 
   const NursingAddIssuePage({super.key, this.issue, required this.serviceType});

@@ -1,5 +1,7 @@
+import 'package:m2health/features/nursing/data/models/nursing_personal_case.dart';
+import 'package:m2health/features/nursing/data/models/professional_model.dart';
 import 'package:m2health/features/nursing/domain/entities/appointment_entity.dart';
-import 'package:intl/intl.dart';
+import 'package:m2health/features/profiles/data/models/profile_model.dart';
 
 class AppointmentModel extends AppointmentEntity {
   const AppointmentModel({
@@ -7,31 +9,47 @@ class AppointmentModel extends AppointmentEntity {
     super.userId,
     required super.type,
     required super.status,
-    required super.date,
-    required super.hour,
+    required super.startDatetime,
+    required super.endDatetime,
     required super.summary,
     required super.payTotal,
     required super.createdAt,
     required super.updatedAt,
     super.providerId,
     super.providerType,
+    super.provider,
+    super.nursingCase,
+    super.patientProfile,
   });
 
   factory AppointmentModel.fromJson(Map<String, dynamic> appointmentJson,
       {Map<String, dynamic>? providerJson}) {
+    final provider = providerJson?['provider'] != null
+        ? ProfessionalModel.fromJson(providerJson?['provider'])
+        : null;
+    final patient = providerJson?['patient'] != null
+        ? ProfileModel.fromJson(providerJson?['patient'])
+        : null;
+    final nursingCase = providerJson?['request_data'] != null
+        ? NursingPersonalCaseModel.fromJson(providerJson?['request_data'])
+        : null;
+
     return AppointmentModel(
       id: appointmentJson['id'],
       userId: appointmentJson['user_id'],
       type: appointmentJson['type'],
       status: appointmentJson['status'],
-      date: DateTime.parse(appointmentJson['date']),
-      hour: appointmentJson['hour'],
-      summary: appointmentJson['summary'] ?? '',
-      payTotal: (appointmentJson['pay_total'] as num).toDouble(),
+      startDatetime: DateTime.parse(appointmentJson['start_datetime']),
+      endDatetime: DateTime.parse(appointmentJson['end_datetime']),
+      summary: appointmentJson['summary'] ?? 'N/A',
+      payTotal: double.parse(appointmentJson['pay_total'].toString()),
       createdAt: DateTime.parse(appointmentJson['created_at']),
       updatedAt: DateTime.parse(appointmentJson['updated_at']),
       providerId: providerJson?['id'],
       providerType: providerJson?['type'],
+      provider: provider,
+      nursingCase: nursingCase,
+      patientProfile: patient,
     );
   }
 
@@ -41,8 +59,8 @@ class AppointmentModel extends AppointmentEntity {
       'user_id': userId,
       'type': type,
       'status': status,
-      'date': DateFormat('yyyy-MM-dd').format(date),
-      'hour': hour,
+      'start_datetime': startDatetime.toIso8601String(),
+      // 'end_datetime': endDatetime.toIso8601String(),
       'summary': summary,
       'pay_total': payTotal,
       'created_at': createdAt.toIso8601String(),
@@ -58,14 +76,17 @@ class AppointmentModel extends AppointmentEntity {
       userId: entity.userId,
       type: entity.type,
       status: entity.status,
-      date: entity.date,
-      hour: entity.hour,
+      startDatetime: entity.startDatetime,
+      endDatetime: entity.endDatetime,
       summary: entity.summary,
       payTotal: entity.payTotal,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
       providerId: entity.providerId,
       providerType: entity.providerType,
+      provider: entity.provider,
+      nursingCase: entity.nursingCase,
+      patientProfile: entity.patientProfile,
     );
   }
 }

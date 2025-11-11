@@ -13,8 +13,8 @@ class ProfessionalEntity extends Equatable {
   final String? workingInformation;
   final String? workingHours;
   final String? workplace;
-  final List<Certificate> certificates;
-  final List<ReviewEntity> reviews;
+  final List<Certificate>? certificates;
+  final List<ReviewEntity>? reviews;
   final int userId;
   final String createdAt;
   final String updatedAt;
