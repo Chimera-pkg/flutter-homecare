@@ -5,10 +5,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/features/personal/personal_cubit.dart';
 import 'package:m2health/features/personal/personal_state.dart';
-import 'package:m2health/models/service_config.dart';
+import 'package:m2health/core/data/models/service_config.dart';
 import 'package:m2health/utils.dart';
 import 'package:equatable/equatable.dart';
-import 'package:m2health/views/search/search_professional.dart';
+import 'package:m2health/core/presentation/views/search/search_professional.dart';
 
 abstract class AddOnState extends Equatable {
   const AddOnState();

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:m2health/const.dart';
-import 'package:m2health/models/favorite.dart';
-import 'package:m2health/views/search/professional_details.dart';
+import 'package:m2health/core/data/models/favorite.dart';
+import 'package:m2health/core/presentation/views/search/professional_details.dart';
 import 'package:m2health/utils.dart';
 import 'package:dio/dio.dart';
 

@@ -7,8 +7,8 @@ import 'package:m2health/route/app_routes.dart';
 import 'package:m2health/utils.dart';
 import 'package:dio/dio.dart';
 import 'package:m2health/features/nursing/pages/payment_page.dart';
-import 'package:m2health/models/profile.dart';
-import 'package:m2health/models/personal_case.dart';
+import 'package:m2health/core/data/models/profile.dart';
+import 'package:m2health/core/data/models/personal_case.dart';
 import 'dart:convert';
 
 class DetailAppointmentPage extends StatefulWidget {

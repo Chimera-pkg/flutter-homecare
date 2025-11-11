@@ -6,7 +6,7 @@ import 'package:m2health/features/pharmacogenomics/injection.dart';
 import 'package:m2health/features/profiles/injection.dart';
 import 'package:m2health/features/schedule/injection.dart';
 import 'package:m2health/features/wellness_genomics/injection.dart';
-import 'package:m2health/services/appointment_service.dart';
+import 'package:m2health/core/services/appointment_service.dart';
 
 final sl = GetIt.instance;
 

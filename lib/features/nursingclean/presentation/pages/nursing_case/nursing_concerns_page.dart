@@ -7,7 +7,7 @@ import 'package:m2health/features/nursingclean/presentation/bloc/nursing_case/nu
 import 'package:m2health/features/nursingclean/presentation/pages/nursing_case/add_concern_page.dart';
 import 'package:m2health/features/nursingclean/presentation/pages/nursing_case/nursing_concern_detail_page.dart';
 import 'package:m2health/features/nursingclean/presentation/pages/nursing_case/nursing_health_status_page.dart';
-import 'package:m2health/widgets/auth_guard_dialog.dart';
+import 'package:m2health/core/presentation/widgets/auth_guard_dialog.dart';
 
 class NursingConcernsPage extends StatefulWidget {
   const NursingConcernsPage({

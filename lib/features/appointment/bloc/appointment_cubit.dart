@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:m2health/features/appointment/models/appointment.dart';
-import 'package:m2health/services/appointment_service.dart';
+import 'package:m2health/core/services/appointment_service.dart';
 import 'package:meta/meta.dart';
 
 part 'appointment_state.dart';

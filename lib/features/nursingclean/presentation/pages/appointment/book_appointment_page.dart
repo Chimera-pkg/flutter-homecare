@@ -10,7 +10,7 @@ import 'package:m2health/features/nursingclean/presentation/bloc/nursing_case/nu
 import 'package:m2health/features/nursingclean/presentation/bloc/nursing_case/nursing_case_state.dart';
 import 'package:m2health/features/nursingclean/presentation/pages/appointment/review_appointment_page.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:m2health/widgets/time_slot_grid_view.dart';
+import 'package:m2health/core/presentation/widgets/time_slot_grid_view.dart';
 
 class BookAppointmentPage extends StatefulWidget {
   final ProfessionalEntity professional;

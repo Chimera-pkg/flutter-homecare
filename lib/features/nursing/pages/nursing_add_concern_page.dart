@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/features/nursing/personal/nursing_personal_cubit.dart';
-import 'package:m2health/widgets/image_preview.dart';
+import 'package:m2health/core/presentation/widgets/image_preview.dart';
 import 'package:m2health/utils.dart'; // Assuming Utils contains the method to get the token
 import 'dart:io';
 

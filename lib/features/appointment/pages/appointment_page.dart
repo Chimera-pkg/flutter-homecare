@@ -8,10 +8,10 @@ import 'package:m2health/const.dart';
 import 'package:m2health/features/appointment/bloc/appointment_cubit.dart';
 import 'package:m2health/features/appointment/models/appointment.dart';
 import 'package:m2health/features/appointment/widgets/cancel_appoinment_dialog.dart';
-import 'package:m2health/models/provider.dart';
+import 'package:m2health/core/data/models/provider.dart';
 import 'package:m2health/route/app_routes.dart';
 import 'package:intl/intl.dart';
-import 'package:m2health/views/book_appointment.dart';
+import 'package:m2health/core/presentation/views/book_appointment.dart';
 
 class AppointmentPage extends StatefulWidget {
   static const String route = '/appointment';

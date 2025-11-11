@@ -4,13 +4,13 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:m2health/models/provider.dart';
+import 'package:m2health/core/data/models/provider.dart';
 import 'package:m2health/utils.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'details/detail_appointment.dart';
 import 'package:m2health/const.dart';
-import 'package:m2health/widgets/time_slot_grid_view.dart';
-import 'package:m2health/services/appointment_service.dart';
+import 'package:m2health/core/presentation/widgets/time_slot_grid_view.dart';
+import 'package:m2health/core/services/appointment_service.dart';
 
 class BookAppointmentPageData {
   final Provider provider;

@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'dart:async';
 import 'package:m2health/const.dart';
-import 'package:m2health/models/service_config.dart';
+import 'package:m2health/core/data/models/service_config.dart';
 import 'package:m2health/utils.dart';
 
 sealed class ServicesState extends Equatable {

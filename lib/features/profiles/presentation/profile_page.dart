@@ -10,8 +10,8 @@ import 'package:m2health/route/app_routes.dart';
 import 'package:m2health/utils.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:m2health/widgets/auth_guard_dialog.dart';
-import 'package:m2health/widgets/profile_widget.dart';
+import 'package:m2health/core/presentation/widgets/auth_guard_dialog.dart';
+import 'package:m2health/core/presentation/widgets/profile_widget.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});

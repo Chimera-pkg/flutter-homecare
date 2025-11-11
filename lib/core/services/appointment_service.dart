@@ -6,7 +6,7 @@ import 'package:m2health/features/appointment/models/appointment.dart';
 import 'package:m2health/features/appointment/models/paginated_appointment_response.dart';
 import 'package:m2health/features/profiles/data/models/profile_model.dart';
 import 'package:m2health/features/profiles/domain/entities/profile.dart';
-import 'package:m2health/models/provider_appointment.dart';
+import 'package:m2health/core/data/models/provider_appointment.dart';
 import 'package:m2health/utils.dart';
 
 class AppointmentService {

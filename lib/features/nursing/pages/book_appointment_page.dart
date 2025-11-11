@@ -7,8 +7,8 @@ import 'package:m2health/utils.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:m2health/features/nursing/pages/detail_appointment_page.dart';
 import 'package:m2health/const.dart';
-import 'package:m2health/widgets/time_slot_grid_view.dart';
-import 'package:m2health/services/appointment_service.dart';
+import 'package:m2health/core/presentation/widgets/time_slot_grid_view.dart';
+import 'package:m2health/core/services/appointment_service.dart';
 
 class BookAppointmentPage extends StatefulWidget {
   final ProfessionalEntity professional;

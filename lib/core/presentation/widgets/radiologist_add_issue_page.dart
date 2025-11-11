@@ -5,7 +5,7 @@ import 'package:m2health/const.dart';
 import 'package:m2health/features/personal/personal_cubit.dart';
 import 'package:m2health/features/personal/personal_state.dart';
 import 'package:m2health/utils.dart';
-import 'package:m2health/views/details/radiologist_add_on.dart';
+import 'package:m2health/core/presentation/views/details/radiologist_add_on.dart';
 
 class RadiologistAddIssuePage extends StatefulWidget {
   final Issue? issue;

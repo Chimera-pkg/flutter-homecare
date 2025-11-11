@@ -4,7 +4,7 @@ import 'package:m2health/core/error/failures.dart';
 import 'package:m2health/features/nursingclean/data/models/appointment_model.dart';
 import 'package:m2health/features/nursingclean/domain/entities/appointment_entity.dart';
 import 'package:m2health/features/nursingclean/domain/repositories/nursing_appointment_repository.dart';
-import 'package:m2health/services/appointment_service.dart';
+import 'package:m2health/core/services/appointment_service.dart';
 
 class NursingAppointmentRepositoryImpl extends NursingAppointmentRepository {
   final AppointmentService appointmentService;

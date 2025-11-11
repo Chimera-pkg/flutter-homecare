@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:m2health/models/service_config.dart';
+import 'package:m2health/core/data/models/service_config.dart';
 
 class ServiceSelectionCard extends StatelessWidget {
   final Map<String, String> service;

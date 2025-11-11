@@ -4,9 +4,9 @@ import 'package:m2health/main.dart';
 import 'package:m2health/route/app_routes.dart';
 import 'package:m2health/route/dashboard_routes.dart';
 import 'package:m2health/route/navigator_keys.dart';
-import 'package:m2health/views/dashboard.dart';
-import 'package:m2health/views/favourites.dart';
-import 'package:m2health/views/medical_store.dart';
+import 'package:m2health/core/presentation/views/dashboard.dart';
+import 'package:m2health/core/presentation/views/favourites.dart';
+import 'package:m2health/core/presentation/views/medical_store.dart';
 import 'package:m2health/features/profiles/presentation/profile_page.dart';
 
 class CoreRoutes {

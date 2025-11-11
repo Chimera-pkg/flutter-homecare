@@ -1,7 +1,7 @@
-import 'package:m2health/models/personal_case.dart';
-import 'package:m2health/models/payment.dart';
-import 'package:m2health/models/profile.dart';
-import 'package:m2health/models/provider.dart';
+import 'package:m2health/core/data/models/personal_case.dart';
+import 'package:m2health/core/data/models/payment.dart';
+import 'package:m2health/core/data/models/profile.dart';
+import 'package:m2health/core/data/models/provider.dart';
 
 class Appointment {
   final int id;

@@ -5,7 +5,7 @@ import 'package:m2health/features/nursingclean/domain/entities/nursing_issue.dar
 import 'package:m2health/features/nursingclean/presentation/bloc/nursing_case/nursing_case_bloc.dart';
 import 'package:m2health/features/nursingclean/presentation/bloc/nursing_case/nursing_case_event.dart';
 import 'package:m2health/features/personal/personal_cubit.dart';
-import 'package:m2health/widgets/image_preview.dart';
+import 'package:m2health/core/presentation/widgets/image_preview.dart';
 import 'dart:io';
 
 class AddConcernPage extends StatefulWidget {

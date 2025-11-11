@@ -5,7 +5,7 @@ import 'package:m2health/features/nursingclean/const.dart';
 import 'package:m2health/features/nursing/pages/nursing_add_concern_page.dart';
 import 'package:m2health/features/nursing/personal/nursing_personal_case_detail_page.dart';
 import 'package:m2health/features/nursing/personal/nursing_personal_cubit.dart';
-import 'package:m2health/widgets/auth_guard_dialog.dart';
+import 'package:m2health/core/presentation/widgets/auth_guard_dialog.dart';
 import 'nursing_personal_state.dart';
 import 'package:m2health/features/nursing/pages/nursing_add_issue_page.dart';
 import 'package:intl/intl.dart';

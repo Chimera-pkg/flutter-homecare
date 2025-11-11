@@ -6,11 +6,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/features/personal/personal_case_detail_page.dart';
 import 'package:m2health/utils.dart';
-import 'package:m2health/widgets/add_concern_page.dart';
-import 'package:m2health/widgets/image_preview.dart';
+import 'package:m2health/core/presentation/widgets/add_concern_page.dart';
+import 'package:m2health/core/presentation/widgets/image_preview.dart';
 import 'personal_cubit.dart';
 import 'personal_state.dart';
-import 'package:m2health/widgets/radiologist_add_issue_page.dart';
+import 'package:m2health/core/presentation/widgets/radiologist_add_issue_page.dart';
 import 'package:intl/intl.dart';
 
 class RadiologistPersonalPage extends StatefulWidget {

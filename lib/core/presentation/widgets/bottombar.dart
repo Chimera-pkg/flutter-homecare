@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
 import 'package:m2health/features/profiles/presentation/profile_page.dart';
 import 'package:m2health/features/appointment/pages/appointment_page.dart';
-import 'package:m2health/views/dashboard.dart';
-import 'package:m2health/views/favourites.dart';
-import 'package:m2health/views/medical_store.dart';
+import 'package:m2health/core/presentation/views/dashboard.dart';
+import 'package:m2health/core/presentation/views/favourites.dart';
+import 'package:m2health/core/presentation/views/medical_store.dart';
 
 class CustomBottomAppBar extends StatefulWidget {
   static final GlobalKey<_CustomBottomAppBarState> globalKey =

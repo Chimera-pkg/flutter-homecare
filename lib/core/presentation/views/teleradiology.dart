@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:m2health/const.dart';
-import 'package:m2health/widgets/image_preview.dart';
+import 'package:m2health/core/presentation/widgets/image_preview.dart';
 
 class TeleradiologyDetail extends StatefulWidget {
   @override

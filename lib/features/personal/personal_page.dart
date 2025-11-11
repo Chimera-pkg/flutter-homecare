@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/features/personal/personal_case_detail_page.dart';
-import 'package:m2health/widgets/add_concern_page.dart';
-import 'package:m2health/widgets/auth_guard_dialog.dart';
+import 'package:m2health/core/presentation/widgets/add_concern_page.dart';
+import 'package:m2health/core/presentation/widgets/auth_guard_dialog.dart';
 import 'personal_cubit.dart';
 import 'personal_state.dart';
-import 'package:m2health/widgets/add_issue_page.dart';
+import 'package:m2health/core/presentation/widgets/add_issue_page.dart';
 import 'package:intl/intl.dart';
 
 class PersonalPage extends StatefulWidget {

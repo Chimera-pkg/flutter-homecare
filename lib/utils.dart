@@ -9,7 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'views/pdf_screen.dart';
+import 'core/presentation/views/pdf_screen.dart';
 import 'package:share_plus/share_plus.dart';
 
 class Utils {

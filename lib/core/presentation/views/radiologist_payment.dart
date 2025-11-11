@@ -4,7 +4,7 @@ import 'package:m2health/main.dart';
 import 'package:m2health/features/appointment/pages/appointment_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2health/route/app_routes.dart';
-import 'package:m2health/widgets/bottombar.dart';
+import 'package:m2health/core/presentation/widgets/bottombar.dart';
 
 class RadiologistPaymentPage extends StatefulWidget {
   final int appointmentId;

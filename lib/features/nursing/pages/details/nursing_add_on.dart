@@ -8,7 +8,7 @@ import 'package:m2health/const.dart';
 import 'package:m2health/features/nursingclean/const.dart';
 import 'package:m2health/features/nursing/pages/search_professional_page.dart';
 import 'package:m2health/features/nursing/personal/nursing_personal_state.dart';
-import 'package:m2health/models/service_config.dart';
+import 'package:m2health/core/data/models/service_config.dart';
 import 'package:m2health/utils.dart';
 
 abstract class AddOnState extends Equatable {

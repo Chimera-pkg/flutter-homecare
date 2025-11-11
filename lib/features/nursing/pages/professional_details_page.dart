@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:m2health/features/nursingclean/domain/entities/professional_entity.dart';
-import 'package:m2health/models/provider.dart';
-import 'package:m2health/views/book_appointment.dart';
+import 'package:m2health/core/data/models/provider.dart';
+import 'package:m2health/core/presentation/views/book_appointment.dart';
 import 'package:m2health/const.dart';
 
 class ProfessionalDetailsPage extends StatelessWidget {

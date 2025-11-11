@@ -5,9 +5,9 @@ import 'package:m2health/features/profiles/presentation/bloc/profile_cubit.dart'
 import 'package:m2health/features/profiles/presentation/bloc/profile_state.dart';
 import 'package:m2health/route/app_routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../const.dart';
-import '../AppLanguage.dart';
-import '../app_localzations.dart';
+import '../../../const.dart';
+import '../../../AppLanguage.dart';
+import '../../../app_localzations.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

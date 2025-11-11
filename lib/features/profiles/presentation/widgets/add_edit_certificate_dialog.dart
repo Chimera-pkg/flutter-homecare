@@ -5,7 +5,7 @@ import 'package:m2health/const.dart';
 import 'package:m2health/features/profiles/domain/entities/certificate.dart';
 import 'dart:io';
 
-import 'package:m2health/widgets/image_preview.dart';
+import 'package:m2health/core/presentation/widgets/image_preview.dart';
 
 class AddEditCertificateDialog extends StatefulWidget {
   final Certificate? certificate;

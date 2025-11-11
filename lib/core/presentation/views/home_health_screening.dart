@@ -4,9 +4,9 @@ import 'package:m2health/app_localzations.dart';
 import 'package:m2health/const.dart';
 
 import 'package:m2health/route/app_routes.dart';
-import 'package:m2health/views/medical_store.dart';
+import 'package:m2health/core/presentation/views/medical_store.dart';
 
-import 'package:m2health/widgets/chat_pharma.dart';
+import 'package:m2health/core/presentation/widgets/chat_pharma.dart';
 
 class HomeHealth extends StatefulWidget {
   @override

@@ -7,14 +7,14 @@ import 'package:m2health/features/appointment/bloc/appointment_cubit.dart';
 import 'package:m2health/features/appointment/bloc/appointment_detail_cubit.dart';
 import 'package:m2health/features/appointment/models/appointment.dart';
 import 'package:m2health/features/appointment/widgets/cancel_appoinment_dialog.dart';
-import 'package:m2health/models/personal_case.dart';
-import 'package:m2health/models/profile.dart';
-import 'package:m2health/models/provider.dart';
+import 'package:m2health/core/data/models/personal_case.dart';
+import 'package:m2health/core/data/models/profile.dart';
+import 'package:m2health/core/data/models/provider.dart';
 import 'package:m2health/route/app_routes.dart';
 import 'package:m2health/service_locator.dart';
-import 'package:m2health/services/appointment_service.dart';
-import 'package:m2health/views/book_appointment.dart';
-import 'package:m2health/widgets/gradient_button.dart'; // Assuming you have this
+import 'package:m2health/core/services/appointment_service.dart';
+import 'package:m2health/core/presentation/views/book_appointment.dart';
+import 'package:m2health/core/presentation/widgets/gradient_button.dart'; // Assuming you have this
 
 class DetailAppointmentPage extends StatefulWidget {
   final int appointmentId;

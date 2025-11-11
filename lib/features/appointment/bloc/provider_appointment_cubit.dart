@@ -6,8 +6,8 @@ import 'package:m2health/features/appointment/appointment_module.dart';
 import 'package:m2health/features/appointment/models/appointment.dart';
 import 'package:m2health/utils.dart';
 import 'package:meta/meta.dart';
-import 'package:m2health/models/provider_appointment.dart';
-import 'package:m2health/services/appointment_service.dart';
+import 'package:m2health/core/data/models/provider_appointment.dart';
+import 'package:m2health/core/services/appointment_service.dart';
 
 part 'provider_appointment_state.dart';
 

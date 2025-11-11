@@ -3,12 +3,12 @@ import 'package:m2health/features/diabetes/diabetic_care_routes.dart';
 import 'package:m2health/features/nursingclean/presentation/pages/nursing_services_page.dart';
 import 'package:m2health/features/precision/precision_nutrition_routes.dart';
 import 'package:m2health/route/navigator_keys.dart';
-import 'package:m2health/views/pharmacist_services.dart';
+import 'package:m2health/core/presentation/views/pharmacist_services.dart';
 import '../features/precision/screens/precision_nutrition_page.dart';
 import '../features/diabetes/diabetic_care.dart';
-import '../views/home_health_screening.dart';
-import '../views/remote_patient_monitoring.dart';
-import '../views/second_opinion.dart';
+import '../core/presentation/views/home_health_screening.dart';
+import '../core/presentation/views/remote_patient_monitoring.dart';
+import '../core/presentation/views/second_opinion.dart';
 import 'app_routes.dart';
 
 class DashboardRoutes {
