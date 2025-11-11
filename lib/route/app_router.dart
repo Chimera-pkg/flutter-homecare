@@ -2,11 +2,11 @@ import 'package:m2health/route/appointment_routes.dart';
 import 'package:m2health/route/auth_routes.dart';
 import 'package:m2health/route/core_routes.dart';
 import 'package:go_router/go_router.dart';
-import 'package:m2health/cubit/locations/location_page.dart';
-import 'package:m2health/cubit/pharmacist_profile/pharmacist_profile_page.dart';
-import 'package:m2health/cubit/personal/personal_page.dart';
+import 'package:m2health/features/locations/location_page.dart';
+import 'package:m2health/features/pharmacist_profile/pharmacist_profile_page.dart';
+import 'package:m2health/features/personal/personal_page.dart';
 import 'package:m2health/route/navigator_keys.dart';
-import 'package:m2health/cubit/profiles/profile_detail_routes.dart';
+import 'package:m2health/features/profiles/profile_detail_routes.dart';
 import 'app_routes.dart';
 
 final GoRouter router = GoRouter(

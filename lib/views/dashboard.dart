@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:m2health/cubit/profiles/presentation/bloc/profile_cubit.dart';
-import 'package:m2health/cubit/profiles/presentation/bloc/profile_state.dart';
+import 'package:m2health/features/profiles/presentation/bloc/profile_cubit.dart';
+import 'package:m2health/features/profiles/presentation/bloc/profile_state.dart';
 import 'package:m2health/route/app_routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../const.dart';

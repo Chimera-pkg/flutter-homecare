@@ -1,7 +1,7 @@
 import 'package:go_router/go_router.dart';
-import 'package:m2health/cubit/appointment/appointment_module.dart';
+import 'package:m2health/features/appointment/appointment_module.dart';
 import 'package:m2health/route/app_routes.dart';
-import 'package:m2health/cubit/appointment/pages/provider_appointment_detail_page.dart';
+import 'package:m2health/features/appointment/pages/provider_appointment_detail_page.dart';
 import 'package:m2health/views/book_appointment.dart';
 
 class AppointmentRoutes {

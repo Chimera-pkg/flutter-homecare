@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:m2health/app_localzations.dart';
-import 'package:m2health/cubit/personal/personal_page.dart';
+import 'package:m2health/features/personal/personal_page.dart';
 import 'package:m2health/route/app_routes.dart';
 import 'package:m2health/main.dart';
 import 'package:m2health/views/medical_store.dart';

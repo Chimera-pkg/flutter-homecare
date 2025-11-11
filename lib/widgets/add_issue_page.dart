@@ -4,10 +4,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/const.dart';
-import 'package:m2health/cubit/medical_record/data/model/medical_record_model.dart';
-import 'package:m2health/cubit/personal/personal_cubit.dart';
-import 'package:m2health/cubit/personal/personal_state.dart';
-import 'package:m2health/cubit/medical_record/domain/entities/medical_record.dart';
+import 'package:m2health/features/medical_record/data/model/medical_record_model.dart';
+import 'package:m2health/features/personal/personal_cubit.dart';
+import 'package:m2health/features/personal/personal_state.dart';
+import 'package:m2health/features/medical_record/domain/entities/medical_record.dart';
 import 'package:m2health/utils.dart';
 import 'package:m2health/views/details/add_on.dart';
 

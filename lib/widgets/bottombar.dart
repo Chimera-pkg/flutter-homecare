@@ -1,8 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
-import 'package:m2health/cubit/profiles/presentation/profile_page.dart';
-import 'package:m2health/cubit/appointment/pages/appointment_page.dart';
+import 'package:m2health/features/profiles/presentation/profile_page.dart';
+import 'package:m2health/features/appointment/pages/appointment_page.dart';
 import 'package:m2health/views/dashboard.dart';
 import 'package:m2health/views/favourites.dart';
 import 'package:m2health/views/medical_store.dart';

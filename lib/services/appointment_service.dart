@@ -2,10 +2,10 @@ import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:m2health/const.dart';
-import 'package:m2health/cubit/appointment/models/appointment.dart';
-import 'package:m2health/cubit/appointment/models/paginated_appointment_response.dart';
-import 'package:m2health/cubit/profiles/data/models/profile_model.dart';
-import 'package:m2health/cubit/profiles/domain/entities/profile.dart';
+import 'package:m2health/features/appointment/models/appointment.dart';
+import 'package:m2health/features/appointment/models/paginated_appointment_response.dart';
+import 'package:m2health/features/profiles/data/models/profile_model.dart';
+import 'package:m2health/features/profiles/domain/entities/profile.dart';
 import 'package:m2health/models/provider_appointment.dart';
 import 'package:m2health/utils.dart';
 

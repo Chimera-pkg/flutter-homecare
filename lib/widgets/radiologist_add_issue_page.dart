@@ -2,8 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/const.dart';
-import 'package:m2health/cubit/personal/personal_cubit.dart';
-import 'package:m2health/cubit/personal/personal_state.dart';
+import 'package:m2health/features/personal/personal_cubit.dart';
+import 'package:m2health/features/personal/personal_state.dart';
 import 'package:m2health/utils.dart';
 import 'package:m2health/views/details/radiologist_add_on.dart';
 

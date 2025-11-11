@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:m2health/cubit/nursingclean/data/models/add_on_service_model.dart';
-import 'package:m2health/cubit/nursingclean/domain/entities/add_on_service.dart';
+import 'package:m2health/features/nursingclean/data/models/add_on_service_model.dart';
+import 'package:m2health/features/nursingclean/domain/entities/add_on_service.dart';
 
 class PersonalCase {
   final int id;

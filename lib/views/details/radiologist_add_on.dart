@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:m2health/const.dart';
-import 'package:m2health/cubit/personal/personal_state.dart';
+import 'package:m2health/features/personal/personal_state.dart';
 import 'package:m2health/utils.dart';
 import '../search/search_professional.dart';
 
