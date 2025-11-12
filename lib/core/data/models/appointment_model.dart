@@ -1,6 +1,5 @@
-import 'dart:developer';
 
-import 'package:m2health/core/data/models/payment.dart';
+import 'package:m2health/features/payment/data/model/payment_model.dart';
 import 'package:m2health/features/booking_appointment/nursing/data/models/nursing_personal_case.dart';
 import 'package:m2health/core/domain/entities/appointment_entity.dart';
 import 'package:m2health/features/booking_appointment/pharmacy/data/models/pharmacy_personal_case.dart';
@@ -36,7 +35,7 @@ class AppointmentModel extends AppointmentEntity {
         ? ProfileModel.fromJson(appointmentJson['patient'])
         : null;
     final payment = appointmentJson['payment'] != null
-        ? Payment.fromJson(appointmentJson['payment'])
+        ? PaymentModel.fromJson(appointmentJson['payment'])
         : null;
     final nursingCase = appointmentJson['nursing_request_data'] != null
         ? NursingPersonalCaseModel.fromJson(

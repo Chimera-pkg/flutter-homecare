@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:m2health/core/data/models/payment.dart';
+import 'package:m2health/features/payment/domain/entities/payment.dart';
 import 'package:m2health/features/booking_appointment/nursing/domain/entities/nursing_case.dart';
 import 'package:m2health/features/booking_appointment/pharmacy/domain/entities/pharmacy_case.dart';
 import 'package:m2health/features/booking_appointment/professional_directory/domain/entities/professional_entity.dart';

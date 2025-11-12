@@ -1,13 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:m2health/const.dart';
-import 'package:m2health/features/appointment/bloc/appointment_cubit.dart';
+import 'package:m2health/core/extensions/string_extensions.dart';
 import 'package:m2health/features/booking_appointment/add_on_services/domain/entities/add_on_service.dart';
 import 'package:m2health/core/domain/entities/appointment_entity.dart';
-import 'package:m2health/features/payment/domain/entities/payment_method.dart';
 import 'package:m2health/features/booking_appointment/professional_directory/domain/entities/professional_entity.dart';
-import 'package:go_router/go_router.dart';
-import 'package:m2health/route/app_routes.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:m2health/features/payment/domain/entities/payment.dart';
+import 'package:m2health/features/payment/presentation/widgets/payment_success_dialog.dart';
+
+class PaymentMethod {
+  final String id;
+  final String type;
+  final String displayName;
+  final String iconUrl;
+  final String code;
+
+  final String? accountNumber;
+  final String? expiryDate;
+
+  PaymentMethod({
+    required this.id,
+    required this.type,
+    required this.displayName,
+    required this.iconUrl,
+    required this.code,
+    this.accountNumber,
+    this.expiryDate,
+  });
+}
 
 class PaymentPage extends StatefulWidget {
   final AppointmentEntity appointment;
@@ -25,13 +43,15 @@ class _PaymentPageState extends State<PaymentPage> {
   PaymentMethod? selectedPaymentMethod;
 
   ProfessionalEntity get profile => widget.appointment.provider!;
-  List<AddOnService> get services => widget.appointment.nursingCase!.addOnServices;
+  List<AddOnService> get services =>
+      widget.appointment.nursingCase!.addOnServices;
   double get totalCost => widget.appointment.payTotal;
 
   List<PaymentMethod> paymentMethods = [
     PaymentMethod(
       id: '1',
       type: 'card',
+      code: 'Visa',
       displayName: 'Visa',
       iconUrl: 'assets/icons/ic_visa.png',
       accountNumber: '**** **** **** 1234',
@@ -40,6 +60,7 @@ class _PaymentPageState extends State<PaymentPage> {
     PaymentMethod(
       id: '2',
       type: 'card',
+      code: 'MasterCard',
       displayName: 'MasterCard',
       iconUrl: 'assets/icons/mastercard.png',
       accountNumber: '**** **** **** 5678',
@@ -48,18 +69,21 @@ class _PaymentPageState extends State<PaymentPage> {
     PaymentMethod(
       id: '3',
       type: 'alipay',
+      code: 'Alipay',
       displayName: 'Alipay',
       iconUrl: 'assets/icons/ic_alipay.png',
     ),
     PaymentMethod(
       id: '4',
       type: 'paynow',
+      code: 'PayNow',
       displayName: 'PayNow',
       iconUrl: 'assets/icons/ic_paynow.jpg',
     ),
     PaymentMethod(
       id: '5',
       type: 'cash',
+      code: 'Cash',
       displayName: 'Cash',
       iconUrl: 'assets/icons/cash.png',
     ),
@@ -81,39 +105,55 @@ class _PaymentPageState extends State<PaymentPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 25,
-                      backgroundImage: NetworkImage(profile.avatar ?? ''),
-                      onBackgroundImageError: (_, __) {},
-                    ),
-                    const SizedBox(width: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          profile.name,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12.withValues(alpha: 0.08),
+                    spreadRadius: 0,
+                    blurRadius: 16,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 40,
+                    backgroundImage: (profile.avatar != null)
+                        ? NetworkImage(profile.avatar!)
+                        : null,
+                    child: (profile.avatar == null)
+                        ? const Icon(Icons.person, size: 40, color: Colors.grey)
+                        : null,
+                  ),
+                  const SizedBox(width: 16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        profile.name,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
                         ),
-                        Text(profile.role),
-                        Row(
-                          children: [
-                            const Icon(Icons.star_half, color: Colors.yellow),
-                            const SizedBox(width: 4),
-                            Text('${profile.rating} (${100} reviews)'),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                      Text(profile.jobTitle?.toTitleCase() ??
+                          profile.role.toTitleCase()),
+                      Row(
+                        children: [
+                          const Icon(Icons.star_half_rounded,
+                              color: Color(0xFF9DEAC0)),
+                          const SizedBox(width: 4),
+                          Text('${profile.rating} (${100} reviews)'),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 16),
@@ -125,16 +165,22 @@ class _PaymentPageState extends State<PaymentPage> {
               ),
             ),
             const SizedBox(height: 8),
-            ...services.map((service) {
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(service.name),
-                  Text('\$${service.price}'),
-                ],
-              );
-            }),
-            const Divider(),
+            Column(
+              spacing: 4,
+              children: [
+                ...services.map((service) {
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(child: Text(service.name)),
+                      Text('\$${service.price}'),
+                    ],
+                  );
+                })
+              ],
+            ),
+            const Divider(height: 32),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -154,16 +200,21 @@ class _PaymentPageState extends State<PaymentPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             const Text(
               'Select Payment Method',
               style: TextStyle(
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
                 fontSize: 18,
               ),
             ),
             const SizedBox(height: 8),
-            ...paymentMethods.map((method) => _buildPaymentMethodCard(method))
+            Column(
+              spacing: 8,
+              children: paymentMethods
+                  .map((method) => _buildPaymentMethodCard(method))
+                  .toList(),
+            )
           ],
         ),
       ),
@@ -174,9 +225,20 @@ class _PaymentPageState extends State<PaymentPage> {
               ? () {
                   showDialog(
                     context: context,
+                    barrierDismissible: false,
                     builder: (context) => PaymentSuccessDialog(
-                      totalCost: totalCost,
-                      pharmacistName: profile.name,
+                      appointment: widget.appointment,
+                      payment: Payment(
+                        // Mock payment data, need to replace with real data after the payment integration
+                        id: 0,
+                        userId: 0,
+                        appointmentId: widget.appointment.id!,
+                        method: selectedPaymentMethod!.code,
+                        amount: totalCost,
+                        status: 'completed',
+                        createdAt: DateTime.now(),
+                        updatedAt: DateTime.now(),
+                      ),
                     ),
                   );
                 }
@@ -188,6 +250,7 @@ class _PaymentPageState extends State<PaymentPage> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),
+            padding: const EdgeInsets.symmetric(vertical: 16),
           ),
           child: const Text(
             'Confirm',
@@ -214,10 +277,19 @@ class _PaymentPageState extends State<PaymentPage> {
       onTap: () {
         toggleSelection(paymentMethod);
       },
-      child: Card(
-        color: selectedPaymentMethod == paymentMethod
-            ? Colors.blue[50]
-            : Colors.white,
+      child: Container(
+        decoration: BoxDecoration(
+          color: selectedPaymentMethod == paymentMethod
+              ? (Colors.green.withValues(alpha: 0.08))
+              : Colors.white,
+          border: Border.all(
+            color: selectedPaymentMethod == paymentMethod
+                ? (Colors.green)
+                : Colors.grey.withValues(alpha: 0.3),
+            width: 1.5,
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
@@ -242,382 +314,6 @@ class _PaymentPageState extends State<PaymentPage> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class PaymentSuccessDialog extends StatelessWidget {
-  final double totalCost;
-  final String pharmacistName;
-
-  const PaymentSuccessDialog(
-      {super.key, required this.totalCost, required this.pharmacistName});
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8.0),
-      ),
-      contentPadding: const EdgeInsets.all(16.0),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Image.asset(
-            'assets/icons/ic_checklist.png',
-            width: 142,
-            height: 142,
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Payment Success',
-            style: TextStyle(
-              color: Const.tosca,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Your money has been successfully sent to $pharmacistName.',
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('Amount'),
-              Text(
-                '\$$totalCost',
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 34),
-              ),
-            ],
-          ),
-          const Divider(
-            color: Colors.grey,
-            thickness: 1,
-            height: 32,
-          ),
-          const Text(
-            'How is your experience?',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Your feedback will help us to improve your\nexperience better',
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                builder: (BuildContext context) {
-                  return FeedbackForm(
-                    pharmacistName: pharmacistName,
-                  );
-                },
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Const.tosca,
-              minimumSize: const Size(150, 50),
-            ),
-            child: const Text(
-              'Please Feedback',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: 150,
-            height: 50,
-            child: ElevatedButton(
-              onPressed: () {
-                context.read<AppointmentCubit>().refreshAllTabs();
-                context.go(AppRoutes.appointment);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Const.tosca,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: const Text(
-                'Return to Home',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class FeedbackForm extends StatefulWidget {
-  final String pharmacistName;
-
-  const FeedbackForm({super.key, required this.pharmacistName});
-
-  @override
-  _FeedbackFormState createState() => _FeedbackFormState();
-}
-
-class _FeedbackFormState extends State<FeedbackForm> {
-  int selectedStar = 5;
-  String selectedTip = '';
-  bool showOtherAmountField = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-        left: 16,
-        right: 16,
-        top: 16,
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-            Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(5, (index) {
-                  return IconButton(
-                    icon: Icon(
-                      Icons.star,
-                      color: index < selectedStar ? Colors.yellow : Colors.grey,
-                      size: 30,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        selectedStar = index + 1;
-                      });
-                    },
-                  );
-                }),
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Center(
-              child: Text(
-                'Excellent',
-                style: TextStyle(
-                  color: Colors.blue,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Center(
-              child: Text(
-                'You rated ${widget.pharmacistName} $selectedStar stars',
-                textAlign: TextAlign.center,
-              ),
-            ),
-            const SizedBox(height: 16),
-            const TextField(
-              decoration: InputDecoration(
-                hintText: 'Write your text',
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 3,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Give some tips to ${widget.pharmacistName}',
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildTipCard('\$1'),
-                _buildTipCard('\$2'),
-                _buildTipCard('\$5'),
-                _buildTipCard('\$10'),
-                _buildTipCard('\$20'),
-              ],
-            ),
-            const SizedBox(height: 16),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  showOtherAmountField = true;
-                });
-              },
-              child: const Text(
-                'Enter other amount',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            if (showOtherAmountField) ...[
-              const SizedBox(height: 8),
-              const TextField(
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  hintText: 'Enter amount',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ],
-            const SizedBox(height: 16),
-            Center(
-              child: SizedBox(
-                width: 353,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const FeedbackDetails()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Const.tosca,
-                  ),
-                  child: const Text(
-                    'Submit',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Center(
-              child: SizedBox(
-                width: 353,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const FeedbackDetails()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Const.tosca,
-                  ),
-                  child: const Text(
-                    'Close',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTipCard(String amount) {
-    bool isSelected = selectedTip == amount;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedTip = amount;
-        });
-      },
-      child: Container(
-        width: 60,
-        height: 60,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(
-            color: isSelected ? Const.tosca : Colors.grey,
-            width: 2,
-          ),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Center(
-          child: Text(
-            amount,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: isSelected ? Const.tosca : Colors.black,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class FeedbackDetails extends StatelessWidget {
-  const FeedbackDetails({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/icons/ic_checklist.png',
-              width: 142,
-              height: 142,
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Thank you for your feedback',
-              style: TextStyle(color: Const.tosca, fontSize: 20),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              'This appointment has been completed and can be viewed in the completed orders menu',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 30),
-            Center(
-              child: SizedBox(
-                width: 300,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    GoRouter.of(context).go(AppRoutes.appointment);
-                  },
-                  child: const Text(
-                    'View Detail',
-                    style: TextStyle(color: Const.tosca),
-                  ),
-                ),
-              ),
-            ),
-          ],
         ),
       ),
     );
