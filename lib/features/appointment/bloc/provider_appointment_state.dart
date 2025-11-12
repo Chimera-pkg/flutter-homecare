@@ -8,7 +8,7 @@ class ProviderAppointmentInitial extends ProviderAppointmentState {}
 class ProviderAppointmentLoading extends ProviderAppointmentState {}
 
 class ProviderAppointmentLoaded extends ProviderAppointmentState {
-  final List<Appointment> appointments;
+  final List<AppointmentEntity> appointments;
 
   ProviderAppointmentLoaded(this.appointments);
 }

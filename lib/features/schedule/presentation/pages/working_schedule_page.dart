@@ -43,7 +43,7 @@ class _WorkingSchedulePageState extends State<WorkingSchedulePage>
         addOverride: sl(),
         updateOverride: sl(),
         deleteOverride: sl(),
-        getAvailableSlots: sl(),
+        getSlotsPreview: sl(),
       )
         // Pass provider info to the cubit
         ..loadSchedules(),

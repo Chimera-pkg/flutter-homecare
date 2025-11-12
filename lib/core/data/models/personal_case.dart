@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:m2health/features/nursing/data/models/add_on_service_model.dart';
-import 'package:m2health/features/nursing/domain/entities/add_on_service.dart';
+import 'package:m2health/features/booking_appointment/add_on_services/data/model/add_on_service_model.dart';
+import 'package:m2health/features/booking_appointment/add_on_services/domain/entities/add_on_service.dart';
 
 class PersonalCase {
   final int id;

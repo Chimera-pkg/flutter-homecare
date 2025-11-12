@@ -5,7 +5,7 @@ import 'package:m2health/features/schedule/domain/repositories/schedule_reposito
 import 'package:m2health/features/schedule/domain/usecases/index.dart';
 
 void initScheduleModule(GetIt sl) {
- // Use cases
+  // Use cases
   sl.registerLazySingleton(() => GetAvailabilities(sl()));
   sl.registerLazySingleton(() => AddAvailability(sl()));
   sl.registerLazySingleton(() => UpdateAvailability(sl()));
@@ -14,7 +14,7 @@ void initScheduleModule(GetIt sl) {
   sl.registerLazySingleton(() => AddOverride(sl()));
   sl.registerLazySingleton(() => UpdateOverride(sl()));
   sl.registerLazySingleton(() => DeleteOverride(sl()));
-  sl.registerLazySingleton(() => GetAvailableSlots(sl()));
+  sl.registerLazySingleton(() => GetSlotsPreview(sl()));
 
   // Repository
   sl.registerLazySingleton<ScheduleRepository>(

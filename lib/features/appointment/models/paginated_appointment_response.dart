@@ -1,4 +1,5 @@
-import 'package:m2health/features/appointment/models/appointment.dart';
+import 'package:m2health/core/data/models/appointment_model.dart';
+import 'package:m2health/core/domain/entities/appointment_entity.dart';
 
 class Meta {
   final int total;
@@ -24,7 +25,7 @@ class Meta {
 }
 
 class PaginatedAppointmentsResponse {
-  final List<Appointment> appointments;
+  final List<AppointmentEntity> appointments;
   final Meta meta;
 
   PaginatedAppointmentsResponse({
@@ -34,9 +35,12 @@ class PaginatedAppointmentsResponse {
 
   factory PaginatedAppointmentsResponse.fromJson(Map<String, dynamic> json) {
     final data = json['data'] as List? ?? [];
-    final appointments =
-        data.map((item) => Appointment.fromJson(item)).toList();
+    final appointments = data
+        .map((item) => AppointmentModel.fromJson(item))
+        .cast<AppointmentEntity>()
+        .toList();
     final meta = Meta.fromJson(json['meta'] ?? {});
-    return PaginatedAppointmentsResponse(appointments: appointments, meta: meta);
+    return PaginatedAppointmentsResponse(
+        appointments: appointments, meta: meta);
   }
 }

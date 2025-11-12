@@ -8,7 +8,7 @@ class AppointmentDetailInitial extends AppointmentDetailState {}
 class AppointmentDetailLoading extends AppointmentDetailState {}
 
 class AppointmentDetailLoaded extends AppointmentDetailState {
-  final Appointment appointment;
+  final AppointmentEntity appointment;
   AppointmentDetailLoaded(this.appointment);
 }
 

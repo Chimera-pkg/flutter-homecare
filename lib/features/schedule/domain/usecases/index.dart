@@ -6,4 +6,4 @@ export 'get_overrides.dart';
 export 'add_override.dart';
 export 'update_override.dart';
 export 'delete_override.dart';
-export 'get_available_slots.dart';
+export 'get_slots_preview.dart';

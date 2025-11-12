@@ -322,7 +322,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TimeSlot(
+                TimeSlotGridView(
                   startTime: DateTime(2023, 1, 1, 9, 0),
                   endTime: DateTime(2023, 1, 1, 18, 0),
                   selectedTime: selectTime,

@@ -2,10 +2,12 @@ import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:m2health/const.dart';
+import 'package:m2health/core/domain/entities/appointment_entity.dart';
 import 'package:m2health/features/appointment/models/appointment.dart';
 import 'package:m2health/features/appointment/models/paginated_appointment_response.dart';
-import 'package:m2health/features/nursing/data/models/appointment_model.dart';
-import 'package:m2health/features/nursing/domain/usecases/create_nursing_appointment.dart';
+// ignore: unused_import
+import 'package:m2health/core/data/models/appointment_model.dart';
+import 'package:m2health/features/booking_appointment/nursing/domain/usecases/create_nursing_appointment.dart';
 import 'package:m2health/features/profiles/data/models/profile_model.dart';
 import 'package:m2health/features/profiles/domain/entities/profile.dart';
 import 'package:m2health/core/data/models/provider_appointment.dart';
@@ -279,6 +281,9 @@ class AppointmentService {
         ),
       );
 
+      log('Response data: ${response.data['data']}',
+          name: 'AppointmentService');
+
       if (response.statusCode == 200 && response.data != null) {
         return PaginatedAppointmentsResponse.fromJson(response.data);
       } else {
@@ -292,7 +297,7 @@ class AppointmentService {
   }
 
   /// Fetches the detail for an appointment.
-  Future<Appointment> fetchAppointmentDetail(int appointmentId) async {
+  Future<AppointmentEntity> fetchAppointmentDetail(int appointmentId) async {
     try {
       final token = await Utils.getSpString(Const.TOKEN);
       final response = await _dio.get(
@@ -305,13 +310,15 @@ class AppointmentService {
         ),
       );
 
-      if (response.statusCode == 200 && response.data['data'] != null) {
-        return Appointment.fromJson(response.data['data']);
-      } else {
-        throw Exception(
-            'Failed to load appointment detail: ${response.statusCode}');
-      }
+      return AppointmentModel.fromJson(response.data);
     } catch (e) {
+      if (e is DioException) {
+        log('DioException fetching appointment detail: ${e.message}',
+            error: e, name: 'AppointmentService');
+      } else {
+        log('Error fetching appointment detail: $e',
+            error: e, name: 'AppointmentService');
+      }
       rethrow;
     }
   }

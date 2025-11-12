@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:m2health/const.dart';
+import 'package:m2health/core/domain/entities/appointment_entity.dart';
 import 'package:m2health/features/appointment/bloc/provider_appointment_cubit.dart';
 import 'package:m2health/features/appointment/bloc/provider_appointment_detail_cubit.dart';
-import 'package:m2health/features/appointment/models/appointment.dart';
+import 'package:m2health/features/booking_appointment/personal_issue/domain/entities/personal_issue.dart';
 import 'package:m2health/service_locator.dart';
 
 class ProviderAppointmentDetailPage extends StatelessWidget {
@@ -51,7 +52,18 @@ class ProviderAppointmentDetailView extends StatelessWidget {
   }
 
   Widget _buildAppointmentDetails(
-      BuildContext context, Appointment appointment) {
+      BuildContext context, AppointmentEntity appointment) {
+    final localStartTime = appointment.startDatetime.toLocal();
+    final localEndTime = appointment.endDatetime?.toLocal();
+
+    final date = DateFormat('EEEE, MMMM dd, yyyy').format(localStartTime);
+
+    final startHour = DateFormat('hh:mm a').format(localStartTime);
+    final endHour = localEndTime != null
+        ? DateFormat('hh:mm a').format(localEndTime)
+        : null;
+    final hour = endHour != null ? '$startHour - $endHour' : startHour;
+
     return Column(
       children: [
         Expanded(
@@ -61,12 +73,8 @@ class ProviderAppointmentDetailView extends StatelessWidget {
               _PatientHeader(appointment: appointment),
               const SizedBox(height: 24),
               _buildSectionTitle('Schedule Appointment'),
-              _InfoRow(
-                  icon: Icons.calendar_today_outlined,
-                  text: DateFormat('EEEE, MMMM dd, yyyy')
-                      .format(DateTime.parse(appointment.date))),
-              _InfoRow(
-                  icon: Icons.access_time_outlined, text: appointment.hour),
+              _InfoRow(icon: Icons.calendar_today_outlined, text: date),
+              _InfoRow(icon: Icons.access_time_outlined, text: hour),
               const SizedBox(height: 24),
               _buildSectionTitle('Patient Information'),
               _PatientInfoTable(appointment: appointment),
@@ -93,7 +101,7 @@ class ProviderAppointmentDetailView extends StatelessWidget {
 }
 
 class _PatientHeader extends StatelessWidget {
-  final Appointment appointment;
+  final AppointmentEntity appointment;
   const _PatientHeader({required this.appointment});
 
   Color _getStatusColor(String status) {
@@ -112,11 +120,16 @@ class _PatientHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final statusColor = _getStatusColor(appointment.status);
+    final patient = appointment.patientProfile!;
     return Row(
       children: [
         CircleAvatar(
           radius: 30,
-          backgroundImage: NetworkImage(appointment.patient?.avatar ?? ''),
+          backgroundImage:
+              (patient.avatar != null) ? NetworkImage(patient.avatar!) : null,
+          child: (patient.avatar == null)
+              ? const Icon(Icons.person, size: 30, color: Colors.grey)
+              : null,
         ),
         const SizedBox(width: 16),
         Expanded(
@@ -124,7 +137,7 @@ class _PatientHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                appointment.patient?.name ?? 'Patient Name',
+                patient.name,
                 style:
                     const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
               ),
@@ -136,7 +149,7 @@ class _PatientHeader extends StatelessWidget {
                   const SizedBox(width: 4),
                   Expanded(
                     child: Text(
-                      appointment.patient?.homeAddress ?? 'Unknown Location',
+                      patient.homeAddress ?? 'Unknown Location',
                       style: const TextStyle(fontSize: 12),
                     ),
                   ),
@@ -187,19 +200,20 @@ class _InfoRow extends StatelessWidget {
 }
 
 class _PatientInfoTable extends StatelessWidget {
-  final Appointment appointment;
+  final AppointmentEntity appointment;
   const _PatientInfoTable({required this.appointment});
 
   @override
   Widget build(BuildContext context) {
+    final patient = appointment.patientProfile!;
     return Column(
       children: [
-        _buildInfoRow('Full Name', appointment.patient!.name),
-        _buildInfoRow('Age', appointment.patient!.age.toString()),
-        _buildInfoRow('Gender', appointment.patient!.gender),
-        _buildInfoRow('Weight', '${appointment.patient!.weight} kg'),
-        _buildInfoRow('Height', '${appointment.patient!.height} cm'),
-        _buildInfoRow('Address', appointment.patient!.homeAddress),
+        _buildInfoRow('Full Name', patient.name),
+        _buildInfoRow('Age', patient.age.toString()),
+        _buildInfoRow('Gender', patient.gender),
+        _buildInfoRow('Weight', '${patient.weight} kg'),
+        _buildInfoRow('Height', '${patient.height} cm'),
+        _buildInfoRow('Address', patient.homeAddress),
       ],
     );
   }
@@ -223,71 +237,95 @@ class _PatientInfoTable extends StatelessWidget {
 }
 
 class _PersonalCaseInfo extends StatelessWidget {
-  final Appointment appointment;
+  final AppointmentEntity appointment;
   const _PersonalCaseInfo({required this.appointment});
 
   @override
   Widget build(BuildContext context) {
-    final personalCase = appointment.personalCase;
-    final images = personalCase?.images ?? [];
+    String? services;
+    List<PersonalIssue>? issues;
+
+    if (appointment.providerType == 'nurse') {
+      final personalCase = appointment.nursingCase;
+      services =
+          personalCase?.addOnServices.map((e) => e.name).join(', ') ?? 'None';
+      issues = personalCase?.issues;
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text.rich(
-          TextSpan(
-            text: 'Services: ',
-            style: const TextStyle(fontWeight: FontWeight.w500),
-            children: [
-              TextSpan(
-                text: personalCase?.addOn.map((e) => e.name,).join(', '),
-                style: const TextStyle(
-                    color: Colors.black, fontWeight: FontWeight.w600),
-              )
-            ],
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text.rich(
-          TextSpan(
-            text: 'Description:\n',
-            style: const TextStyle(fontWeight: FontWeight.w500),
-            children: [
-              TextSpan(
-                text: personalCase?.description ?? 'No description provided.',
-                style: const TextStyle(color: Colors.black, height: 1.5),
-              )
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        if (images.isNotEmpty) ...[
-          const Text('Images', style: TextStyle(fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          SizedBox(
-            height: 80,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: images.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.network(images[index]),
-                  ),
-                );
-              },
+        if (services != null)
+          Text.rich(
+            TextSpan(
+              text: 'Services: ',
+              style: const TextStyle(fontWeight: FontWeight.w500),
+              children: [
+                TextSpan(
+                  text: services,
+                  style: const TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.w600),
+                )
+              ],
             ),
+          ),
+        const SizedBox(height: 8),
+        if (issues != null && issues.isNotEmpty)
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: issues.length,
+            itemBuilder: (context, issueIndex) {
+              final issue = issues![issueIndex];
+              final description = issue.description;
+              final images = issue.imageUrls;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text.rich(
+                    TextSpan(
+                      text: 'Description:\n',
+                      style: const TextStyle(fontWeight: FontWeight.w500),
+                      children: [
+                        TextSpan(
+                          text: description,
+                          style:
+                              const TextStyle(color: Colors.black, height: 1.5),
+                        )
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  if (images.isNotEmpty)
+                    SizedBox(
+                      height: 80,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: images.length,
+                        itemBuilder: (context, imageIndex) {
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.network(images[imageIndex]),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  const SizedBox(height: 16),
+                ],
+              );
+            },
           )
-        ]
       ],
     );
   }
 }
 
 class _ActionButtons extends StatelessWidget {
-  final Appointment appointment;
+  final AppointmentEntity appointment;
   const _ActionButtons({required this.appointment});
 
   @override
@@ -328,7 +366,7 @@ class _ActionButtons extends StatelessWidget {
                   onPressed: () {
                     context
                         .read<ProviderAppointmentCubit>()
-                        .rejectAppointment(appointment.id);
+                        .rejectAppointment(appointment.id!);
                     Navigator.of(context).pop();
                   },
                   style: OutlinedButton.styleFrom(
@@ -363,7 +401,7 @@ class _ActionButtons extends StatelessWidget {
                     onPressed: () {
                       context
                           .read<ProviderAppointmentCubit>()
-                          .acceptAppointment(appointment.id);
+                          .acceptAppointment(appointment.id!);
                       Navigator.of(context).pop();
                     },
                     style: ElevatedButton.styleFrom(

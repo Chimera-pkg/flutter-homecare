@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:m2health/const.dart';
 
-class TimeSlot extends StatefulWidget {
+class TimeSlotGridView extends StatefulWidget {
   final DateTime startTime;
   final DateTime endTime;
   final DateTime? selectedTime;
   final ValueChanged<DateTime> onTimeSelected;
 
-  TimeSlot({
+  const TimeSlotGridView({
     required this.startTime,
     required this.endTime,
     required this.selectedTime,
@@ -15,10 +15,10 @@ class TimeSlot extends StatefulWidget {
   });
 
   @override
-  _TimeSlotState createState() => _TimeSlotState();
+  _TimeSlotGridViewState createState() => _TimeSlotGridViewState();
 }
 
-class _TimeSlotState extends State<TimeSlot> {
+class _TimeSlotGridViewState extends State<TimeSlotGridView> {
   List<DateTime> timeSlots = [];
 
   @override

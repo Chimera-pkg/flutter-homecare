@@ -5,7 +5,7 @@ enum AppointmentStatus { pending, upcoming, completed, cancelled, missed }
 enum LoadStatus { initial, loading, success, failure, loadingMore, refreshing }
 
 class AppointmentTabData {
-  final List<Appointment> appointments;
+  final List<AppointmentEntity> appointments;
   final int currentPage;
   final bool hasMore;
   final LoadStatus status;
@@ -20,7 +20,7 @@ class AppointmentTabData {
   });
 
   AppointmentTabData copyWith({
-    List<Appointment>? appointments,
+    List<AppointmentEntity>? appointments,
     int? currentPage,
     bool? hasMore,
     LoadStatus? status,

@@ -17,7 +17,7 @@ class ScheduleCubit extends Cubit<ScheduleState> {
   final AddOverride addOverride;
   final UpdateOverride updateOverride;
   final DeleteOverride deleteOverride;
-  final GetAvailableSlots getAvailableSlots;
+  final GetSlotsPreview getSlotsPreview;
 
   ScheduleCubit({
     required this.getAvailabilities,
@@ -28,7 +28,7 @@ class ScheduleCubit extends Cubit<ScheduleState> {
     required this.addOverride,
     required this.updateOverride,
     required this.deleteOverride,
-    required this.getAvailableSlots,
+    required this.getSlotsPreview,
   }) : super(const ScheduleState());
 
   Future<void> loadSchedules() async {
@@ -153,12 +153,12 @@ class ScheduleCubit extends Cubit<ScheduleState> {
         await FlutterTimezone.getLocalTimezone();
     final String timezone = currentTimeZone.identifier;
     log('Timezone: $timezone', name: 'ScheduleCubit');
-    final params = GetAvailableSlotsParams(
+    final params = GetSlotsPreviewParams(
       date: DateFormat('yyyy-MM-dd').format(date),
       timezone: timezone,
     );
 
-    final result = await getAvailableSlots(params);
+    final result = await getSlotsPreview(params);
     result.fold(
       (failure) =>
           emit(state.copyWith(isPreviewLoading: false, error: failure.message)),

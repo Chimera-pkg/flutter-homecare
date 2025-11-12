@@ -1,7 +1,9 @@
 import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
+import 'package:m2health/features/booking_appointment/add_on_services/injection.dart';
+import 'package:m2health/features/booking_appointment/injection.dart';
 import 'package:m2health/features/medical_record/injection.dart';
-import 'package:m2health/features/nursing/injection.dart';
+import 'package:m2health/features/booking_appointment/nursing/injection.dart';
 import 'package:m2health/features/pharmacogenomics/injection.dart';
 import 'package:m2health/features/profiles/injection.dart';
 import 'package:m2health/features/schedule/injection.dart';
@@ -17,7 +19,7 @@ Future<void> setupLocator() async {
   sl.registerLazySingleton(() => AppointmentService(sl()));
 
   // Feature Module Injectors
-  initNursingModule(sl);
+  initBookingAppointmentModule(sl);
   initMedicalRecordModule(sl);
   initProfileModule(sl);
   initPharmacogenomicsModule(sl);

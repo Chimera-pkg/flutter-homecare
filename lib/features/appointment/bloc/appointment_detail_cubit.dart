@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
-import 'package:m2health/features/appointment/models/appointment.dart';
+import 'package:m2health/core/domain/entities/appointment_entity.dart';
 import 'package:m2health/core/services/appointment_service.dart';
 import 'package:meta/meta.dart';
 

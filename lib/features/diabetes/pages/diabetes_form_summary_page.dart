@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:m2health/features/booking_appointment/nursing/presentation/bloc/nursing_appointment_flow_bloc.dart';
+import 'package:m2health/features/booking_appointment/nursing/presentation/pages/nursing_appointment_flow_page.dart';
 import 'package:m2health/features/diabetes/bloc/diabetes_form_cubit.dart';
 import 'package:m2health/features/diabetes/bloc/diabetes_form_state.dart';
 import 'package:m2health/features/diabetes/widgets/diabetes_form_widget.dart';
-import 'package:m2health/features/nursing/const.dart';
-import 'package:m2health/features/nursing_legacy/personal/nursing_personal_page.dart';
+import 'package:m2health/features/booking_appointment/nursing/const.dart';
 import 'package:m2health/route/app_routes.dart';
+import 'package:m2health/service_locator.dart';
 
 class DiabetesFormSummaryPage extends StatelessWidget {
   const DiabetesFormSummaryPage({super.key});
@@ -415,11 +417,17 @@ class _ActionButtons extends StatelessWidget {
         PrimaryButton(
           text: 'Next',
           onPressed: () async {
-            Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => const PersonalPage(
-                serviceType: NurseServiceType.specializedNurse,
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => BlocProvider(
+                  create: (context) => NursingAppointmentFlowBloc(
+                    createNursingAppointment: sl(),
+                    serviceType: NurseServiceType.specializedNurse,
+                  ),
+                  child: const NursingAppointmentFlowPage(),
+                ),
               ),
-            ));
+            );
           },
         ),
       ],

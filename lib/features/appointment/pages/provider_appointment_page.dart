@@ -4,8 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:m2health/core/domain/entities/appointment_entity.dart';
 import 'package:m2health/features/appointment/bloc/provider_appointment_cubit.dart';
-import 'package:m2health/features/appointment/models/appointment.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/route/app_routes.dart';
 
@@ -163,7 +163,7 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
   }
 
   Widget _buildProviderAppointmentList(
-      List<Appointment> appointments, String status) {
+      List<AppointmentEntity> appointments, String status) {
     final filteredAppointments = appointments
         .where((appointment) =>
             appointment.status.toLowerCase() == status.toLowerCase())
@@ -216,8 +216,17 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
     );
   }
 
-  Widget _buildProviderAppointmentCard(Appointment appointment, String status) {
-    final patient = appointment.patient;
+  Widget _buildProviderAppointmentCard(
+      AppointmentEntity appointment, String status) {
+    final patient = appointment.patientProfile!;
+
+    final localStarTime = appointment.startDatetime.toLocal();
+    final localEndTime = appointment.endDatetime?.toLocal();
+    final date = DateFormat('EEEE, dd MMMM yyyy').format(localStarTime);
+    final startHour = DateFormat('hh:mm a').format(localStarTime);
+    final endHour = localEndTime != null
+        ? DateFormat('hh:mm a').format(localEndTime)
+        : null;
 
     return GestureDetector(
       onTap: () {
@@ -241,11 +250,10 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
                 children: [
                   CircleAvatar(
                     radius: 30,
-                    backgroundImage:
-                        (patient != null && patient.avatar.isNotEmpty)
-                            ? NetworkImage(patient.avatar)
-                            : null,
-                    child: (patient == null || patient.avatar.isEmpty)
+                    backgroundImage: (patient.avatar != null)
+                        ? NetworkImage(patient.avatar!)
+                        : null,
+                    child: (patient.avatar == null)
                         ? const Icon(Icons.person, size: 30, color: Colors.grey)
                         : null,
                   ),
@@ -299,8 +307,7 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
                                 size: 16, color: Colors.grey[600]),
                             const SizedBox(width: 4),
                             Text(
-                              DateFormat('EEEE, dd MMMM yyyy')
-                                  .format(DateTime.parse(appointment.date)),
+                              date,
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey[600],
@@ -315,7 +322,9 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
                                 size: 16, color: Colors.grey[600]),
                             const SizedBox(width: 4),
                             Text(
-                              appointment.hour,
+                              endHour != null
+                                  ? '$startHour - $endHour'
+                                  : startHour,
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey[600],
@@ -372,7 +381,7 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
                     Row(
                       children: [
                         ElevatedButton(
-                          onPressed: () => _declineAppointment(appointment.id),
+                          onPressed: () => _declineAppointment(appointment.id!),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
                             foregroundColor: Colors.white,
@@ -382,7 +391,7 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
                         ),
                         const SizedBox(width: 8),
                         ElevatedButton(
-                          onPressed: () => _acceptAppointment(appointment.id),
+                          onPressed: () => _acceptAppointment(appointment.id!),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF35C5CF),
                             foregroundColor: Colors.white,
@@ -394,7 +403,7 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
                     ),
                   if (status.toLowerCase() == 'accepted')
                     ElevatedButton(
-                      onPressed: () => _completeAppointment(appointment.id),
+                      onPressed: () => _completeAppointment(appointment.id!),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         foregroundColor: Colors.white,

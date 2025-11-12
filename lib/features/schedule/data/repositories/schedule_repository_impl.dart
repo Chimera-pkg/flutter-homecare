@@ -120,8 +120,8 @@ class ScheduleRepositoryImpl implements ScheduleRepository {
   }
 
   @override
-  Future<Either<Failure, List<TimeSlot>>> getAvailableSlots(
-      GetAvailableSlotsParams params) async {
+  Future<Either<Failure, List<TimeSlot>>> getSlotsPreview(
+      GetSlotsPreviewParams params) async {
     try {
       final result = await remoteDatasource.getAvailableSlots(params.date, params.timezone);
       return Right(result);

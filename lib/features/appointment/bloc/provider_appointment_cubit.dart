@@ -2,11 +2,11 @@ import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:dio/dio.dart';
 import 'package:m2health/const.dart';
+import 'package:m2health/core/data/models/appointment_model.dart';
+import 'package:m2health/core/domain/entities/appointment_entity.dart';
 import 'package:m2health/features/appointment/appointment_module.dart';
-import 'package:m2health/features/appointment/models/appointment.dart';
 import 'package:m2health/utils.dart';
 import 'package:meta/meta.dart';
-import 'package:m2health/core/data/models/provider_appointment.dart';
 import 'package:m2health/core/services/appointment_service.dart';
 
 part 'provider_appointment_state.dart';
@@ -41,8 +41,10 @@ class ProviderAppointmentCubit extends Cubit<ProviderAppointmentState> {
 
       final List<dynamic> appointmentsJson = response.data['data'] ?? [];
 
-      final List<Appointment> appointments =
-          appointmentsJson.map((e) => Appointment.fromJson(e)).toList();
+      final List<AppointmentEntity> appointments = appointmentsJson
+          .map((e) => AppointmentModel.fromJson(e))
+          .cast<AppointmentEntity>()
+          .toList();
 
       emit(ProviderAppointmentLoaded(appointments));
     } catch (e, stackTrace) {

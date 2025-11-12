@@ -1,17 +1,14 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2health/const.dart';
+import 'package:m2health/core/domain/entities/appointment_entity.dart';
 import 'package:m2health/features/appointment/bloc/appointment_cubit.dart';
-import 'package:m2health/features/appointment/models/appointment.dart';
 import 'package:m2health/features/appointment/widgets/cancel_appoinment_dialog.dart';
-import 'package:m2health/core/data/models/provider.dart';
+import 'package:m2health/features/booking_appointment/schedule_appointment/presentation/pages/schedule_appointment_page.dart';
 import 'package:m2health/route/app_routes.dart';
 import 'package:intl/intl.dart';
-import 'package:m2health/core/presentation/views/book_appointment.dart';
 
 class AppointmentPage extends StatefulWidget {
   static const String route = '/appointment';
@@ -279,20 +276,12 @@ class _AppointmentListViewState extends State<AppointmentListView> {
 }
 
 class _AppointmentListItem extends StatelessWidget {
-  final Appointment appointment;
+  final AppointmentEntity appointment;
 
   const _AppointmentListItem({
     super.key,
     required this.appointment,
   });
-
-  String _getProviderName(Provider? provider) {
-    return provider?.name ?? 'Unknown Provider';
-  }
-
-  String? _getAvatarUrl(Provider? provider) {
-    return provider?.avatar;
-  }
 
   Color _getStatusColor(String status) {
     final statusLower = status.toLowerCase();
@@ -315,8 +304,17 @@ class _AppointmentListItem extends StatelessWidget {
     final appointmentStatus = appointment.status;
     final appointmentStatusLower = appointmentStatus.toLowerCase();
     final statusColor = _getStatusColor(appointmentStatusLower);
-    final providerName = _getProviderName(appointment.provider);
-    final avatarUrl = _getAvatarUrl(appointment.provider);
+    final providerName = appointment.provider?.name ?? 'Unknown Provider';
+    final avatarUrl = appointment.provider?.avatar;
+
+    final localStartTime = appointment.startDatetime.toLocal();
+    final localEndTime = appointment.endDatetime?.toLocal();
+    final date = DateFormat('EEEE, MMMM dd, yyyy').format(localStartTime);
+    final startHour = DateFormat('hh:mm a').format(localStartTime);
+    final endHour = localEndTime != null
+        ? DateFormat('hh:mm a').format(localEndTime)
+        : null;
+    final hour = endHour != null ? '$startHour - $endHour' : startHour;
 
     final cancelButton = OutlinedButton(
       onPressed: () {
@@ -326,7 +324,7 @@ class _AppointmentListItem extends StatelessWidget {
             return CancelAppoinmentDialog(onPressYes: () {
               context
                   .read<AppointmentCubit>()
-                  .cancelAppointment(appointment.id);
+                  .cancelAppointment(appointment.id!);
             });
           },
         );
@@ -360,13 +358,12 @@ class _AppointmentListItem extends StatelessWidget {
       ),
       child: OutlinedButton(
         onPressed: () {
-          GoRouter.of(context).push(
-            AppRoutes.bookAppointment,
-            extra: BookAppointmentPageData(
-              provider: appointment.provider!,
-              appointmentId: appointment.id,
-              initialDate: DateTime.parse(appointment.date),
-              initialTime: DateFormat('HH:mm').parse(appointment.hour),
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => ScheduleAppointmentPage(
+                professional: appointment.provider!,
+                currentAppointment: appointment,
+              ),
             ),
           );
         },
@@ -486,7 +483,7 @@ class _AppointmentListItem extends StatelessWidget {
                           ],
                         ),
                         Text(
-                          '${DateFormat('EEEE, dd MMMM yyyy').format(DateTime.parse(appointment.date))} | ${appointment.hour}',
+                          '$date | $hour',
                         ),
                       ],
                     ),

@@ -20,6 +20,6 @@ abstract class ScheduleRepository {
       UpdateOverrideParams params);
   Future<Either<Failure, Unit>> deleteOverride(int id);
 
-  Future<Either<Failure, List<TimeSlot>>> getAvailableSlots(
-      GetAvailableSlotsParams params);
+  Future<Either<Failure, List<TimeSlot>>> getSlotsPreview(
+      GetSlotsPreviewParams params);
 }

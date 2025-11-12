@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:m2health/const.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:m2health/features/medical_record/domain/entities/medical_record.dart';
 import 'package:m2health/features/medical_record/presentation/bloc/medical_record_bloc.dart';
@@ -33,7 +34,7 @@ class MedicalRecordDetailPage extends StatelessWidget {
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8F9FA),
+        backgroundColor: Const.grayLight,
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
