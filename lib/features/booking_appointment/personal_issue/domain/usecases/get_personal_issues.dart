@@ -8,7 +8,7 @@ class GetPersonalIssues {
 
  GetPersonalIssues(this.repository);
 
-  Future<Either<Failure, List<PersonalIssue>>> call() async {
-    return await repository.getPersonalIssues();
+  Future<Either<Failure, List<PersonalIssue>>> call(String serviceType) async {
+    return await repository.getPersonalIssues(serviceType);
   }
 }

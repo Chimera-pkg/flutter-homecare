@@ -115,10 +115,10 @@ class _ManageServicesPageState extends State<ManageServicesPage>
   late TabController _tabController;
 
   final List<Map<String, String>> serviceTabs = [
-    {'type': 'nurse', 'display': 'Nurse'},
-    {'type': 'specialized_nurse', 'display': 'Specialized Nurse'},
-    {'type': 'pharma', 'display': 'Pharmacist'},
-    {'type': 'radiologist', 'display': 'Radiologist'},
+    {'type': 'nursing', 'display': 'Nurse Procedure'},
+    {'type': 'specialized_nursing', 'display': 'Specialized Nurse Procudure'},
+    {'type': 'pharmacy', 'display': 'Pharmacist Service'},
+    {'type': 'radiology', 'display': 'Radiologist Service'},
   ];
 
   @override

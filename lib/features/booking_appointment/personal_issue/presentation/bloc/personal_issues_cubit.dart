@@ -13,17 +13,18 @@ class PersonalIssuesCubit extends Cubit<PersonalIssuesState> {
   final DeletePersonalIssue deletePersonalIssue;
 
   PersonalIssuesCubit({
+    required String serviceType,
     required this.getPersonalIssues,
     required this.createPersonalIssue,
     required this.deletePersonalIssue,
-  }) : super(PersonalIssuesState.initial());
+  }) : super(PersonalIssuesState.initial(serviceType: serviceType));
 
   Future<void> loadNursingIssues() async {
     emit(state.copyWith(
       loadStatus: ActionStatus.loading,
       loadErrorMessage: null,
     ));
-    final result = await getPersonalIssues();
+    final result = await getPersonalIssues(state.serviceType);
     result.fold(
       (failure) => emit(state.copyWith(
         loadStatus: ActionStatus.error,
@@ -41,7 +42,8 @@ class PersonalIssuesCubit extends Cubit<PersonalIssuesState> {
       createStatus: ActionStatus.loading,
       createErrorMessage: null,
     ));
-    log('Adding issue: ${issue.title}, ${issue.description}, images count: ${issue.images.length}');
+    log('Adding issue: ${issue.title}, ${issue.description}, images count: ${issue.images.length}',
+        name: 'PersonalIssuesCubit');
     final result = await createPersonalIssue(issue);
     result.fold(
       (failure) {

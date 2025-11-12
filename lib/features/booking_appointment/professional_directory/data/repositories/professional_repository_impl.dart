@@ -2,21 +2,20 @@ import 'package:m2health/features/booking_appointment/professional_directory/dat
 import 'package:m2health/features/booking_appointment/professional_directory/domain/entities/professional_entity.dart';
 import 'package:m2health/features/booking_appointment/professional_directory/domain/repositories/professional_repository.dart';
 
-class ProfessionalRepositoryImpl implements ProfessionalRepository{
+class ProfessionalRepositoryImpl implements ProfessionalRepository {
   ProfessionalRemoteDatasource remoteDataSource;
 
   ProfessionalRepositoryImpl({required this.remoteDataSource});
 
   @override
-  Future<List<ProfessionalEntity>> getProfessionals(String serviceType) async {
-    final professionals = await remoteDataSource.getProfessionals(serviceType);
+  Future<List<ProfessionalEntity>> getProfessionals(String role) async {
+    final professionals = await remoteDataSource.getProfessionals(role);
     return professionals;
   }
 
   @override
-  Future<ProfessionalEntity> getProfessionalDetail(
-      String serviceType, int id) async {
-    return await remoteDataSource.getProfessionalDetail(serviceType, id);
+  Future<ProfessionalEntity> getProfessionalDetail(String role, int id) async {
+    return await remoteDataSource.getProfessionalDetail(role, id);
   }
 
   @override

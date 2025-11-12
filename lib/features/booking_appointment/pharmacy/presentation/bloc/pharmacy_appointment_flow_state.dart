@@ -1,6 +1,6 @@
-part of 'nursing_appointment_flow_bloc.dart';
+part of 'pharmacy_appointment_flow_bloc.dart';
 
-enum NursingFlowStep {
+enum PharmacyFlowStep {
   personalCase,
   healthStatus,
   addOnService,
@@ -16,10 +16,8 @@ enum AppointmentSubmissionStatus {
   failure,
 }
 
-class NursingAppointmentFlowState extends Equatable {
-  final NursingFlowStep currentStep;
-
-  final NurseServiceType serviceType;
+class PharmacyAppointmentFlowState extends Equatable {
+  final PharmacyFlowStep currentStep;
 
   // Data collected along the flow
   final List<PersonalIssue> selectedIssues;
@@ -33,9 +31,8 @@ class NursingAppointmentFlowState extends Equatable {
   final AppointmentSubmissionStatus submissionStatus;
   final String? errorMessage;
 
-  const NursingAppointmentFlowState({
-    this.currentStep = NursingFlowStep.personalCase,
-    required this.serviceType,
+  const PharmacyAppointmentFlowState({
+    this.currentStep = PharmacyFlowStep.personalCase,
     this.selectedIssues = const [],
     this.healthStatus,
     this.selectedAddOnServices = const [],
@@ -46,15 +43,12 @@ class NursingAppointmentFlowState extends Equatable {
     this.errorMessage,
   });
 
-  factory NursingAppointmentFlowState.initial(NurseServiceType serviceType) {
-    return NursingAppointmentFlowState(
-      serviceType: serviceType,
-    );
+  factory PharmacyAppointmentFlowState.initial() {
+    return const PharmacyAppointmentFlowState();
   }
 
-  NursingAppointmentFlowState copyWith({
-    NursingFlowStep? currentStep,
-    NurseServiceType? serviceType,
+  PharmacyAppointmentFlowState copyWith({
+    PharmacyFlowStep? currentStep,
     List<PersonalIssue>? selectedIssues,
     HealthStatus? healthStatus,
     List<AddOnService>? selectedAddOnServices,
@@ -64,9 +58,8 @@ class NursingAppointmentFlowState extends Equatable {
     AppointmentSubmissionStatus? submissionStatus,
     String? errorMessage,
   }) {
-    return NursingAppointmentFlowState(
+    return PharmacyAppointmentFlowState(
       currentStep: currentStep ?? this.currentStep,
-      serviceType: serviceType ?? this.serviceType,
       selectedIssues: selectedIssues ?? this.selectedIssues,
       healthStatus: healthStatus ?? this.healthStatus,
       selectedAddOnServices:
@@ -82,7 +75,6 @@ class NursingAppointmentFlowState extends Equatable {
   @override
   List<Object?> get props => [
         currentStep,
-        serviceType,
         selectedIssues,
         healthStatus,
         selectedAddOnServices,

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:m2health/features/booking_appointment/personal_issue/presentation/bloc/personal_issues_cubit.dart';
 import 'package:m2health/features/diabetes/bloc/diabetes_form_cubit.dart';
 import 'package:m2health/features/medical_record/domain/usecases/delete_medical_record.dart';
 import 'package:m2health/features/medical_record/domain/usecases/get_medical_records.dart';
@@ -56,13 +55,6 @@ void main() async {
         ),
         BlocProvider(create: (context) => AppointmentCubit(sl<Dio>())),
         BlocProvider(create: (context) => ProviderAppointmentCubit(sl<Dio>())),
-        BlocProvider(
-          create: (context) => PersonalIssuesCubit(
-            getPersonalIssues: sl(),
-            createPersonalIssue: sl(),
-            deletePersonalIssue: sl(),
-          ),
-        ),
         BlocProvider(
             create: (context) => PersonalCubit()..loadPersonalDetails()),
         BlocProvider(

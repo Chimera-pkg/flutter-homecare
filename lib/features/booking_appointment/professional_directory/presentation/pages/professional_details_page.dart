@@ -5,22 +5,35 @@ import 'package:m2health/features/booking_appointment/professional_directory/dom
 import 'package:m2health/features/booking_appointment/professional_directory/presentation/bloc/professional_detail/professional_detail_cubit.dart';
 import 'package:m2health/features/booking_appointment/professional_directory/presentation/bloc/professional_detail/professional_detail_state.dart';
 import 'package:m2health/const.dart';
-import 'package:m2health/service_locator.dart';
 
-class ProfessionalDetailsPage extends StatelessWidget {
+class ProfessionalDetailsPage extends StatefulWidget {
   final int professionalId;
-  final String serviceType;
+  final String role;
   final Function onButtonPressed;
 
   const ProfessionalDetailsPage({
     super.key,
     required this.professionalId,
-    required this.serviceType,
+    required this.role,
     required this.onButtonPressed,
   });
 
+  @override
+  State<ProfessionalDetailsPage> createState() =>
+      _ProfessionalDetailsPageState();
+}
+
+class _ProfessionalDetailsPageState extends State<ProfessionalDetailsPage> {
+  @override
+  void initState() {
+    super.initState();
+    context
+        .read<ProfessionalDetailCubit>()
+        .fetchProfessionalDetail(widget.role, widget.professionalId);
+  }
+
   String get title {
-    switch (serviceType) {
+    switch (widget.role) {
       case 'nursing':
         return 'Nurse Details';
       case 'pharmacist':
@@ -34,38 +47,34 @@ class ProfessionalDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => ProfessionalDetailCubit(getProfessionalDetail: sl())
-        ..fetchProfessionalDetail(serviceType, professionalId),
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            title,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        body: BlocBuilder<ProfessionalDetailCubit, ProfessionalDetailState>(
-          builder: (context, state) {
-            if (state is ProfessionalDetailLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is ProfessionalDetailError) {
-              return Center(child: Text(state.message));
-            } else if (state is ProfessionalDetailLoaded) {
-              final professional = state.professional;
-              return _buildProfessionalBody(context, professional);
-            }
-            return const Center(child: Text('Failed to load details.'));
-          },
-        ),
-        bottomNavigationBar:
-            BlocBuilder<ProfessionalDetailCubit, ProfessionalDetailState>(
-          builder: (context, state) {
-            if (state is ProfessionalDetailLoaded) {
-              return _buildBottomButton(context, state.professional);
-            }
-            return _buildBottomButton(context, null, disabled: true);
-          },
-        ),
+      ),
+      body: BlocBuilder<ProfessionalDetailCubit, ProfessionalDetailState>(
+        builder: (context, state) {
+          if (state is ProfessionalDetailLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is ProfessionalDetailError) {
+            return Center(child: Text(state.message));
+          } else if (state is ProfessionalDetailLoaded) {
+            final professional = state.professional;
+            return _buildProfessionalBody(context, professional);
+          }
+          return const Center(child: Text('Failed to load details.'));
+        },
+      ),
+      bottomNavigationBar:
+          BlocBuilder<ProfessionalDetailCubit, ProfessionalDetailState>(
+        builder: (context, state) {
+          if (state is ProfessionalDetailLoaded) {
+            return _buildBottomButton(context, state.professional);
+          }
+          return _buildBottomButton(context, null, disabled: true);
+        },
       ),
     );
   }
@@ -435,7 +444,7 @@ class ProfessionalDetailsPage extends StatelessWidget {
         onPressed: (disabled || professional == null)
             ? null
             : () {
-                onButtonPressed();
+                widget.onButtonPressed();
 
                 // Navigator.push(
                 //   context,

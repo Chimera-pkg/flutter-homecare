@@ -14,9 +14,9 @@ enum NurseServiceType {
   String get apiValue {
     switch (this) {
       case NurseServiceType.primaryNurse:
-        return 'nurse';
+        return 'nursing';
       case NurseServiceType.specializedNurse:
-        return 'specialized_nurse';
+        return 'specialized_nursing';
     }
   }
 

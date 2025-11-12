@@ -13,9 +13,9 @@ class PersonalIssueRepositoryImpl implements PersonalIssueRepository {
   PersonalIssueRepositoryImpl({required this.remoteDataSource});
 
   @override
-  Future<Either<Failure, List<PersonalIssue>>> getPersonalIssues() async {
+  Future<Either<Failure, List<PersonalIssue>>> getPersonalIssues(String serviceType) async {
     try {
-      final issues = await remoteDataSource.getPersonalIssues();
+      final issues = await remoteDataSource.getPersonalIssues(serviceType);
       return Right(issues);
     } on Exception catch (e) {
       return Left(ServerFailure(e.toString()));

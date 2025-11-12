@@ -6,7 +6,7 @@ import 'package:m2health/main.dart';
 import 'package:m2health/core/presentation/views/medical_store.dart';
 import 'package:m2health/core/presentation/views/teleradiology.dart';
 
-import 'package:m2health/core/presentation/widgets/chat_pharma.dart';
+import 'package:m2health/features/booking_appointment/pharmacy/presentation/pages/chat_pharma.dart';
 
 class OpinionMedical extends StatefulWidget {
   @override

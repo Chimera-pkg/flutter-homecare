@@ -3,7 +3,7 @@ import 'package:m2health/features/diabetes/diabetic_care_routes.dart';
 import 'package:m2health/features/booking_appointment/nursing/presentation/pages/nursing_services_page.dart';
 import 'package:m2health/features/precision/precision_nutrition_routes.dart';
 import 'package:m2health/route/navigator_keys.dart';
-import 'package:m2health/core/presentation/views/pharmacist_services.dart';
+import 'package:m2health/features/booking_appointment/pharmacy/presentation/pages/pharmacy_services_page.dart';
 import '../features/precision/screens/precision_nutrition_page.dart';
 import '../features/diabetes/diabetic_care.dart';
 import '../core/presentation/views/home_health_screening.dart';
@@ -17,14 +17,14 @@ class DashboardRoutes {
       parentNavigatorKey: rootNavigatorKey,
       path: AppRoutes.pharmaServices,
       builder: (context, state) {
-        return const PharmaServices();
+        return PharmacyServicesPage();
       },
     ),
     GoRoute(
       path: AppRoutes.nursingServices,
       parentNavigatorKey: rootNavigatorKey,
       builder: (context, state) {
-        return const NursingService(); // From nursing module
+        return const NursingService();
       },
     ),
     GoRoute(

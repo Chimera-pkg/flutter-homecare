@@ -7,7 +7,7 @@ import 'package:m2health/features/booking_appointment/personal_issue/domain/enti
 import 'package:m2health/utils.dart';
 
 abstract class PersonalIssueRemoteDataSource {
-  Future<List<PersonalIssue>> getPersonalIssues();
+  Future<List<PersonalIssue>> getPersonalIssues(String serviceType);
   Future<void> createPersonalIssue(PersonalIssueModel data);
   Future<void> updatePersonalIssue(int id, PersonalIssueModel data);
   Future<void> deletePersonalIssue(int issueId);
@@ -20,10 +20,12 @@ class PersonalIssueRemoteDataSourceImpl
   PersonalIssueRemoteDataSourceImpl({required this.dio});
 
   @override
-  Future<List<PersonalIssue>> getPersonalIssues() async {
+  Future<List<PersonalIssue>> getPersonalIssues(String serviceType) async {
     final token = await Utils.getSpString(Const.TOKEN);
+    final params = {'type': serviceType};
     final response = await dio.get(
       Const.API_PERSONAL_ISSUES,
+      queryParameters: params,
       options: Options(
         headers: {
           'Authorization': 'Bearer $token',

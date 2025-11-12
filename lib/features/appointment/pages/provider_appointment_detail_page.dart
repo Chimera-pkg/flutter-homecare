@@ -250,6 +250,11 @@ class _PersonalCaseInfo extends StatelessWidget {
       services =
           personalCase?.addOnServices.map((e) => e.name).join(', ') ?? 'None';
       issues = personalCase?.issues;
+    } else if (appointment.providerType == 'pharmacist') {
+      final personalCase = appointment.pharmacyCase;
+      services =
+          personalCase?.addOnServices.map((e) => e.name).join(', ') ?? 'None';
+      issues = personalCase?.issues;
     }
 
     return Column(

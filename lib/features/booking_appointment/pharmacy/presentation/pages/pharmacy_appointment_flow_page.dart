@@ -2,28 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2health/features/booking_appointment/add_on_services/presentation/pages/add_on_service_page.dart';
-import 'package:m2health/features/booking_appointment/nursing/presentation/bloc/nursing_appointment_flow_bloc.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/presentation/bloc/personal_issues_cubit.dart';
-import 'package:m2health/features/booking_appointment/professional_directory/presentation/bloc/professional/professional_bloc.dart';
-import 'package:m2health/features/booking_appointment/professional_directory/presentation/bloc/professional_detail/professional_detail_cubit.dart';
-import 'package:m2health/features/booking_appointment/schedule_appointment/presentation/pages/schedule_appointment_page.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/presentation/pages/health_status_page.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/presentation/pages/personal_issues_page.dart';
-import 'package:m2health/features/booking_appointment/professional_directory/presentation/pages/search_professional_page.dart';
+import 'package:m2health/features/booking_appointment/pharmacy/presentation/bloc/pharmacy_appointment_flow_bloc.dart';
+import 'package:m2health/features/booking_appointment/professional_directory/presentation/bloc/professional/professional_bloc.dart';
+import 'package:m2health/features/booking_appointment/professional_directory/presentation/bloc/professional_detail/professional_detail_cubit.dart';
 import 'package:m2health/features/booking_appointment/professional_directory/presentation/pages/professional_details_page.dart';
+import 'package:m2health/features/booking_appointment/professional_directory/presentation/pages/search_professional_page.dart';
+import 'package:m2health/features/booking_appointment/schedule_appointment/presentation/pages/schedule_appointment_page.dart';
+
 import 'package:m2health/route/app_routes.dart';
 import 'package:m2health/service_locator.dart';
 
-class NursingAppointmentFlowPage extends StatefulWidget {
-  const NursingAppointmentFlowPage({super.key});
+class PharmacyAppointmentFlowPage extends StatefulWidget {
+  const PharmacyAppointmentFlowPage({super.key});
 
   @override
-  State<NursingAppointmentFlowPage> createState() =>
-      _NursingAppointmentFlowPageState();
+  State<PharmacyAppointmentFlowPage> createState() =>
+      PharmacyAppointmentFlowPageState();
 }
 
-class _NursingAppointmentFlowPageState
-    extends State<NursingAppointmentFlowPage> {
+class PharmacyAppointmentFlowPageState
+    extends State<PharmacyAppointmentFlowPage> {
   final PageController _pageController = PageController();
 
   @override
@@ -33,40 +34,41 @@ class _NursingAppointmentFlowPageState
   }
 
   void _onBack(BuildContext context) {
-    final state = context.read<NursingAppointmentFlowBloc>().state;
-    final flowBloc = context.read<NursingAppointmentFlowBloc>();
+    final state = context.read<PharmacyAppointmentFlowBloc>().state;
+    final flowBloc = context.read<PharmacyAppointmentFlowBloc>();
 
     if (state.submissionStatus == AppointmentSubmissionStatus.submitting) {
-      return; // Prevent back navigation during submission
+      return;
     }
 
     switch (state.currentStep) {
-      case NursingFlowStep.personalCase:
-        Navigator.pop(context);
+      case PharmacyFlowStep.personalCase:
+        Navigator.pop(context); // Exit the flow
         break;
-      case NursingFlowStep.healthStatus:
-        flowBloc.add(const FlowStepChanged(NursingFlowStep.personalCase));
+      case PharmacyFlowStep.healthStatus:
+        flowBloc.add(const FlowStepChanged(PharmacyFlowStep.personalCase));
         break;
-      case NursingFlowStep.addOnService:
-        flowBloc.add(const FlowStepChanged(NursingFlowStep.healthStatus));
+      case PharmacyFlowStep.addOnService:
+        flowBloc.add(const FlowStepChanged(PharmacyFlowStep.healthStatus));
         break;
-      case NursingFlowStep.searchProfessional:
-        flowBloc.add(const FlowStepChanged(NursingFlowStep.addOnService));
+      case PharmacyFlowStep.searchProfessional:
+        flowBloc.add(const FlowStepChanged(PharmacyFlowStep.addOnService));
         break;
-      case NursingFlowStep.viewProfessionalDetail:
-        flowBloc.add(const FlowStepChanged(NursingFlowStep.searchProfessional));
-        break;
-      case NursingFlowStep.scheduling:
+      case PharmacyFlowStep.viewProfessionalDetail:
         flowBloc
-            .add(const FlowStepChanged(NursingFlowStep.viewProfessionalDetail));
+            .add(const FlowStepChanged(PharmacyFlowStep.searchProfessional));
+        break;
+      case PharmacyFlowStep.scheduling:
+        flowBloc.add(
+            const FlowStepChanged(PharmacyFlowStep.viewProfessionalDetail));
         break;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<NursingAppointmentFlowBloc,
-        NursingAppointmentFlowState>(
+    return BlocConsumer<PharmacyAppointmentFlowBloc,
+        PharmacyAppointmentFlowState>(
       listenWhen: (previous, current) =>
           previous.submissionStatus != current.submissionStatus ||
           previous.currentStep != current.currentStep,
@@ -80,7 +82,6 @@ class _NursingAppointmentFlowPageState
               backgroundColor: Colors.green,
             ),
           );
-
           GoRouter.of(context).goNamed(
             AppRoutes.appointmentDetail,
             extra: state.createdAppointment!.id!,
@@ -118,7 +119,7 @@ class _NursingAppointmentFlowPageState
               children: [
                 BlocProvider(
                   create: (context) => PersonalIssuesCubit(
-                    serviceType: 'nursing',
+                    serviceType: 'pharmacy',
                     getPersonalIssues: sl(),
                     createPersonalIssue: sl(),
                     deletePersonalIssue: sl(),
@@ -126,7 +127,7 @@ class _NursingAppointmentFlowPageState
                   child: PersonalIssuesPage(
                     onIssuesSelected: (issues) {
                       context
-                          .read<NursingAppointmentFlowBloc>()
+                          .read<PharmacyAppointmentFlowBloc>()
                           .add(FlowPersonalIssueUpdated(issues));
                     },
                   ),
@@ -135,16 +136,16 @@ class _NursingAppointmentFlowPageState
                   initialHealthStatus: state.healthStatus,
                   onSubmit: (healthStatus) {
                     context
-                        .read<NursingAppointmentFlowBloc>()
+                        .read<PharmacyAppointmentFlowBloc>()
                         .add(FlowHealthStatusUpdated(healthStatus));
                   },
                 ),
                 AddOnServicePage(
-                  serviceType: state.serviceType.apiValue,
+                  serviceType: 'pharmacy',
                   initialSelectedServices: state.selectedAddOnServices,
                   onComplete: (services) {
                     context
-                        .read<NursingAppointmentFlowBloc>()
+                        .read<PharmacyAppointmentFlowBloc>()
                         .add(FlowAddOnServicesUpdated(services));
                   },
                 ),
@@ -154,10 +155,10 @@ class _NursingAppointmentFlowPageState
                     toggleFavorite: sl(),
                   ),
                   child: SearchProfessionalPage(
-                    role: 'nurse',
+                    role: 'pharmacist',
                     onProfessionalSelected: (prof) {
                       context
-                          .read<NursingAppointmentFlowBloc>()
+                          .read<PharmacyAppointmentFlowBloc>()
                           .add(FlowProfessionalSelected(prof));
                     },
                   ),
@@ -169,25 +170,24 @@ class _NursingAppointmentFlowPageState
                     ),
                     child: ProfessionalDetailsPage(
                       professionalId: state.selectedProfessional!.id,
-                      role: state.selectedProfessional?.role ?? 'nurse',
+                      role: 'pharmacist',
                       onButtonPressed: () {
-                        context.read<NursingAppointmentFlowBloc>().add(
-                            const FlowStepChanged(NursingFlowStep.scheduling));
+                        context.read<PharmacyAppointmentFlowBloc>().add(
+                            const FlowStepChanged(PharmacyFlowStep.scheduling));
                       },
                     ),
-                  ), // Placeholder
+                  ),
                 if (state.selectedProfessional != null)
                   ScheduleAppointmentPage(
-                    // Handle null professional for the first build
                     professional: state.selectedProfessional!,
                     isSubmitting: state.submissionStatus ==
                         AppointmentSubmissionStatus.submitting,
                     onTimeSlotSelected: (timeSlot) {
                       context
-                          .read<NursingAppointmentFlowBloc>()
+                          .read<PharmacyAppointmentFlowBloc>()
                           .add(FlowTimeSlotSelected(timeSlot));
                     },
-                  ), // Placeholder
+                  ),
               ],
             ),
           ),

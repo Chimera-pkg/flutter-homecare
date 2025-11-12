@@ -57,13 +57,13 @@ class AddOnServiceViewState extends State<AddOnServiceView> {
   Widget build(BuildContext context) {
     String getTitle(String serviceType) {
       switch (serviceType) {
-        case 'nurse':
+        case 'nursing':
           return 'Nursing Procedures';
-        case 'specialized_nurse':
+        case 'specialized_nursing':
           return 'Specialized Nursing Procedures';
-        case 'pharmacist':
+        case 'pharmacy':
           return 'Pharmacy Services';
-        case 'radiologist':
+        case 'radiology':
           return 'Radiology Services';
         default:
           return 'Add On Services';

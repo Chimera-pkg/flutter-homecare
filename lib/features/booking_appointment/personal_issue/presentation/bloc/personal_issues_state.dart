@@ -9,6 +9,7 @@ enum ActionStatus {
 }
 
 final class PersonalIssuesState extends Equatable {
+  final String serviceType;
   final List<PersonalIssue> issues;
 
   final ActionStatus loadStatus;
@@ -21,6 +22,7 @@ final class PersonalIssuesState extends Equatable {
   final String? deleteErrorMessage;
 
   const PersonalIssuesState({
+    required this.serviceType,
     this.issues = const [],
     this.loadStatus = ActionStatus.initial,
     this.loadErrorMessage,
@@ -42,6 +44,7 @@ final class PersonalIssuesState extends Equatable {
       ];
 
   PersonalIssuesState copyWith({
+    String? serviceType,
     List<PersonalIssue>? issues,
     ActionStatus? loadStatus,
     String? loadErrorMessage,
@@ -51,6 +54,7 @@ final class PersonalIssuesState extends Equatable {
     String? deleteErrorMessage,
   }) {
     return PersonalIssuesState(
+      serviceType: serviceType ?? this.serviceType,
       issues: issues ?? this.issues,
       loadStatus: loadStatus ?? this.loadStatus,
       loadErrorMessage: loadErrorMessage ?? this.loadErrorMessage,
@@ -61,7 +65,7 @@ final class PersonalIssuesState extends Equatable {
     );
   }
 
-  factory PersonalIssuesState.initial() {
-    return const PersonalIssuesState();
+  factory PersonalIssuesState.initial({required String serviceType}) {
+    return PersonalIssuesState(serviceType: serviceType);
   }
 }

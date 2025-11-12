@@ -222,8 +222,9 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
     List<PersonalIssue>? issues;
 
     if (appointment.providerType == 'nurse') {
-      final personalCase = appointment.nursingCase;
-      issues = personalCase?.issues;
+      issues = appointment.nursingCase?.issues;
+    } else if (appointment.providerType == 'pharmacist') {
+      issues = appointment.pharmacyCase?.issues;
     }
 
     return Padding(

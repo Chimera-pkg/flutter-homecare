@@ -8,10 +8,10 @@ class ProfessionalDetailCubit extends Cubit<ProfessionalDetailState> {
   ProfessionalDetailCubit({required this.getProfessionalDetail})
       : super(ProfessionalDetailInitial());
 
-  Future<void> fetchProfessionalDetail(String serviceType, int id) async {
+  Future<void> fetchProfessionalDetail(String role, int id) async {
     emit(ProfessionalDetailLoading());
     try {
-      final professional = await getProfessionalDetail(serviceType, id);
+      final professional = await getProfessionalDetail(role, id);
       emit(ProfessionalDetailLoaded(professional));
     } catch (e) {
       emit(ProfessionalDetailError(e.toString()));

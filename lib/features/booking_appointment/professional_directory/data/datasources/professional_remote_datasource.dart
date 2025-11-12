@@ -10,14 +10,14 @@ class ProfessionalRemoteDatasource {
 
   ProfessionalRemoteDatasource(this.dio);
 
-  Future<List<ProfessionalModel>> getProfessionals(String serviceType,
+  Future<List<ProfessionalModel>> getProfessionals(String role,
       {String? name}) async {
     try {
       final token = await Utils.getSpString(Const.TOKEN);
       final response = await dio.get(
         '${Const.URL_API}/professionals',
         queryParameters: {
-          'provider_type': serviceType,
+          'provider_type': role,
           if (name != null) 'name': name,
         },
         options: Options(
@@ -38,14 +38,13 @@ class ProfessionalRemoteDatasource {
     }
   }
 
-  Future<ProfessionalModel> getProfessionalDetail(
-      String serviceType, int id) async {
+  Future<ProfessionalModel> getProfessionalDetail(String role, int id) async {
     final token = await Utils.getSpString(Const.TOKEN);
 
     final response = await dio.get(
       '${Const.URL_API}/professionals/$id',
       queryParameters: {
-        'provider_type': serviceType,
+        'provider_type': role,
       },
       options: Options(
         headers: {

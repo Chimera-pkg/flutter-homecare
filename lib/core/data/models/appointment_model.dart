@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:m2health/core/data/models/payment.dart';
 import 'package:m2health/features/booking_appointment/nursing/data/models/nursing_personal_case.dart';
 import 'package:m2health/core/domain/entities/appointment_entity.dart';
+import 'package:m2health/features/booking_appointment/pharmacy/data/models/pharmacy_personal_case.dart';
 import 'package:m2health/features/booking_appointment/professional_directory/data/models/professional_model.dart';
 import 'package:m2health/features/profiles/data/models/profile_model.dart';
 
@@ -22,6 +23,7 @@ class AppointmentModel extends AppointmentEntity {
     super.providerType,
     super.provider,
     super.nursingCase,
+    super.pharmacyCase,
     super.patientProfile,
     super.payment,
   });
@@ -33,11 +35,16 @@ class AppointmentModel extends AppointmentEntity {
     final patient = appointmentJson['patient'] != null
         ? ProfileModel.fromJson(appointmentJson['patient'])
         : null;
-    final nursingCase = appointmentJson['request_data'] != null
-        ? NursingPersonalCaseModel.fromJson(appointmentJson['request_data'])
-        : null;
     final payment = appointmentJson['payment'] != null
         ? Payment.fromJson(appointmentJson['payment'])
+        : null;
+    final nursingCase = appointmentJson['nursing_request_data'] != null
+        ? NursingPersonalCaseModel.fromJson(
+            appointmentJson['nursing_request_data'])
+        : null;
+    final pharmacyCase = appointmentJson['pharmacy_request_data'] != null
+        ? PharmacyPersonalCaseModel.fromJson(
+            appointmentJson['pharmacy_request_data'])
         : null;
 
     return AppointmentModel(
@@ -55,6 +62,7 @@ class AppointmentModel extends AppointmentEntity {
       providerType: appointmentJson['provider_type'],
       provider: provider,
       nursingCase: nursingCase,
+      pharmacyCase: pharmacyCase,
       patientProfile: patient,
       payment: payment,
     );

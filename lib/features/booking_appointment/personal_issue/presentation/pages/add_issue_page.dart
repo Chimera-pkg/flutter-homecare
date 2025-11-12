@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/const.dart';
@@ -11,10 +9,8 @@ import 'dart:io';
 import 'package:m2health/features/booking_appointment/personal_issue/presentation/bloc/personal_issues_state.dart';
 
 class AddIssuePage extends StatefulWidget {
-  final String providerType;
   const AddIssuePage({
     super.key,
-    required this.providerType,
   });
   @override
   State<AddIssuePage> createState() => _AddIssuePageState();
@@ -46,8 +42,9 @@ class _AddIssuePageState extends State<AddIssuePage> {
       return;
     }
 
+    final serviceType = context.read<PersonalIssuesCubit>().state.serviceType;
     final newIssue = PersonalIssue(
-      type: widget.providerType,
+      type: serviceType,
       title: issueTitle,
       description: description,
       images: _images.whereType<File>().toList(),

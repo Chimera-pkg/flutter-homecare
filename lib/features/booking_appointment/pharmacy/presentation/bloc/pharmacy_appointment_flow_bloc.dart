@@ -3,26 +3,24 @@ import 'dart:developer';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/features/booking_appointment/add_on_services/domain/entities/add_on_service.dart';
-import 'package:m2health/features/booking_appointment/nursing/const.dart';
 import 'package:m2health/core/domain/entities/appointment_entity.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/domain/entities/health_status.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/domain/entities/mobility_status.dart';
-import 'package:m2health/features/booking_appointment/nursing/domain/entities/nursing_case.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/domain/entities/personal_issue.dart';
-import 'package:m2health/features/booking_appointment/nursing/domain/usecases/create_nursing_appointment.dart';
+import 'package:m2health/features/booking_appointment/pharmacy/domain/entities/pharmacy_case.dart';
+import 'package:m2health/features/booking_appointment/pharmacy/domain/usecases/create_pharmacy_appointment.dart';
 import 'package:m2health/features/booking_appointment/professional_directory/domain/entities/professional_entity.dart';
 
-part 'nursing_appointment_flow_event.dart';
-part 'nursing_appointment_flow_state.dart';
+part 'pharmacy_appointment_flow_event.dart';
+part 'pharmacy_appointment_flow_state.dart';
 
-class NursingAppointmentFlowBloc
-    extends Bloc<NursingAppointmentFlowEvent, NursingAppointmentFlowState> {
-  final CreateNursingAppointment createNursingAppointment;
+class PharmacyAppointmentFlowBloc
+    extends Bloc<PharmacyAppointmentFlowEvent, PharmacyAppointmentFlowState> {
+  final CreatePharmacyAppointment createPharmacyAppointment;
 
-  NursingAppointmentFlowBloc({
-    required this.createNursingAppointment,
-    required NurseServiceType serviceType,
-  }) : super(NursingAppointmentFlowState.initial(serviceType)) {
+  PharmacyAppointmentFlowBloc({
+    required this.createPharmacyAppointment,
+  }) : super(PharmacyAppointmentFlowState.initial()) {
     on<FlowStepChanged>(_onStepChanged);
     on<FlowPersonalIssueUpdated>(_onPersonalCaseUpdated);
     on<FlowHealthStatusUpdated>(_onHealthStatusUpdated);
@@ -33,64 +31,64 @@ class NursingAppointmentFlowBloc
   }
 
   @override
-  void onEvent(NursingAppointmentFlowEvent event) {
+  void onEvent(PharmacyAppointmentFlowEvent event) {
     super.onEvent(event);
     log('Event triggered: $event'); // Logs the event details
   }
 
   void _onStepChanged(
-      FlowStepChanged event, Emitter<NursingAppointmentFlowState> emit) {
+      FlowStepChanged event, Emitter<PharmacyAppointmentFlowState> emit) {
     emit(state.copyWith(currentStep: event.step));
   }
 
   void _onPersonalCaseUpdated(FlowPersonalIssueUpdated event,
-      Emitter<NursingAppointmentFlowState> emit) {
+      Emitter<PharmacyAppointmentFlowState> emit) {
     emit(state.copyWith(
       selectedIssues: event.personalIssues,
-      currentStep: NursingFlowStep.healthStatus,
+      currentStep: PharmacyFlowStep.healthStatus,
     ));
   }
 
   void _onHealthStatusUpdated(FlowHealthStatusUpdated event,
-      Emitter<NursingAppointmentFlowState> emit) {
+      Emitter<PharmacyAppointmentFlowState> emit) {
     emit(state.copyWith(
       healthStatus: event.healthStatus,
-      currentStep: NursingFlowStep.addOnService,
+      currentStep: PharmacyFlowStep.addOnService,
     ));
   }
 
   void _onAddOnServicesUpdated(FlowAddOnServicesUpdated event,
-      Emitter<NursingAppointmentFlowState> emit) {
+      Emitter<PharmacyAppointmentFlowState> emit) {
     emit(state.copyWith(
       selectedAddOnServices: event.addOnServices,
-      currentStep: NursingFlowStep.searchProfessional,
+      currentStep: PharmacyFlowStep.searchProfessional,
     ));
   }
 
   void _onProfessionalSelected(FlowProfessionalSelected event,
-      Emitter<NursingAppointmentFlowState> emit) {
+      Emitter<PharmacyAppointmentFlowState> emit) {
     emit(state.copyWith(
       selectedProfessional: event.professional,
-      currentStep: NursingFlowStep.viewProfessionalDetail,
+      currentStep: PharmacyFlowStep.viewProfessionalDetail,
     ));
   }
 
   void _onTimeSlotSelected(
-      FlowTimeSlotSelected event, Emitter<NursingAppointmentFlowState> emit) {
+      FlowTimeSlotSelected event, Emitter<PharmacyAppointmentFlowState> emit) {
     emit(state.copyWith(selectedTimeSlot: event.timeSlot));
 
     add(FlowSubmitAppointment()); // Trigger submission after time slot selection
   }
 
   void _onSubmitAppointment(FlowSubmitAppointment event,
-      Emitter<NursingAppointmentFlowState> emit) async {
+      Emitter<PharmacyAppointmentFlowState> emit) async {
     emit(state.copyWith(
         submissionStatus: AppointmentSubmissionStatus.submitting));
 
-    final params = CreateNursingAppointmentParams(
+    final params = CreatePharmacyAppointmentParams(
       providerId: state.selectedProfessional!.id,
       startDatetime: state.selectedTimeSlot!,
-      nursingCase: NursingCase(
+      pharmacyCase: PharmacyCase(
         issues: state.selectedIssues,
         mobilityStatus: state.healthStatus?.mobilityStatus,
         relatedHealthRecordId: state.healthStatus?.relatedHealthRecordId,
@@ -98,7 +96,7 @@ class NursingAppointmentFlowBloc
       ),
     );
 
-    final result = await createNursingAppointment(params);
+    final result = await createPharmacyAppointment(params);
     result.fold(
       (failure) {
         emit(state.copyWith(

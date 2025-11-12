@@ -10,12 +10,10 @@ import 'package:m2health/features/booking_appointment/personal_issue/presentatio
 import 'package:m2health/features/booking_appointment/personal_issue/presentation/pages/personal_issue_detail_page.dart';
 
 class PersonalIssuesPage extends StatefulWidget {
-  final String serviceType;
   final Function(List<PersonalIssue>) onIssuesSelected;
 
   const PersonalIssuesPage({
     super.key,
-    required this.serviceType,
     required this.onIssuesSelected,
   });
 
@@ -27,6 +25,10 @@ class _PersonalIssuesPageState extends State<PersonalIssuesPage> {
   @override
   void initState() {
     super.initState();
+    _loadData();
+  }
+
+  void _loadData() {
     context.read<PersonalIssuesCubit>().loadNursingIssues();
   }
 
@@ -34,13 +36,14 @@ class _PersonalIssuesPageState extends State<PersonalIssuesPage> {
     widget.onIssuesSelected(issues);
   }
 
-  String getTitle(String serviceType) {
+  String getTitle() {
+    final serviceType = context.read<PersonalIssuesCubit>().state.serviceType;
     switch (serviceType) {
-      case 'nurse':
+      case 'nursing':
         return 'Nurse Services Case';
-      case 'pharmacist':
+      case 'pharmacy':
         return 'Pharmacist Services Case';
-      case 'radiologist':
+      case 'radiology':
         return 'Radiologist Services Case';
       default:
         return 'Service Case';
@@ -81,7 +84,7 @@ class _PersonalIssuesPageState extends State<PersonalIssuesPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          getTitle(widget.serviceType),
+          getTitle(),
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         leading: BackButton(
@@ -130,7 +133,7 @@ class _PersonalIssuesPageState extends State<PersonalIssuesPage> {
                       color: Const.aqua,
                       backgroundColor: Colors.white,
                       onRefresh: () async {
-                        context.read<PersonalIssuesCubit>().loadNursingIssues();
+                        _loadData();
                       },
                       child: issues.isEmpty
                           ? const Center(
@@ -242,11 +245,14 @@ class _PersonalIssuesPageState extends State<PersonalIssuesPage> {
                       height: 58,
                       child: OutlinedButton(
                         onPressed: () {
+                          final issuesCubit =
+                              context.read<PersonalIssuesCubit>();
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => AddIssuePage(
-                                providerType: widget.serviceType,
+                              builder: (context) => BlocProvider.value(
+                                value: issuesCubit,
+                                child: const AddIssuePage(),
                               ),
                             ),
                           );

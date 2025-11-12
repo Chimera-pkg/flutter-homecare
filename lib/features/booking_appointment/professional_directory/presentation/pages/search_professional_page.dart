@@ -7,12 +7,12 @@ import 'package:m2health/features/booking_appointment/professional_directory/pre
 import 'package:m2health/features/booking_appointment/professional_directory/presentation/bloc/professional/professional_state.dart';
 
 class SearchProfessionalPage extends StatefulWidget {
-  final String serviceType;
+  final String role;
   final Function(ProfessionalEntity) onProfessionalSelected;
 
   const SearchProfessionalPage({
     super.key,
-    required this.serviceType,
+    required this.role,
     required this.onProfessionalSelected,
   });
 
@@ -24,13 +24,11 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
   @override
   void initState() {
     super.initState();
-    context
-        .read<ProfessionalBloc>()
-        .add(GetProfessionalsEvent(widget.serviceType));
+    context.read<ProfessionalBloc>().add(GetProfessionalsEvent(widget.role));
   }
 
-  String getTitle(String serviceType) {
-    switch (serviceType) {
+  String getTitle(String role) {
+    switch (role) {
       case 'nurse':
         return 'Search Nurse';
       case 'pharmacist':
@@ -47,7 +45,7 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          getTitle(widget.serviceType),
+          getTitle(widget.role),
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
@@ -58,7 +56,7 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
             TextField(
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.search),
-                hintText: getTitle(widget.serviceType),
+                hintText: getTitle(widget.role),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
@@ -162,8 +160,8 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
                                               //         ProfessionalDetailsPage(
                                               //       professionalId:
                                               //           professional.id,
-                                              //       serviceType:
-                                              //           widget.serviceType,
+                                              //       role:
+                                              //           widget.role,
                                               //     ),
                                               //   ),
                                               // );
