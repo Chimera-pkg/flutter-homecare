@@ -2,7 +2,6 @@ import 'package:go_router/go_router.dart';
 import 'package:m2health/features/appointment/appointment_module.dart';
 import 'package:m2health/route/app_routes.dart';
 import 'package:m2health/features/appointment/pages/provider_appointment_detail_page.dart';
-import 'package:m2health/core/presentation/views/book_appointment.dart';
 import 'package:m2health/route/navigator_keys.dart';
 
 class AppointmentRoutes {
@@ -14,15 +13,6 @@ class AppointmentRoutes {
       builder: (context, state) {
         final appointmentId = state.extra as int;
         return DetailAppointmentPage(appointmentId: appointmentId);
-      },
-    ),
-    GoRoute(
-      parentNavigatorKey: rootNavigatorKey,
-      path: 'book',
-      name: AppRoutes.bookAppointment,
-      builder: (context, state) {
-        final data = state.extra as BookAppointmentPageData;
-        return BookAppointmentPage(data: data);
       },
     ),
     GoRoute(

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:m2health/features/personal/personal_cubit.dart';
-import 'package:m2health/features/personal/personal_page.dart';
 
 class ChatPharma extends StatelessWidget {
   final List<Map<String, dynamic>> chatHistory;

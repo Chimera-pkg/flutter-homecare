@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:m2health/core/presentation/views/search/search_professional.dart';
+import 'package:m2health/core/presentation/widgets/star_rating.dart';
 import 'package:m2health/features/booking_appointment/professional_directory/domain/entities/professional_entity.dart';
 import 'package:m2health/features/booking_appointment/professional_directory/presentation/bloc/professional/professional_bloc.dart';
 import 'package:m2health/features/booking_appointment/professional_directory/presentation/bloc/professional/professional_event.dart';

@@ -3,7 +3,6 @@ import 'package:m2health/features/diabetes/bloc/diabetes_form_cubit.dart';
 import 'package:m2health/features/medical_record/domain/usecases/delete_medical_record.dart';
 import 'package:m2health/features/medical_record/domain/usecases/get_medical_records.dart';
 import 'package:m2health/features/medical_record/presentation/bloc/medical_record_bloc.dart';
-import 'package:m2health/features/personal/personal_cubit.dart';
 import 'package:m2health/features/pharmacogenomics/domain/usecases/delete_pharmacogenomics.dart';
 import 'package:m2health/features/pharmacogenomics/domain/usecases/store_pharmacogenomics.dart';
 import 'package:m2health/features/pharmacogenomics/presentation/bloc/pharmacogenomics_cubit.dart';
@@ -55,8 +54,6 @@ void main() async {
         ),
         BlocProvider(create: (context) => AppointmentCubit(sl<Dio>())),
         BlocProvider(create: (context) => ProviderAppointmentCubit(sl<Dio>())),
-        BlocProvider(
-            create: (context) => PersonalCubit()..loadPersonalDetails()),
         BlocProvider(
             create: (context) => ProfileCubit(
                   getProfileUseCase: sl<GetProfile>(),
@@ -170,8 +167,6 @@ class _MyAppState extends State<MyApp> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => AppointmentCubit(sl<Dio>())),
-        BlocProvider(
-            create: (context) => PersonalCubit()..loadPersonalDetails()),
       ],
       child: AnimatedBuilder(
         animation: appSetting,

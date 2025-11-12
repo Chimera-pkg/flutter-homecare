@@ -338,12 +338,31 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
             const SizedBox(height: 8),
             Row(
               children: [
+                const Text('Payment Date'),
+                const Spacer(),
+                Text(DateFormat('MMM dd, yyyy, hh:mm a')
+                    .format(appointment.payment!.createdAt.toLocal())),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
                 const Text('Payment Method'),
                 const Spacer(),
                 Text(appointment.payment!.method),
               ],
             ),
-            const Divider(height: 16),
+            const SizedBox(height: 8),
+            // TODO: Order completed date still use updatedat
+            Row(
+              children: [
+                const Text('Order Completed'),
+                const Spacer(),
+                Text(DateFormat('MMM dd, yyyy, hh:mm a')
+                    .format(appointment.payment!.updatedAt.toLocal())),
+              ],
+            ),
+            const Divider(height: 20),
           ],
           const Text(
             'Services',
@@ -545,6 +564,7 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
         ),
         child: isHorizontalLayout
             ? Row(
+                spacing: 16,
                 children:
                     buttons.map((button) => Expanded(child: button)).toList(),
               )
