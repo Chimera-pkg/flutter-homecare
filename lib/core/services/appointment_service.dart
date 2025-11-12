@@ -23,12 +23,7 @@ class AppointmentService {
     try {
       final token = await Utils.getSpString(Const.TOKEN);
 
-      print('Attempting to accept appointment $appointmentId');
-      print(
-          'Using endpoint: ${Const.URL_API}/provider/appointments/$appointmentId/accept');
-      print('Token: $token');
-
-      final response = await _dio.put(
+      final response = await _dio.post(
         '${Const.URL_API}/provider/appointments/$appointmentId/accept',
         options: Options(
           headers: {
@@ -42,11 +37,13 @@ class AppointmentService {
         ),
       );
 
-      print('Accept appointment response status: ${response.statusCode}');
-      print('Accept appointment response data: ${response.data}');
+      log('Accept appointment response status: ${response.statusCode}',
+          name: 'AppointmentService');
+      log('Accept appointment response data: ${response.data}',
+          name: 'AppointmentService');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print('Appointment accepted successfully');
+        log('Appointment accepted successfully', name: 'AppointmentService');
       } else if (response.statusCode == 404) {
         throw Exception('Appointment not found or endpoint not available');
       } else if (response.statusCode == 403) {
@@ -82,24 +79,9 @@ class AppointmentService {
   Future<void> rejectProviderAppointment(int appointmentId) async {
     try {
       final token = await Utils.getSpString(Const.TOKEN);
-      final userId = await Utils.getSpString(Const.USER_ID);
-      final userRole = await Utils.getSpString(Const.ROLE);
 
-      print('=== REJECTING APPOINTMENT DEBUG ===');
-      print('Appointment ID: $appointmentId');
-      print('User ID: $userId');
-      print('User Role: $userRole');
-      print('Token present: ${token != null}');
-      print('Token length: ${token?.length ?? 0}');
-      if (token != null && token.length > 20) {
-        print('Token preview: ${token.substring(0, 20)}...');
-      }
-      print(
-          'Full endpoint: ${Const.URL_API}/provider/appointments/$appointmentId/reject');
-      print('Base URL: ${Const.URL_API}');
-      print('=== SENDING REJECT REQUEST ===');
-      final response = await _dio.put(
-        '${Const.URL_API}/provider/appointments/$appointmentId/reject',
+      final response = await _dio.post(
+        '${Const.URL_API}/provider/appointments/$appointmentId/cancel',
         options: Options(
           headers: {
             'Authorization': 'Bearer $token',
@@ -111,44 +93,39 @@ class AppointmentService {
         ),
       );
 
-      print('=== REJECT RESPONSE RECEIVED ===');
-      print('Response status: ${response.statusCode}');
-      print('Response headers: ${response.headers}');
-      print('Response data: ${response.data}');
-      print('Response status message: ${response.statusMessage}');
-
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print('✅ Appointment rejected successfully');
+        log('✅ Appointment rejected successfully');
       } else if (response.statusCode == 404) {
-        print('❌ Appointment not found (404)');
+        log('❌ Appointment not found (404)');
         throw Exception('Appointment not found or endpoint not available');
       } else if (response.statusCode == 403) {
-        print('❌ Permission denied (403)');
+        log('❌ Permission denied (403)');
         throw Exception('Permission denied to reject this appointment');
       } else if (response.statusCode == 401) {
-        print('❌ Authentication failed (401)');
+        log('❌ Authentication failed (401)');
         throw Exception('Authentication failed. Please login again.');
       } else if (response.statusCode == 422) {
-        print('❌ Validation error (422)');
+        log('❌ Validation error (422)');
         final errorMessage = response.data['message'] ?? 'Validation failed';
         throw Exception('Validation error: $errorMessage');
       } else {
-        print('❌ Unexpected response: ${response.statusCode}');
+        log('❌ Unexpected response: ${response.statusCode}');
         throw Exception(
             'Failed to reject appointment: ${response.statusCode} - ${response.data}');
       }
     } catch (e) {
-      print('=== REJECT APPOINTMENT ERROR ===');
-      print('Error type: ${e.runtimeType}');
-      print('Error message: $e');
+      log(
+        'Error rejecting appointment: $e',
+        name: 'AppointmentService',
+      );
 
       if (e is DioException) {
-        print('DioException type: ${e.type}');
-        print('DioException message: ${e.message}');
-        print('DioException response status: ${e.response?.statusCode}');
-        print('DioException response data: ${e.response?.data}');
-        print('DioException request path: ${e.requestOptions.path}');
-        print('DioException request headers: ${e.requestOptions.headers}');
+        log('DioException type: ${e.type}');
+        log('DioException message: ${e.message}');
+        log('DioException response status: ${e.response?.statusCode}');
+        log('DioException response data: ${e.response?.data}');
+        log('DioException request path: ${e.requestOptions.path}');
+        log('DioException request headers: ${e.requestOptions.headers}');
 
         if (e.response?.statusCode == 404) {
           throw Exception(
@@ -356,13 +333,12 @@ class AppointmentService {
     }
   }
 
-  Future<void> updateAppointmentStatus(int appointmentId, String status) async {
+  Future<void> cancelAppointment(int appointmentId) async {
     try {
       final token = await Utils.getSpString(Const.TOKEN);
 
-      final response = await _dio.put(
-        '${Const.API_APPOINTMENT}/$appointmentId',
-        data: {'status': status},
+      final response = await _dio.post(
+        '${Const.API_APPOINTMENT}/$appointmentId/cancel',
         options: Options(
           headers: {
             'Authorization': 'Bearer $token',
@@ -370,13 +346,17 @@ class AppointmentService {
           },
         ),
       );
-
-      if (response.statusCode != 200) {
-        throw Exception(
-            'Failed to update appointment status: ${response.statusCode}');
-      }
+      log('Cancel appointment response status: ${response.statusCode}',
+          name: 'AppointmentService');
     } catch (e) {
-      throw Exception('Error updating appointment status: $e');
+      if (e is DioException) {
+        log('DioException cancelling appointment: ${e.message}',
+            error: e, name: 'AppointmentService');
+      } else {
+        log('Error cancelling appointment: $e',
+            error: e, name: 'AppointmentService');
+      }
+      rethrow;
     }
   }
 

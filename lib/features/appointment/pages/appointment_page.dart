@@ -357,15 +357,15 @@ class _AppointmentListItem extends StatelessWidget {
         ),
       ),
       child: OutlinedButton(
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => ScheduleAppointmentPage(
-                professional: appointment.provider!,
-                currentAppointment: appointment,
-              ),
+        onPressed: () async {
+          await GoRouter.of(context).pushNamed(
+            AppRoutes.scheduleAppoointment,
+            extra: ScheduleAppointmentPageData(
+              professional: appointment.provider!,
+              currentAppointment: appointment,
             ),
           );
+          context.read<AppointmentCubit>().refreshAllTabs();
         },
         style: OutlinedButton.styleFrom(
           side: const BorderSide(color: Colors.transparent),

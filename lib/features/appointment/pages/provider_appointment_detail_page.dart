@@ -3,8 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/core/domain/entities/appointment_entity.dart';
+import 'package:m2health/core/extensions/string_extensions.dart';
 import 'package:m2health/features/appointment/bloc/provider_appointment_cubit.dart';
 import 'package:m2health/features/appointment/bloc/provider_appointment_detail_cubit.dart';
+import 'package:m2health/features/appointment/widgets/provider_appointment_action_dialog.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/domain/entities/personal_issue.dart';
 import 'package:m2health/service_locator.dart';
 
@@ -106,6 +108,7 @@ class _PatientHeader extends StatelessWidget {
 
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
+      case 'completed':
       case 'accepted':
         return const Color(0xFF18B23C);
       case 'pending':
@@ -163,7 +166,7 @@ class _PatientHeader extends StatelessWidget {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  appointment.status,
+                  appointment.status.toTitleCase(),
                   style: TextStyle(
                     color: statusColor,
                     fontWeight: FontWeight.w400,
@@ -206,11 +209,15 @@ class _PatientInfoTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final patient = appointment.patientProfile!;
+    final gender = patient.gender != null
+        ? patient.gender!.toTitleCase()
+        : 'Not Specified';
+
     return Column(
       children: [
         _buildInfoRow('Full Name', patient.name),
         _buildInfoRow('Age', patient.age.toString()),
-        _buildInfoRow('Gender', patient.gender),
+        _buildInfoRow('Gender', gender),
         _buildInfoRow('Weight', '${patient.weight} kg'),
         _buildInfoRow('Height', '${patient.height} cm'),
         _buildInfoRow('Address', patient.homeAddress),
@@ -335,6 +342,17 @@ class _ActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    void _refreshAppointmentDetail() {
+      context
+          .read<ProviderAppointmentDetailCubit>()
+          .fetchProviderAppointmentById(appointment.id!);
+    }
+
+    if (appointment.status.toLowerCase() == 'completed' ||
+        appointment.status.toLowerCase() == 'cancelled') {
+      return const SizedBox.shrink();
+    }
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -346,38 +364,53 @@ class _ActionButtons extends StatelessWidget {
               blurRadius: 10)
         ],
       ),
-      child: Column(
-        children: [
-          OutlinedButton(
-            onPressed: () {},
-            style: OutlinedButton.styleFrom(
-              minimumSize: const Size(double.infinity, 50),
-              side: const BorderSide(color: Const.aqua),
-              foregroundColor: Const.aqua,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              textStyle: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+      child: BlocListener<ProviderAppointmentCubit, ProviderAppointmentState>(
+        listener: (context, state) {
+          if (state is ProviderAppointmentChangeSucceed) {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    const Icon(Icons.check, color: Colors.white),
+                    const SizedBox(width: 8),
+                    Text(state.message ?? 'Appointment updated successfully'),
+                  ],
+                ),
+                backgroundColor: Colors.green,
+                duration: const Duration(seconds: 2),
               ),
-            ),
-            child: const Text('Arrange Video Consultation'),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () {
-                    context
-                        .read<ProviderAppointmentCubit>()
-                        .rejectAppointment(appointment.id!);
-                    Navigator.of(context).pop();
-                  },
+            );
+            _refreshAppointmentDetail();
+          } else if (state is ProviderAppointmentError) {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    const Icon(Icons.error, color: Colors.white),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(state.message)),
+                  ],
+                ),
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 5),
+              ),
+            );
+          }
+        },
+        child: Builder(builder: (context) {
+          final status = appointment.status.toLowerCase();
+
+          if (status == 'pending') {
+            return Column(
+              children: [
+                OutlinedButton(
+                  onPressed: () {},
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 50),
-                    side: const BorderSide(color: Color(0xFFED3443)),
-                    foregroundColor: const Color(0xFFED3443),
+                    side: const BorderSide(color: Const.aqua),
+                    foregroundColor: Const.aqua,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
                     textStyle: const TextStyle(
@@ -385,51 +418,109 @@ class _ActionButtons extends StatelessWidget {
                       fontSize: 16,
                     ),
                   ),
-                  child: const Text('Cancel'),
+                  child: const Text('Arrange Video Consultation'),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [
-                        Color(0xFF9DCEFF),
-                        Color(0xFF35C5CF),
-                      ],
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      context
-                          .read<ProviderAppointmentCubit>()
-                          .acceptAppointment(appointment.id!);
-                      Navigator.of(context).pop();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 50),
-                      backgroundColor: Colors
-                          .transparent, // Make button background transparent
-                      foregroundColor: Colors.white,
-                      shadowColor: Colors.transparent, // Remove shadow
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      textStyle: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          // await context
+                          //     .read<ProviderAppointmentCubit>()
+                          //     .rejectAppointment(appointment.id!);
+
+                          // await context
+                          //     .read<ProviderAppointmentDetailCubit>()
+                          //     .fetchProviderAppointmentById(appointment.id!);
+                          showDeclineAppointmentDialog(
+                              context, appointment.id!);
+                        },
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 50),
+                          side: const BorderSide(color: Color(0xFFED3443)),
+                          foregroundColor: const Color(0xFFED3443),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                          textStyle: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        child: const Text('Decline'),
                       ),
                     ),
-                    child: const Text('Accept'),
-                  ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [
+                              Color(0xFF9DCEFF),
+                              Color(0xFF35C5CF),
+                            ],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            showAcceptAppointmentDialog(
+                                context, appointment.id!);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size(double.infinity, 50),
+                            backgroundColor: Colors
+                                .transparent, // Make button background transparent
+                            foregroundColor: Colors.white,
+                            shadowColor: Colors.transparent, // Remove shadow
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            textStyle: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          child: const Text('Accept'),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            );
+          } else if (status == 'accepted') {
+            return ElevatedButton(
+              onPressed: () async {
+                // await context
+                //     .read<ProviderAppointmentCubit>()
+                //     .completeAppointment(appointment.id!);
+                // await context
+                //     .read<ProviderAppointmentDetailCubit>()
+                //     .fetchProviderAppointmentById(appointment.id!);
+
+                showCompleteAppointmentDialog(context, appointment.id!);
+              },
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 50),
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+                shadowColor: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                textStyle: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
               ),
-            ],
-          )
-        ],
+              child: const Text('Mark as Completed'),
+            );
+          }
+          return const SizedBox.shrink();
+        }),
       ),
     );
   }

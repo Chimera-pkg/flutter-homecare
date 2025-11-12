@@ -22,7 +22,7 @@ class ScheduleAppointmentRepositoryImpl implements ScheduleAppointmentRepository
   }
 
   @override
-  Future<Either<Failure, void>> rescheduleAppointment({
+  Future<Either<Failure, Unit>> rescheduleAppointment({
     required int appointmentId,
     required DateTime newTime,
   }) async {
@@ -31,7 +31,7 @@ class ScheduleAppointmentRepositoryImpl implements ScheduleAppointmentRepository
         appointmentId: appointmentId,
         newTime: newTime,
       );
-      return const Right(null);
+      return const Right(unit);
     } on Exception catch (e) {
       return Left(ServerFailure(e.toString()));
     }

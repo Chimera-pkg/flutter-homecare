@@ -9,62 +9,40 @@ import 'package:m2health/features/booking_appointment/professional_directory/dom
 import 'package:m2health/features/booking_appointment/schedule_appointment/domain/entities/time_slot.dart';
 import 'package:m2health/features/booking_appointment/schedule_appointment/presentation/bloc/schedule_appointment_cubit.dart';
 import 'package:m2health/features/booking_appointment/schedule_appointment/presentation/widgets/time_slot_grid_view.dart';
-import 'package:m2health/service_locator.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class ScheduleAppointmentPage extends StatelessWidget {
+class ScheduleAppointmentPageData {
   final ProfessionalEntity professional;
   final bool isSubmitting;
   final Function(DateTime)? onTimeSlotSelected;
   final AppointmentEntity? currentAppointment; // For reschedule mode
 
+  ScheduleAppointmentPageData({
+    required this.professional,
+    this.isSubmitting = false,
+    this.onTimeSlotSelected,
+    this.currentAppointment,
+  });
+}
+
+class ScheduleAppointmentPage extends StatefulWidget {
+  final ScheduleAppointmentPageData data;
+
   const ScheduleAppointmentPage({
     super.key,
-    required this.professional,
-    this.isSubmitting = false,
-    this.onTimeSlotSelected,
-    this.currentAppointment,
+    required this.data,
   });
 
   @override
-  Widget build(BuildContext context) {
-    // This page provides its own Cubit
-    return BlocProvider(
-      create: (context) =>
-          ScheduleAppointmentCubit(getAvailableTimeSlots: sl()),
-      child: _ScheduleAppointmentView(
-        professional: professional,
-        isSubmitting: isSubmitting,
-        onTimeSlotSelected: onTimeSlotSelected,
-        currentAppointment: currentAppointment,
-      ),
-    );
-  }
+  State<ScheduleAppointmentPage> createState() =>
+      _ScheduleAppointmentPageState();
 }
 
-class _ScheduleAppointmentView extends StatefulWidget {
-  final ProfessionalEntity professional;
-  final bool isSubmitting;
-  final Function(DateTime)? onTimeSlotSelected;
-  final AppointmentEntity? currentAppointment;
-
-  const _ScheduleAppointmentView({
-    required this.professional,
-    this.isSubmitting = false,
-    this.onTimeSlotSelected,
-    this.currentAppointment,
-  });
-
-  @override
-  State<_ScheduleAppointmentView> createState() =>
-      _ScheduleAppointmentViewState();
-}
-
-class _ScheduleAppointmentViewState extends State<_ScheduleAppointmentView> {
+class _ScheduleAppointmentPageState extends State<ScheduleAppointmentPage> {
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
 
-  bool get isRescheduleMode => widget.currentAppointment != null;
+  bool get isRescheduleMode => widget.data.currentAppointment != null;
 
   @override
   void initState() {
@@ -81,13 +59,13 @@ class _ScheduleAppointmentViewState extends State<_ScheduleAppointmentView> {
       return;
     }
 
-    if (widget.onTimeSlotSelected != null) {
-      widget.onTimeSlotSelected!(selectedTime);
+    if (widget.data.onTimeSlotSelected != null) {
+      widget.data.onTimeSlotSelected!(selectedTime);
       return;
     }
 
     if (isRescheduleMode) {
-      final appointmentId = widget.currentAppointment!.id!;
+      final appointmentId = widget.data.currentAppointment!.id!;
       context.read<ScheduleAppointmentCubit>().rescheduleAppointment(
             appointmentId: appointmentId,
             newTime: selectedTime,
@@ -96,16 +74,16 @@ class _ScheduleAppointmentViewState extends State<_ScheduleAppointmentView> {
   }
 
   void _fetchSlots(DateTime date) async {
-    final currentlyBookedSlot = widget.currentAppointment != null
+    final currentlyBookedSlot = widget.data.currentAppointment != null
         ? TimeSlot(
-            startTime: widget.currentAppointment!.startDatetime,
-            endTime: widget.currentAppointment!.endDatetime!,
+            startTime: widget.data.currentAppointment!.startDatetime,
+            endTime: widget.data.currentAppointment!.endDatetime!,
           )
         : null;
 
     await context.read<ScheduleAppointmentCubit>().fetchSlots(
-          providerId: widget.professional.id,
-          providerType: widget.professional.role.toLowerCase(),
+          providerId: widget.data.professional.id,
+          providerType: widget.data.professional.role.toLowerCase(),
           date: date,
           currentlyBookedSlot: currentlyBookedSlot,
         );
@@ -177,7 +155,7 @@ class _ScheduleAppointmentViewState extends State<_ScheduleAppointmentView> {
   }
 
   Widget _buildProfessionalCard() {
-    final professional = widget.professional;
+    final professional = widget.data.professional;
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -307,9 +285,9 @@ class _ScheduleAppointmentViewState extends State<_ScheduleAppointmentView> {
       color: Colors.white,
       elevation: 8,
       child: BlocConsumer<ScheduleAppointmentCubit, ScheduleAppointmentState>(
-        listenWhen: (previous, current) =>
-            previous.rescheduleStatus != current.rescheduleStatus,
         listener: (context, state) {
+          log('Reschedule Status: ${state.rescheduleStatus}',
+              name: '_buildBottomButton');
           if (state.rescheduleStatus == ActionStatus.success) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -331,7 +309,7 @@ class _ScheduleAppointmentViewState extends State<_ScheduleAppointmentView> {
         },
         builder: (context, state) {
           final isButtonDisabled =
-              state.selectedTime == null || widget.isSubmitting;
+              state.selectedTime == null || widget.data.isSubmitting;
           return ElevatedButton(
             onPressed: isButtonDisabled ? null : _submit,
             style: ElevatedButton.styleFrom(
@@ -343,7 +321,7 @@ class _ScheduleAppointmentViewState extends State<_ScheduleAppointmentView> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: widget.isSubmitting
+            child: widget.data.isSubmitting
                 ? const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

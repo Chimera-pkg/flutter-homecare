@@ -178,7 +178,7 @@ class _NursingAppointmentFlowPageState
                   ), // Placeholder
                 if (state.selectedProfessional != null)
                   ScheduleAppointmentPage(
-                    // Handle null professional for the first build
+                      data: ScheduleAppointmentPageData(
                     professional: state.selectedProfessional!,
                     isSubmitting: state.submissionStatus ==
                         AppointmentSubmissionStatus.submitting,
@@ -187,7 +187,7 @@ class _NursingAppointmentFlowPageState
                           .read<NursingAppointmentFlowBloc>()
                           .add(FlowTimeSlotSelected(timeSlot));
                     },
-                  ), // Placeholder
+                  )), // Placeholder
               ],
             ),
           ),

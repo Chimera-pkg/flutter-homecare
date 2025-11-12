@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:m2health/core/domain/entities/appointment_entity.dart';
 import 'package:m2health/features/appointment/bloc/provider_appointment_cubit.dart';
 import 'package:m2health/const.dart';
+import 'package:m2health/features/appointment/widgets/provider_appointment_action_dialog.dart';
 import 'package:m2health/route/app_routes.dart';
 
 class ProviderAppointmentPage extends StatefulWidget {
@@ -228,6 +229,21 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
         ? DateFormat('hh:mm a').format(localEndTime)
         : null;
 
+    String getStatusDescription(String status) {
+      switch (status.toLowerCase()) {
+        case 'pending':
+          return 'Waiting Approval';
+        case 'accepted':
+          return 'Accepted';
+        case 'completed':
+          return 'Completed';
+        case 'cancelled':
+          return 'Cancelled';
+        default:
+          return 'Unknown Status';
+      }
+    }
+
     return GestureDetector(
       onTap: () {
         GoRouter.of(context).pushNamed(
@@ -263,7 +279,7 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          patient?.name ?? 'Patient Name',
+                          patient.name,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -273,7 +289,7 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
                         Row(
                           children: [
                             Text(
-                              appointment.type,
+                              getStatusDescription(status),
                               style: TextStyle(
                                 color: Colors.grey[600],
                                 fontSize: 14,
@@ -381,7 +397,8 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
                     Row(
                       children: [
                         ElevatedButton(
-                          onPressed: () => _declineAppointment(appointment.id!),
+                          onPressed: () => showDeclineAppointmentDialog(
+                              context, appointment.id!),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
                             foregroundColor: Colors.white,
@@ -391,7 +408,8 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
                         ),
                         const SizedBox(width: 8),
                         ElevatedButton(
-                          onPressed: () => _acceptAppointment(appointment.id!),
+                          onPressed: () => showAcceptAppointmentDialog(
+                              context, appointment.id!),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF35C5CF),
                             foregroundColor: Colors.white,
@@ -403,7 +421,8 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
                     ),
                   if (status.toLowerCase() == 'accepted')
                     ElevatedButton(
-                      onPressed: () => _completeAppointment(appointment.id!),
+                      onPressed: () => showCompleteAppointmentDialog(
+                          context, appointment.id!),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         foregroundColor: Colors.white,
@@ -430,158 +449,5 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
       default:
         return Colors.orange;
     }
-  }
-
-  void _acceptAppointment(int appointmentId) {
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Text('Accept Appointment'),
-          content:
-              const Text('Are you sure you want to accept this appointment?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
-              ),
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                context
-                    .read<ProviderAppointmentCubit>()
-                    .acceptAppointment(appointmentId);
-              },
-              child: const Text('Accept'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _declineAppointment(int appointmentId) {
-    log('=== UI: REJECT APPOINTMENT TRIGGERED ===');
-    log('Appointment ID to decline: $appointmentId');
-
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Row(
-            children: [
-              Icon(Icons.cancel, color: Colors.red),
-              SizedBox(width: 8),
-              Flexible(child: Text('Decline Appointment')),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Are you sure you want to decline this appointment?'),
-              const SizedBox(height: 8),
-              Text(
-                'Appointment ID: $appointmentId',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'This action cannot be undone.',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.red[600],
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                log('Decline appointment cancelled by user');
-                Navigator.of(dialogContext).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                log('User confirmed decline of appointment $appointmentId');
-                Navigator.of(dialogContext).pop();
-
-                // Show loading indicator
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Row(
-                      children: [
-                        SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        ),
-                        SizedBox(width: 12),
-                        Text('Declining appointment...'),
-                      ],
-                    ),
-                    duration: Duration(seconds: 3),
-                    backgroundColor: Colors.orange,
-                  ),
-                );
-
-                // Call the cubit to decline appointment
-                log('Calling cubit to decline appointment $appointmentId');
-                context
-                    .read<ProviderAppointmentCubit>()
-                    .rejectAppointment(appointmentId);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('Decline'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _completeAppointment(int appointmentId) {
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Text('Complete Appointment'),
-          content: const Text('Mark this appointment as completed?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                context
-                    .read<ProviderAppointmentCubit>()
-                    .completeAppointment(appointmentId);
-              },
-              child:
-                  const Text('Complete', style: TextStyle(color: Colors.green)),
-            ),
-          ],
-        );
-      },
-    );
   }
 }

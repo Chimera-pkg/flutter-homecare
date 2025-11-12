@@ -1,8 +1,12 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2health/features/appointment/appointment_module.dart';
+import 'package:m2health/features/booking_appointment/schedule_appointment/presentation/bloc/schedule_appointment_cubit.dart';
+import 'package:m2health/features/booking_appointment/schedule_appointment/presentation/pages/schedule_appointment_page.dart';
 import 'package:m2health/route/app_routes.dart';
 import 'package:m2health/features/appointment/pages/provider_appointment_detail_page.dart';
 import 'package:m2health/route/navigator_keys.dart';
+import 'package:m2health/service_locator.dart';
 
 class AppointmentRoutes {
   static List<GoRoute> routes = [
@@ -22,6 +26,21 @@ class AppointmentRoutes {
       builder: (context, state) {
         final id = state.extra as int;
         return ProviderAppointmentDetailPage(appointmentId: id);
+      },
+    ),
+    GoRoute(
+      parentNavigatorKey: rootNavigatorKey,
+      path: 'schedule-appointment',
+      name: AppRoutes.scheduleAppoointment,
+      builder: (context, state) {
+        final data = state.extra as ScheduleAppointmentPageData;
+        return BlocProvider(
+          create: (context) => ScheduleAppointmentCubit(
+            getAvailableTimeSlots: sl(),
+            rescheduleAppointment: sl(),
+          ),
+          child: ScheduleAppointmentPage(data: data),
+        );
       },
     ),
   ];

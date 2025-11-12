@@ -23,7 +23,7 @@ class AppRoutes {
   // Appointment
   static const String appointmentDetail = '/appointment/detail';
   static const String providerAppointmentDetail = '/appointment/provider-detail';
-  // static const String providerAppointment = '/provider-appointment';
+  static const String scheduleAppoointment = '/schedule-appointment';
 
   static const String payment = '/payment';
 

@@ -179,14 +179,16 @@ class PharmacyAppointmentFlowPageState
                   ),
                 if (state.selectedProfessional != null)
                   ScheduleAppointmentPage(
-                    professional: state.selectedProfessional!,
-                    isSubmitting: state.submissionStatus ==
-                        AppointmentSubmissionStatus.submitting,
-                    onTimeSlotSelected: (timeSlot) {
-                      context
-                          .read<PharmacyAppointmentFlowBloc>()
-                          .add(FlowTimeSlotSelected(timeSlot));
-                    },
+                    data: ScheduleAppointmentPageData(
+                      professional: state.selectedProfessional!,
+                      isSubmitting: state.submissionStatus ==
+                          AppointmentSubmissionStatus.submitting,
+                      onTimeSlotSelected: (timeSlot) {
+                        context
+                            .read<PharmacyAppointmentFlowBloc>()
+                            .add(FlowTimeSlotSelected(timeSlot));
+                      },
+                    ),
                   ),
               ],
             ),

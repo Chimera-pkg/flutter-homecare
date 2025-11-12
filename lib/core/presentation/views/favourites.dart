@@ -226,7 +226,7 @@ class _FavouritesPageState extends State<FavouritesPage> {
 
     if (_pharmacists.isEmpty) {
       return const Center(
-        child: Text('You have no favorite pharmacists yet.'),
+        child: Text('You have no favorite professionals yet.'),
       );
     }
 

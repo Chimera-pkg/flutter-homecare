@@ -5,16 +5,20 @@ import 'package:equatable/equatable.dart';
 import 'package:m2health/features/booking_appointment/schedule_appointment/domain/entities/time_slot.dart';
 import 'package:m2health/features/booking_appointment/schedule_appointment/domain/usecases/get_available_time_slot.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/presentation/bloc/personal_issues_state.dart';
+import 'package:m2health/features/booking_appointment/schedule_appointment/domain/usecases/reschedule_appointment.dart';
 import 'package:table_calendar/table_calendar.dart'; // For isSameDay
 
 part 'schedule_appointment_state.dart';
 
 class ScheduleAppointmentCubit extends Cubit<ScheduleAppointmentState> {
   final GetAvailableTimeSlots _getAvailableTimeSlots;
+  final RescheduleAppointment _rescheduleAppointment;
 
-  ScheduleAppointmentCubit(
-      {required GetAvailableTimeSlots getAvailableTimeSlots})
-      : _getAvailableTimeSlots = getAvailableTimeSlots,
+  ScheduleAppointmentCubit({
+    required GetAvailableTimeSlots getAvailableTimeSlots,
+    required RescheduleAppointment rescheduleAppointment,
+  })  : _getAvailableTimeSlots = getAvailableTimeSlots,
+        _rescheduleAppointment = rescheduleAppointment,
         super(const ScheduleAppointmentState());
 
   Future<void> fetchSlots({
@@ -38,7 +42,8 @@ class ScheduleAppointmentCubit extends Cubit<ScheduleAppointmentState> {
         List<TimeSlot> finalSlots = List<TimeSlot>.from(slots);
         DateTime? newSelectedTime;
 
-        // --- Reschedule Logic ---
+        // --- Reschedule Mode Logic ---
+        //  Add the currently booked slot back if it's not in the available slots
         if (currentlyBookedSlot != null &&
             isSameDay(currentlyBookedSlot.startTime, date) &&
             !finalSlots.any(
@@ -75,19 +80,26 @@ class ScheduleAppointmentCubit extends Cubit<ScheduleAppointmentState> {
       rescheduleErrorMessage: null,
     ));
 
-    try {
-      // Simulate rescheduling logic
-      await Future.delayed(const Duration(seconds: 2));
+    final result = await _rescheduleAppointment(
+      appointmentId: appointmentId,
+      newTime: newTime,
+    );
 
-      emit(state.copyWith(rescheduleStatus: ActionStatus.success));
-    } catch (e, stackTrace) {
-      log('Error rescheduling appointment: $e',
-          stackTrace: stackTrace, error: e, name: 'ScheduleAppointmentCubit');
-      emit(state.copyWith(
-        rescheduleStatus: ActionStatus.error,
-        rescheduleErrorMessage:
-            'Failed to reschedule appointment. Please try again.',
-      ));
-    }
+    result.fold(
+      (failure) {
+        log('Error rescheduling appointment: ${failure.message}',
+            name: 'ScheduleAppointmentCubit');
+        emit(state.copyWith(
+          rescheduleStatus: ActionStatus.error,
+          rescheduleErrorMessage:
+              'Failed to reschedule appointment. Please try again.',
+        ));
+      },
+      (_) {
+        log('Successfully rescheduled appointment',
+            name: 'ScheduleAppointmentCubit');
+        emit(state.copyWith(rescheduleStatus: ActionStatus.success));
+      },
+    );
   }
 }

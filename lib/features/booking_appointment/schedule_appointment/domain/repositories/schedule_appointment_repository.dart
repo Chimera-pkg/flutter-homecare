@@ -6,7 +6,7 @@ import 'package:m2health/features/booking_appointment/schedule_appointment/domai
 abstract class ScheduleAppointmentRepository {
   Future<Either<Failure, List<TimeSlot>>> getAvailableTimeSlots(
       GetAvailableTimeSlotsParams params);
-  Future<Either<Failure, void>> rescheduleAppointment({
+  Future<Either<Failure, Unit>> rescheduleAppointment({
     required int appointmentId,
     required DateTime newTime,
   });

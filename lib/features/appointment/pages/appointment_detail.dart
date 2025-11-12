@@ -484,19 +484,17 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
         begin: Alignment.bottomRight,
         end: Alignment.topLeft,
       ),
-      onPressed: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => ScheduleAppointmentPage(
-              professional: appointment.provider!,
-              currentAppointment: appointment,
-              isSubmitting: false,
-              onTimeSlotSelected: (datetime) {
-                Navigator.of(context).pop();
-              },
-            ),
+      onPressed: () async {
+        await GoRouter.of(context).pushNamed(
+          AppRoutes.scheduleAppoointment,
+          extra: ScheduleAppointmentPageData(
+            professional: appointment.provider!,
+            currentAppointment: appointment,
           ),
         );
+        context
+            .read<AppointmentDetailCubit>()
+            .fetchAppointmentDetail(appointment.id!);
       },
     );
 

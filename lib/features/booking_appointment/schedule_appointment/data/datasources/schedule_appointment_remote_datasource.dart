@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/features/booking_appointment/schedule_appointment/data/models/time_slot_model.dart';
 import 'package:m2health/features/booking_appointment/schedule_appointment/domain/usecases/get_available_time_slot.dart';
+import 'package:m2health/utils.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class ScheduleAppointmentRemoteDataSource {
@@ -60,9 +61,13 @@ class ScheduleAppointmentRemoteDataSource {
         name: 'ScheduleRemoteDataSource');
 
     try {
-      await dio.post(
+      final token = await Utils.getSpString(Const.TOKEN);
+      await dio.patch(
         '${Const.URL_API}/appointments/$appointmentId/reschedule',
         data: body,
+        options: Options(headers: {
+          'Authorization': 'Bearer $token',
+        }),
       );
     } catch (e) {
       if (e is DioException) {

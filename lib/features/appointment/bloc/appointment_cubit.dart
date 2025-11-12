@@ -128,15 +128,14 @@ class AppointmentCubit extends Cubit<AppointmentState> {
 
   Future<void> cancelAppointment(int appointmentId) async {
     try {
-      await _appointmentService.updateAppointmentStatus(
-          appointmentId, 'cancelled');
+      await _appointmentService.cancelAppointment(appointmentId);
       await _refreshTabs([
         AppointmentStatus.pending,
         AppointmentStatus.upcoming,
         AppointmentStatus.cancelled
       ]);
     } catch (e) {
-      print('Error cancelling appointment: $e');
+      
     }
   }
 }

@@ -63,7 +63,13 @@ class ScheduleAppointmentState extends Equatable {
     );
   }
 
-
   @override
-  List<Object?> get props => [status, slots, selectedTime, errorMessage];
+  List<Object?> get props => [
+        status,
+        slots,
+        selectedTime,
+        errorMessage,
+        rescheduleStatus,
+        rescheduleErrorMessage,
+      ];
 }
