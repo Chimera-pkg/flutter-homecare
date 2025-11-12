@@ -6,21 +6,15 @@ import 'package:m2health/const.dart';
 import 'package:m2health/core/domain/entities/appointment_entity.dart';
 import 'package:m2health/features/appointment/bloc/appointment_cubit.dart';
 import 'package:m2health/features/appointment/bloc/appointment_detail_cubit.dart';
-import 'package:m2health/features/appointment/models/appointment.dart';
 import 'package:m2health/features/appointment/widgets/cancel_appoinment_dialog.dart';
-import 'package:m2health/core/data/models/personal_case.dart';
-import 'package:m2health/core/data/models/profile.dart';
-import 'package:m2health/core/data/models/provider.dart';
 import 'package:m2health/features/booking_appointment/add_on_services/domain/entities/add_on_service.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/domain/entities/personal_issue.dart';
 import 'package:m2health/features/booking_appointment/professional_directory/domain/entities/professional_entity.dart';
 import 'package:m2health/features/booking_appointment/schedule_appointment/presentation/pages/schedule_appointment_page.dart';
 import 'package:m2health/features/payment/presentation/pages/payment_page.dart';
 import 'package:m2health/features/profiles/domain/entities/profile.dart';
-import 'package:m2health/route/app_routes.dart';
 import 'package:m2health/service_locator.dart';
 import 'package:m2health/core/services/appointment_service.dart';
-import 'package:m2health/core/presentation/views/book_appointment.dart';
 import 'package:m2health/core/presentation/widgets/gradient_button.dart'; // Assuming you have this
 
 class DetailAppointmentPage extends StatefulWidget {

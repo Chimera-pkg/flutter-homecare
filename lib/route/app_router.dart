@@ -15,7 +15,6 @@ final GoRouter router = GoRouter(
   routes: [
     ...CoreRoutes.routes, // NavBar Routes
     ...AuthRoutes.routes,
-    ...AppointmentRoutes.routes,
     ...ProfileDetailRoutes.routes,
 
     GoRoute(

@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:m2health/features/appointment/appointment_module.dart';
 import 'package:m2health/main.dart';
 import 'package:m2health/route/app_routes.dart';
+import 'package:m2health/route/appointment_routes.dart';
 import 'package:m2health/route/dashboard_routes.dart';
 import 'package:m2health/route/navigator_keys.dart';
 import 'package:m2health/core/presentation/views/dashboard.dart';
@@ -30,6 +31,7 @@ class CoreRoutes {
           routes: [
             GoRoute(
               path: AppRoutes.appointment,
+              routes: AppointmentRoutes.routes,
               builder: (context, state) => const UnifiedAppointmentPage(),
             ),
           ],
