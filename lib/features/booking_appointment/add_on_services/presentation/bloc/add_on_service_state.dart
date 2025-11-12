@@ -23,8 +23,12 @@ final class AddOnServiceState {
     this.errorMessage,
   });
 
-  factory AddOnServiceState.initial() {
-    return const AddOnServiceState._(status: AddOnServiceStateStatus.initial);
+  factory AddOnServiceState.initial(
+      {List<AddOnService> selectedServices = const []}) {
+    return AddOnServiceState._(
+      status: AddOnServiceStateStatus.initial,
+      selectedAddOnServices: selectedServices,
+    );
   }
 
   factory AddOnServiceState.loading() {

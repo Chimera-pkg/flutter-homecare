@@ -1,10 +1,9 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:m2health/features/booking_appointment/add_on_services/presentation/pages/add_on_service_page.dart';
 import 'package:m2health/features/appointment/pages/appointment_detail.dart';
 import 'package:m2health/features/booking_appointment/nursing/presentation/bloc/nursing_appointment_flow_bloc.dart';
-import 'package:m2health/features/booking_appointment/personal_issue/presentation/bloc/personal_issues_cubit.dart';
 import 'package:m2health/features/booking_appointment/professional_directory/presentation/bloc/professional/professional_bloc.dart';
 import 'package:m2health/features/booking_appointment/professional_directory/presentation/bloc/professional_detail/professional_detail_cubit.dart';
 import 'package:m2health/features/booking_appointment/schedule_appointment/presentation/pages/schedule_appointment_page.dart';
@@ -12,6 +11,7 @@ import 'package:m2health/features/booking_appointment/personal_issue/presentatio
 import 'package:m2health/features/booking_appointment/personal_issue/presentation/pages/personal_issues_page.dart';
 import 'package:m2health/features/booking_appointment/professional_directory/presentation/pages/search_professional_page.dart';
 import 'package:m2health/features/booking_appointment/professional_directory/presentation/pages/professional_details_page.dart';
+import 'package:m2health/route/app_routes.dart';
 import 'package:m2health/service_locator.dart';
 
 class NursingAppointmentFlowPage extends StatefulWidget {
@@ -83,15 +83,22 @@ class _NursingAppointmentFlowPageState
         if (state.submissionStatus == AppointmentSubmissionStatus.success &&
             state.createdAppointment != null) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Appointment created successfully')),
-          );
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => DetailAppointmentPage(
-                appointmentId: state.createdAppointment!.id!,
-              ),
+            const SnackBar(
+              content: Text('Appointment created successfully'),
+              backgroundColor: Colors.green,
             ),
+          );
+          // Navigator.pushReplacement(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (_) => DetailAppointmentPage(
+          //       appointmentId: state.createdAppointment!.id!,
+          //     ),
+          //   ),
+          // );
+          GoRouter.of(context).goNamed(
+            AppRoutes.appointmentDetail,
+            extra: state.createdAppointment!.id!,
           );
         }
         if (state.submissionStatus == AppointmentSubmissionStatus.failure) {
@@ -133,6 +140,7 @@ class _NursingAppointmentFlowPageState
                   },
                 ),
                 HealthStatusPage(
+                  initialHealthStatus: state.healthStatus,
                   onSubmit: (healthStatus) {
                     context
                         .read<NursingAppointmentFlowBloc>()
@@ -141,6 +149,7 @@ class _NursingAppointmentFlowPageState
                 ),
                 AddOnServicePage(
                   serviceType: state.serviceType.apiValue,
+                  initialSelectedServices: state.selectedAddOnServices,
                   onComplete: (services) {
                     context
                         .read<NursingAppointmentFlowBloc>()

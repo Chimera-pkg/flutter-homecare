@@ -9,11 +9,14 @@ class AddOnServiceCubit extends Cubit<AddOnServiceState> {
   final GetAddOnServices getAddOnServices;
 
   AddOnServiceCubit(
-    this.getAddOnServices,
-  ) : super(AddOnServiceState.initial());
+    this.getAddOnServices, {
+    List<AddOnService> initialSelectedServices = const [],
+  }) : super(AddOnServiceState.initial(
+          selectedServices: initialSelectedServices,
+        ));
 
   Future<void> loadAddOnServices(String serviceType) async {
-    emit(AddOnServiceState.loading());
+    emit(state.copyWith(status: AddOnServiceStateStatus.loading));
     final result = await getAddOnServices(serviceType);
     result.fold(
       (failure) {
@@ -22,7 +25,10 @@ class AddOnServiceCubit extends Cubit<AddOnServiceState> {
         emit(AddOnServiceState.error('Failed to load add-on services'));
       },
       (addOnServices) {
-        emit(AddOnServiceState.loaded(addOnServices));
+        emit(state.copyWith(
+          status: AddOnServiceStateStatus.loaded,
+          addOnServices: addOnServices,
+        ));
       },
     );
   }

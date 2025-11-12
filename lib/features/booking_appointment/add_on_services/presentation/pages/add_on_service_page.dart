@@ -8,17 +8,22 @@ import 'package:m2health/service_locator.dart';
 class AddOnServicePage extends StatelessWidget {
   final String serviceType;
   final Function(List<AddOnService>) onComplete;
+  final List<AddOnService>? initialSelectedServices;
 
   const AddOnServicePage({
     super.key,
     required this.serviceType,
     required this.onComplete,
+    this.initialSelectedServices,
   });
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => AddOnServiceCubit(sl()),
+      create: (context) => AddOnServiceCubit(
+        sl(),
+        initialSelectedServices: initialSelectedServices ?? [],
+      ),
       child: AddOnServiceView(
         serviceType: serviceType,
         onComplete: onComplete,

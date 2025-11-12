@@ -71,6 +71,7 @@ class Const {
 
   static const Color tosca = Color(0xFF00B0A7);
   static const Color aqua = Color(0xFF35C5CF);
+  static const Color grayLight = Color(0xFFF8F9FA);
   static const Color primaryBlue = Color(0xFF4894FE);
   static const Color primaryTextColor = Color(0xFF414C6B);
   static const Color secondaryTextColor = Color(0xFFE4979E);

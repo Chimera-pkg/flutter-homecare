@@ -9,10 +9,12 @@ import 'package:m2health/features/booking_appointment/nursing/presentation/bloc/
 
 class HealthStatusPage extends StatefulWidget {
   final Function(HealthStatus) onSubmit;
+  final HealthStatus? initialHealthStatus;
 
   const HealthStatusPage({
     super.key,
     required this.onSubmit,
+    this.initialHealthStatus,
   });
 
   @override
@@ -25,7 +27,7 @@ class HealthStatusPageState extends State<HealthStatusPage> {
   @override
   void initState() {
     super.initState();
-    healthStatus = const HealthStatus();
+    healthStatus = widget.initialHealthStatus ?? const HealthStatus();
     context.read<MedicalRecordBloc>().add(FetchMedicalRecords());
   }
 
