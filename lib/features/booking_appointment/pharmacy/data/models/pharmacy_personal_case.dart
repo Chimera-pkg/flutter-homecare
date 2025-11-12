@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:m2health/features/booking_appointment/add_on_services/data/model/add_on_service_model.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/data/models/personal_issue_model.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/domain/entities/mobility_status.dart';

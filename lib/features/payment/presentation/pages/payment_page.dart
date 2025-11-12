@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/core/extensions/string_extensions.dart';
 import 'package:m2health/features/booking_appointment/add_on_services/domain/entities/add_on_service.dart';
 import 'package:m2health/core/domain/entities/appointment_entity.dart';
 import 'package:m2health/features/booking_appointment/professional_directory/domain/entities/professional_entity.dart';
-import 'package:m2health/features/payment/domain/entities/payment.dart';
+import 'package:m2health/features/payment/presentation/cubit/payment_cubit.dart';
 import 'package:m2health/features/payment/presentation/widgets/payment_success_dialog.dart';
 
 class PaymentMethod {
@@ -43,8 +44,16 @@ class _PaymentPageState extends State<PaymentPage> {
   PaymentMethod? selectedPaymentMethod;
 
   ProfessionalEntity get profile => widget.appointment.provider!;
-  List<AddOnService> get services =>
-      widget.appointment.nursingCase!.addOnServices;
+  List<AddOnService> get services {
+    if (widget.appointment.nursingCase != null) {
+      return widget.appointment.nursingCase!.addOnServices;
+    } else if (widget.appointment.pharmacyCase != null) {
+      return widget.appointment.pharmacyCase!.addOnServices;
+    } else {
+      return [];
+    }
+  }
+
   double get totalCost => widget.appointment.payTotal;
 
   List<PaymentMethod> paymentMethods = [
@@ -89,173 +98,204 @@ class _PaymentPageState extends State<PaymentPage> {
     ),
   ];
 
+  void _onConfirmPayment() {
+    if (selectedPaymentMethod == null) return;
+    if (widget.appointment.id == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error: Appointment ID is missing.')),
+      );
+      return;
+    }
+
+    context.read<PaymentCubit>().createPayment(
+          appointmentId: widget.appointment.id!,
+          method: selectedPaymentMethod!.code,
+          amount: totalCost,
+        );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isButtonEnabled = selectedPaymentMethod != null;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Payment',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12.withValues(alpha: 0.08),
-                    spreadRadius: 0,
-                    blurRadius: 16,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 40,
-                    backgroundImage: (profile.avatar != null)
-                        ? NetworkImage(profile.avatar!)
-                        : null,
-                    child: (profile.avatar == null)
-                        ? const Icon(Icons.person, size: 40, color: Colors.grey)
-                        : null,
-                  ),
-                  const SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        profile.name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Text(profile.jobTitle?.toTitleCase() ??
-                          profile.role.toTitleCase()),
-                      Row(
-                        children: [
-                          const Icon(Icons.star_half_rounded,
-                              color: Color(0xFF9DEAC0)),
-                          const SizedBox(width: 4),
-                          Text('${profile.rating} (${100} reviews)'),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+    return BlocListener<PaymentCubit, PaymentState>(
+      listener: (context, state) {
+        if (state is PaymentSuccess) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => PaymentSuccessDialog(
+              appointment: widget.appointment,
+              payment: state.payment,
             ),
-            const SizedBox(height: 16),
-            const Text(
-              'Charge',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
+          );
+        } else if (state is PaymentFailure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Payment Failed: ${state.message}'),
+              backgroundColor: Colors.red,
             ),
-            const SizedBox(height: 8),
-            Column(
-              spacing: 4,
-              children: [
-                ...services.map((service) {
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(child: Text(service.name)),
-                      Text('\$${service.price}'),
-                    ],
-                  );
-                })
-              ],
-            ),
-            const Divider(height: 32),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Total',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-                Text(
-                  '\$$totalCost',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'Select Payment Method',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Column(
-              spacing: 8,
-              children: paymentMethods
-                  .map((method) => _buildPaymentMethodCard(method))
-                  .toList(),
-            )
-          ],
-        ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ElevatedButton(
-          onPressed: isButtonEnabled
-              ? () {
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (context) => PaymentSuccessDialog(
-                      appointment: widget.appointment,
-                      payment: Payment(
-                        // Mock payment data, need to replace with real data after the payment integration
-                        id: 0,
-                        userId: 0,
-                        appointmentId: widget.appointment.id!,
-                        method: selectedPaymentMethod!.code,
-                        amount: totalCost,
-                        status: 'completed',
-                        createdAt: DateTime.now(),
-                        updatedAt: DateTime.now(),
-                      ),
-                    ),
-                  );
-                }
-              : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF35C5CF),
-            foregroundColor: Colors.white,
-            disabledBackgroundColor: const Color(0xFFB2B9C4),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 16),
+          );
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'Payment',
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          child: const Text(
-            'Confirm',
-            style: TextStyle(
-                color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12.withValues(alpha: 0.08),
+                      spreadRadius: 0,
+                      blurRadius: 16,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundImage: (profile.avatar != null)
+                          ? NetworkImage(profile.avatar!)
+                          : null,
+                      child: (profile.avatar == null)
+                          ? const Icon(Icons.person,
+                              size: 40, color: Colors.grey)
+                          : null,
+                    ),
+                    const SizedBox(width: 16),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          profile.name,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        Text(profile.jobTitle?.toTitleCase() ??
+                            profile.role.toTitleCase()),
+                        Row(
+                          children: [
+                            const Icon(Icons.star_half_rounded,
+                                color: Color(0xFF9DEAC0)),
+                            const SizedBox(width: 4),
+                            Text('${profile.rating} (${100} reviews)'),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Charge',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Column(
+                spacing: 4,
+                children: [
+                  ...services.map((service) {
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(child: Text(service.name)),
+                        Text('\$${service.price}'),
+                      ],
+                    );
+                  })
+                ],
+              ),
+              const Divider(height: 32),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Total',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  Text(
+                    '\$$totalCost',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Select Payment Method',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Column(
+                spacing: 8,
+                children: paymentMethods
+                    .map((method) => _buildPaymentMethodCard(method))
+                    .toList(),
+              )
+            ],
+          ),
+        ),
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: BlocBuilder<PaymentCubit, PaymentState>(
+            builder: (context, state) {
+              final isLoading = state is PaymentLoading;
+              return ElevatedButton(
+                onPressed:
+                    isButtonEnabled && !isLoading ? _onConfirmPayment : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF35C5CF),
+                  foregroundColor: Colors.white,
+                  disabledBackgroundColor: const Color(0xFFB2B9C4),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: isLoading
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(color: Colors.white),
+                      )
+                    : const Text(
+                        'Confirm',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600),
+                      ),
+              );
+            },
           ),
         ),
       ),

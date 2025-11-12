@@ -5,8 +5,10 @@ import 'package:m2health/const.dart';
 import 'package:m2health/core/domain/entities/appointment_entity.dart';
 import 'package:m2health/features/appointment/appointment_module.dart';
 import 'package:m2health/features/payment/domain/entities/payment.dart';
+import 'package:m2health/features/payment/presentation/cubit/feedback_cubit.dart';
 import 'package:m2health/features/payment/presentation/pages/feedback_form_page.dart';
 import 'package:m2health/route/app_routes.dart';
+import 'package:m2health/service_locator.dart';
 
 class PaymentSuccessDialog extends StatelessWidget {
   final Payment payment;
@@ -99,8 +101,12 @@ class PaymentSuccessDialog extends StatelessWidget {
                         isScrollControlled: true,
                         backgroundColor: Colors.white,
                         builder: (BuildContext context) {
-                          return FeedbackFormPage(
-                            appointment: appointment,
+                          return BlocProvider(
+                            create: (context) =>
+                                FeedbackCubit(submitFeedbackUseCase: sl()),
+                            child: FeedbackFormPage(
+                              appointment: appointment,
+                            ),
                           );
                         },
                       );

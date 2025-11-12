@@ -14,6 +14,7 @@ import 'package:m2health/features/booking_appointment/professional_directory/dom
 import 'package:m2health/features/booking_appointment/schedule_appointment/presentation/pages/schedule_appointment_page.dart';
 import 'package:m2health/features/payment/presentation/pages/payment_page.dart';
 import 'package:m2health/features/profiles/domain/entities/profile.dart';
+import 'package:m2health/route/app_routes.dart';
 import 'package:m2health/service_locator.dart';
 import 'package:m2health/core/services/appointment_service.dart';
 import 'package:m2health/core/presentation/widgets/gradient_button.dart'; // Assuming you have this
@@ -317,7 +318,13 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
       if (nursingCase != null && nursingCase.addOnServices.isNotEmpty) {
         addOns = nursingCase.addOnServices;
       }
+    } else if (appointment.providerType == 'pharmacist') {
+      final pharmacyCase = appointment.pharmacyCase;
+      if (pharmacyCase != null && pharmacyCase.addOnServices.isNotEmpty) {
+        addOns = pharmacyCase.addOnServices;
+      }
     }
+
     final total = appointment.payTotal;
     final isPaid = appointment.payment != null;
 
@@ -419,14 +426,7 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
 
     Widget payButton = ElevatedButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PaymentPage(
-                appointment: appointment,
-              ),
-            ),
-          );
+          GoRouter.of(context).pushNamed(AppRoutes.payment, extra: appointment);
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF35C5CF),
