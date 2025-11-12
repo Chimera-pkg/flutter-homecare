@@ -6,6 +6,7 @@ import 'package:m2health/features/booking_appointment/nursing/presentation/bloc/
 import 'package:m2health/features/booking_appointment/personal_issue/presentation/bloc/personal_issues_cubit.dart';
 import 'package:m2health/features/booking_appointment/professional_directory/presentation/bloc/professional/professional_bloc.dart';
 import 'package:m2health/features/booking_appointment/professional_directory/presentation/bloc/professional_detail/professional_detail_cubit.dart';
+import 'package:m2health/features/booking_appointment/schedule_appointment/presentation/bloc/schedule_appointment_cubit.dart';
 import 'package:m2health/features/booking_appointment/schedule_appointment/presentation/pages/schedule_appointment_page.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/presentation/pages/health_status_page.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/presentation/pages/personal_issues_page.dart';
@@ -177,17 +178,23 @@ class _NursingAppointmentFlowPageState
                     ),
                   ), // Placeholder
                 if (state.selectedProfessional != null)
-                  ScheduleAppointmentPage(
-                      data: ScheduleAppointmentPageData(
-                    professional: state.selectedProfessional!,
-                    isSubmitting: state.submissionStatus ==
-                        AppointmentSubmissionStatus.submitting,
-                    onTimeSlotSelected: (timeSlot) {
-                      context
-                          .read<NursingAppointmentFlowBloc>()
-                          .add(FlowTimeSlotSelected(timeSlot));
-                    },
-                  )), // Placeholder
+                  BlocProvider(
+                    create: (context) => ScheduleAppointmentCubit(
+                      getAvailableTimeSlots: sl(),
+                      rescheduleAppointment: sl(),
+                    ),
+                    child: ScheduleAppointmentPage(
+                        data: ScheduleAppointmentPageData(
+                      professional: state.selectedProfessional!,
+                      isSubmitting: state.submissionStatus ==
+                          AppointmentSubmissionStatus.submitting,
+                      onTimeSlotSelected: (timeSlot) {
+                        context
+                            .read<NursingAppointmentFlowBloc>()
+                            .add(FlowTimeSlotSelected(timeSlot));
+                      },
+                    )),
+                  ), // Placeholder
               ],
             ),
           ),

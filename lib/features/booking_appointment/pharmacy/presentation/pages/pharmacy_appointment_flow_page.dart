@@ -10,6 +10,7 @@ import 'package:m2health/features/booking_appointment/professional_directory/pre
 import 'package:m2health/features/booking_appointment/professional_directory/presentation/bloc/professional_detail/professional_detail_cubit.dart';
 import 'package:m2health/features/booking_appointment/professional_directory/presentation/pages/professional_details_page.dart';
 import 'package:m2health/features/booking_appointment/professional_directory/presentation/pages/search_professional_page.dart';
+import 'package:m2health/features/booking_appointment/schedule_appointment/presentation/bloc/schedule_appointment_cubit.dart';
 import 'package:m2health/features/booking_appointment/schedule_appointment/presentation/pages/schedule_appointment_page.dart';
 
 import 'package:m2health/route/app_routes.dart';
@@ -178,16 +179,22 @@ class PharmacyAppointmentFlowPageState
                     ),
                   ),
                 if (state.selectedProfessional != null)
-                  ScheduleAppointmentPage(
-                    data: ScheduleAppointmentPageData(
-                      professional: state.selectedProfessional!,
-                      isSubmitting: state.submissionStatus ==
-                          AppointmentSubmissionStatus.submitting,
-                      onTimeSlotSelected: (timeSlot) {
-                        context
-                            .read<PharmacyAppointmentFlowBloc>()
-                            .add(FlowTimeSlotSelected(timeSlot));
-                      },
+                  BlocProvider(
+                    create: (context) => ScheduleAppointmentCubit(
+                      getAvailableTimeSlots: sl(),
+                      rescheduleAppointment: sl(),
+                    ),
+                    child: ScheduleAppointmentPage(
+                      data: ScheduleAppointmentPageData(
+                        professional: state.selectedProfessional!,
+                        isSubmitting: state.submissionStatus ==
+                            AppointmentSubmissionStatus.submitting,
+                        onTimeSlotSelected: (timeSlot) {
+                          context
+                              .read<PharmacyAppointmentFlowBloc>()
+                              .add(FlowTimeSlotSelected(timeSlot));
+                        },
+                      ),
                     ),
                   ),
               ],
