@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:m2health/features/appointment/pages/appointment_page.dart';
-import 'package:m2health/route/app_routes.dart';
 import 'package:m2health/features/appointment/pages/provider_appointment_page.dart';
 import 'package:m2health/utils.dart';
 import 'package:m2health/const.dart';

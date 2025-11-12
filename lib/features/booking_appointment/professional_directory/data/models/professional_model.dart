@@ -32,7 +32,7 @@ class ProfessionalModel extends ProfessionalEntity {
       experience: json['experience'],
       rating: (json['rating'] as num).toDouble(),
       about: json['about'],
-      jobTitle: json['job_title'] ?? 'Nurse',
+      jobTitle: json['job_title'] ?? json['role'],
       workingInformation: json['working_information'] ?? '',
       workingHours: json['working_hours'],
       workplace: json['workplace'],
@@ -48,7 +48,7 @@ class ProfessionalModel extends ProfessionalEntity {
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
       isFavorite: json['is_favorite'] ?? false,
-      role: json['role'] ?? 'nurse',
+      role: json['role'],
       providerType: json['provider_type'] ?? json['role'],
     );
   }

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/core/domain/entities/appointment_entity.dart';
+import 'package:m2health/core/extensions/string_extensions.dart';
 import 'package:m2health/features/appointment/bloc/appointment_cubit.dart';
 import 'package:m2health/features/appointment/bloc/appointment_detail_cubit.dart';
 import 'package:m2health/features/appointment/widgets/cancel_appoinment_dialog.dart';
@@ -101,40 +102,50 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
   Widget _buildProviderCard(ProfessionalEntity? provider, String status) {
     if (provider == null) return const SizedBox.shrink();
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 30,
-              backgroundImage: (provider.avatar != null)
-                  ? NetworkImage(provider.avatar!)
-                  : null,
-              child: (provider.avatar == null)
-                  ? const Icon(Icons.person, size: 30, color: Colors.grey)
-                  : null,
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    provider.name,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12.withValues(alpha: 0.08),
+            spreadRadius: 0,
+            blurRadius: 16,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 40,
+            backgroundImage: (provider.avatar != null)
+                ? NetworkImage(provider.avatar!)
+                : null,
+            child: (provider.avatar == null)
+                ? const Icon(Icons.person, size: 40, color: Colors.grey)
+                : null,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  provider.name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
                   ),
-                  Text(provider.jobTitle ?? provider.role),
-                  const SizedBox(height: 8),
-                  _StatusTag(status: status),
-                ],
-              ),
+                ),
+                Text(provider.jobTitle ?? provider.role),
+                const SizedBox(height: 8),
+                _StatusTag(status: status.toTitleCase()),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -179,6 +190,10 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
   }
 
   Widget _buildPatientInfo(Profile profile) {
+    final gender = profile.gender != null
+        ? profile.gender!.toTitleCase()
+        : 'Not specified';
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -196,7 +211,7 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
           const SizedBox(height: 12),
           _InfoRow(label: 'Age', text: '${profile.age} years old'),
           const SizedBox(height: 12),
-          _InfoRow(label: 'Gender', text: profile.gender ?? 'N/A'),
+          _InfoRow(label: 'Gender', text: gender),
           const SizedBox(height: 12),
           _InfoRow(
             label: 'Address',

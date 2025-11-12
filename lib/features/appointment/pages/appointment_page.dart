@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/core/domain/entities/appointment_entity.dart';
+import 'package:m2health/core/extensions/string_extensions.dart';
 import 'package:m2health/features/appointment/bloc/appointment_cubit.dart';
 import 'package:m2health/features/appointment/widgets/cancel_appoinment_dialog.dart';
 import 'package:m2health/features/booking_appointment/schedule_appointment/presentation/pages/schedule_appointment_page.dart';
@@ -95,10 +96,9 @@ class _AppointmentPageState extends State<AppointmentPage>
           labelColor: Const.aqua,
           tabAlignment: TabAlignment.start,
           isScrollable: true,
+          labelStyle: const TextStyle(fontSize: 16),
           tabs: _tabs
-              .map((status) => Tab(
-                  text:
-                      status.name[0].toUpperCase() + status.name.substring(1)))
+              .map((status) => Tab(text: status.name.toTitleCase()))
               .toList(),
         ),
       ),
@@ -301,20 +301,20 @@ class _AppointmentListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appointmentStatus = appointment.status;
+    final appointmentStatus = appointment.status.toTitleCase();
     final appointmentStatusLower = appointmentStatus.toLowerCase();
     final statusColor = _getStatusColor(appointmentStatusLower);
     final providerName = appointment.provider?.name ?? 'Unknown Provider';
     final avatarUrl = appointment.provider?.avatar;
 
     final localStartTime = appointment.startDatetime.toLocal();
-    final localEndTime = appointment.endDatetime?.toLocal();
-    final date = DateFormat('EEEE, MMMM dd, yyyy').format(localStartTime);
+    // final localEndTime = appointment.endDatetime?.toLocal();
+    final date = DateFormat('MMM dd, yyyy').format(localStartTime);
     final startHour = DateFormat('hh:mm a').format(localStartTime);
-    final endHour = localEndTime != null
-        ? DateFormat('hh:mm a').format(localEndTime)
-        : null;
-    final hour = endHour != null ? '$startHour - $endHour' : startHour;
+    // final endHour = localEndTime != null
+    //     ? DateFormat('hh:mm a').format(localEndTime)
+    //     : null;
+    final hour = startHour;
 
     final cancelButton = OutlinedButton(
       onPressed: () {
@@ -376,7 +376,7 @@ class _AppointmentListItem extends StatelessWidget {
         ),
         child: const Text(
           'Reschedule',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
     );
@@ -436,61 +436,78 @@ class _AppointmentListItem extends StatelessWidget {
         // Navigate to detail page, passing only the ID
         context.push(AppRoutes.appointmentDetail, extra: appointment.id);
       },
-      child: Card(
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12.withValues(alpha: 0.08),
+              spreadRadius: 0,
+              blurRadius: 40,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
         margin: const EdgeInsets.all(10),
-        elevation: 2,
+        padding: const EdgeInsets.symmetric(vertical: 8),
         child: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Column(
             children: [
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundImage: (avatarUrl != null && avatarUrl.isNotEmpty)
-                        ? NetworkImage(avatarUrl)
-                        : null,
-                    child: (avatarUrl == null || avatarUrl.isEmpty)
-                        ? const Icon(Icons.person, size: 30, color: Colors.grey)
-                        : null,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          providerName,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Row(
-                          children: [
-                            Text(
-                                '${appointment.provider?.jobTitle ?? appointment.type} |'),
-                            const SizedBox(width: 5),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: statusColor.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                appointmentStatus,
-                                style: TextStyle(color: statusColor),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          '$date | $hour',
-                        ),
-                      ],
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundImage:
+                          (avatarUrl != null && avatarUrl.isNotEmpty)
+                              ? NetworkImage(avatarUrl)
+                              : null,
+                      child: (avatarUrl == null || avatarUrl.isEmpty)
+                          ? const Icon(Icons.person,
+                              size: 30, color: Colors.grey)
+                          : null,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            providerName,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                  '${appointment.provider?.jobTitle!.toTitleCase()} |'),
+                              const SizedBox(width: 5),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: statusColor.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  appointmentStatus,
+                                  style: TextStyle(color: statusColor),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            '$date | $hour',
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 16),
               // --- Action Buttons ---
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
