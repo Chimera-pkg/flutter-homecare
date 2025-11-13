@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/core/domain/entities/appointment_entity.dart';
+import 'package:m2health/core/error/failures.dart';
 import 'package:m2health/features/appointment/models/appointment.dart';
 import 'package:m2health/features/appointment/models/paginated_appointment_response.dart';
 // ignore: unused_import
@@ -396,6 +397,9 @@ class AppointmentService {
         throw Exception('Provider type is required');
       }
 
+      log('Creating appointment with payload:\n$payload',
+          name: 'AppointmentService');
+
       final response = await _dio.post(
         Const.API_APPOINTMENT,
         data: payload,
@@ -404,39 +408,28 @@ class AppointmentService {
             'Authorization': 'Bearer $token',
             'Content-Type': 'application/json',
           },
-          validateStatus: (status) => status != null && status < 500,
         ),
       );
 
-      print('Create appointment response status: ${response.statusCode}');
-      print('Create appointment response data: ${response.data}');
+      log('Create appointment response status: ${response.statusCode}',
+          name: 'AppointmentService');
+      log('Create appointment response data: ${response.data}',
+          name: 'AppointmentService');
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return response.data;
-      } else if (response.statusCode == 422) {
-        final errorData = response.data;
-        String errorMessage = 'Validation failed';
-
-        if (errorData != null && errorData['errors'] != null) {
-          final errors = errorData['errors'] as List;
-          errorMessage = errors
-              .map((error) => '${error['field']}: ${error['message']}')
-              .join(', ');
-        }
-
-        throw Exception('Validation error: $errorMessage');
-      } else {
-        throw Exception(
-            'Failed to create appointment: ${response.statusCode} - ${response.data}');
-      }
-    } catch (e) {
-      print('Error creating appointment: $e');
+      return response.data;
+    } catch (e, stackTrace) {
+      log(
+        'Error creating appointment',
+        name: 'AppointmentService',
+        error: e,
+        stackTrace: stackTrace,
+      );
       if (e is DioException) {
-        print('DioException type: ${e.type}');
-        print('DioException message: ${e.message}');
-        print('DioException response: ${e.response?.data}');
+        log('DioException message: ${e.message}', name: 'AppointmentService');
+        log('DioException response: ${e.response?.data}',
+            name: 'AppointmentService');
 
-        if (e.response?.statusCode == 422) {
+        if (e.response?.data['code'] == 'E_VALIDATION_ERROR') {
           final errorData = e.response?.data;
           if (errorData != null && errorData['errors'] != null) {
             final errors = errorData['errors'] as List;
@@ -445,8 +438,9 @@ class AppointmentService {
                 .join(', ');
           }
         }
+        throw BadRequestFailure(e.response?.data['message']);
       }
-      throw Exception('Error creating appointment: $e');
+      throw Exception('Unknown error creating appointment.');
     }
   }
 

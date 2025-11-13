@@ -10,8 +10,7 @@ void initScheduleModule(GetIt sl) {
   sl.registerLazySingleton(() => AddAvailability(sl()));
   sl.registerLazySingleton(() => UpdateAvailability(sl()));
   sl.registerLazySingleton(() => DeleteAvailability(sl()));
-  sl.registerLazySingleton(() => GetOverrides(sl()));
-  sl.registerLazySingleton(() => AddOverride(sl()));
+  sl.registerLazySingleton(() => GetOverridesByDate(sl()));
   sl.registerLazySingleton(() => UpdateOverride(sl()));
   sl.registerLazySingleton(() => DeleteOverride(sl()));
   sl.registerLazySingleton(() => GetSlotsPreview(sl()));

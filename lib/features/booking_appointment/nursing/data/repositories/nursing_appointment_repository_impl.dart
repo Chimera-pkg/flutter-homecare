@@ -35,7 +35,9 @@ class NursingAppointmentRepositoryImpl extends NursingAppointmentRepository {
       final response = await appointmentService.createAppointment(payload);
       final result = AppointmentModel.fromJson(response);
       return Right(result);
-    } catch (e) {
+    } on Failure catch (failure) {
+      return Left(failure);
+    } on Exception catch (e) {
       return Left(ServerFailure(e.toString()));
     }
   }

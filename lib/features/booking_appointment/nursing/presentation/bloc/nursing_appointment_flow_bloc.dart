@@ -87,6 +87,8 @@ class NursingAppointmentFlowBloc
     emit(state.copyWith(
         submissionStatus: AppointmentSubmissionStatus.submitting));
 
+    log('Selected Time: ${state.selectedTimeSlot!.toIso8601String()}');
+
     final params = CreateNursingAppointmentParams(
       providerId: state.selectedProfessional!.id,
       startDatetime: state.selectedTimeSlot!,
@@ -103,7 +105,7 @@ class NursingAppointmentFlowBloc
       (failure) {
         emit(state.copyWith(
           submissionStatus: AppointmentSubmissionStatus.failure,
-          errorMessage: 'Failed to create appointment',
+          errorMessage: 'Failed to create appointment:\n${failure.message}',
         ));
       },
       (appointment) {

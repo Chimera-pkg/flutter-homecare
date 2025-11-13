@@ -123,29 +123,35 @@ class _ScheduleAppointmentPageState extends State<ScheduleAppointmentPage> {
               ),
             ),
             const SizedBox(height: 12),
-            BlocBuilder<ScheduleAppointmentCubit, ScheduleAppointmentState>(
-              builder: (context, state) {
-                if (state.status == ActionStatus.loading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (state.status == ActionStatus.error) {
-                  return Center(
-                      child:
-                          Text(state.errorMessage ?? 'Failed to load slots'));
-                }
-                if (state.slots.isEmpty) {
-                  return const Center(
-                      child: Text('No available slots for this day.'));
-                }
+            Container(
+              constraints: const BoxConstraints(
+                minHeight: 300, // Set the minimum height to 400px
+              ),
+              child: BlocBuilder<ScheduleAppointmentCubit,
+                  ScheduleAppointmentState>(
+                builder: (context, state) {
+                  if (state.status == ActionStatus.loading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (state.status == ActionStatus.error) {
+                    return Center(
+                        child:
+                            Text(state.errorMessage ?? 'Failed to load slots'));
+                  }
+                  if (state.slots.isEmpty) {
+                    return const Center(
+                        child: Text('No available slots for this day.'));
+                  }
 
-                return TimeSlotGridView(
-                  timeSlots: state.slots,
-                  selectedTime: state.selectedTime,
-                  onTimeSelected: (time) {
-                    context.read<ScheduleAppointmentCubit>().selectTime(time);
-                  },
-                );
-              },
+                  return TimeSlotGridView(
+                    timeSlots: state.slots,
+                    selectedTime: state.selectedTime,
+                    onTimeSelected: (time) {
+                      context.read<ScheduleAppointmentCubit>().selectTime(time);
+                    },
+                  );
+                },
+              ),
             ),
           ],
         ),

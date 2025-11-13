@@ -93,6 +93,7 @@ class _NursingAppointmentFlowPageState
               content: Text(
                 state.errorMessage ?? 'Failed to create appointment',
               ),
+              backgroundColor: Colors.red,
             ),
           );
         }

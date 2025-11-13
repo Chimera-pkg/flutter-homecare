@@ -235,22 +235,25 @@ class _ProfessionalDetailsPageState extends State<ProfessionalDetailsPage> {
   }
 
   Widget _buildAboutMe(ProfessionalEntity professional) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'About Me',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'About Me',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          professional.about ?? 'No description available.',
-          textAlign: TextAlign.justify,
-        ),
-      ],
+          const SizedBox(height: 8),
+          Text(
+            professional.about ?? 'No description available.',
+            textAlign: TextAlign.justify,
+          ),
+        ],
+      ),
     );
   }
 
