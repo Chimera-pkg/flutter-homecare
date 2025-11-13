@@ -122,7 +122,7 @@ class _SchedulePreviewTabState extends State<SchedulePreviewTab> {
       itemCount: slots.length,
       itemBuilder: (context, index) {
         final slot = slots[index];
-        final absoluteTime = DateTime.parse(slot.startISO);
+        final absoluteTime = DateTime.parse(slot.startTime);
         final localTime = tz.TZDateTime.from(absoluteTime, tz.local);
         final startTime = DateFormat('HH:mm').format(localTime);
         return OutlinedButton(

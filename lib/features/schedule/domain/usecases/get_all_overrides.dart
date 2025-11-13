@@ -3,11 +3,11 @@ import 'package:m2health/core/error/failures.dart';
 import 'package:m2health/features/schedule/domain/entities/provider_availability_override.dart';
 import 'package:m2health/features/schedule/domain/repositories/schedule_repository.dart';
 
-class GetOverrides {
+class GetAllOverrides {
   final ScheduleRepository repository;
-  GetOverrides(this.repository);
+  GetAllOverrides(this.repository);
 
   Future<Either<Failure, List<ProviderAvailabilityOverride>>> call() async {
-    return await repository.getOverrides();
+    return await repository.getAllOverrides();
   }
 }

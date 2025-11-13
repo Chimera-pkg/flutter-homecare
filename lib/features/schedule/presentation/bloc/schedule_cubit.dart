@@ -5,16 +5,17 @@ import 'package:intl/intl.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:m2health/features/schedule/domain/entities/provider_availability.dart';
 import 'package:m2health/features/schedule/domain/entities/provider_availability_override.dart';
+import 'package:m2health/features/schedule/domain/entities/time_slot.dart';
 import 'package:m2health/features/schedule/domain/usecases/index.dart';
 import 'package:m2health/features/schedule/presentation/bloc/schedule_state.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class ScheduleCubit extends Cubit<ScheduleState> {
   final GetAvailabilities getAvailabilities;
   final AddAvailability addAvailability;
   final UpdateAvailability updateAvailability;
   final DeleteAvailability deleteAvailability;
-  final GetOverrides getOverrides;
-  final AddOverride addOverride;
+  final GetAllOverrides getAllOverrides;
   final UpdateOverride updateOverride;
   final DeleteOverride deleteOverride;
   final GetSlotsPreview getSlotsPreview;
@@ -24,8 +25,7 @@ class ScheduleCubit extends Cubit<ScheduleState> {
     required this.addAvailability,
     required this.updateAvailability,
     required this.deleteAvailability,
-    required this.getOverrides,
-    required this.addOverride,
+    required this.getAllOverrides,
     required this.updateOverride,
     required this.deleteOverride,
     required this.getSlotsPreview,
@@ -35,7 +35,7 @@ class ScheduleCubit extends Cubit<ScheduleState> {
     emit(state.copyWith(isLoading: true, error: null, successMessage: null));
     final results = await Future.wait([
       getAvailabilities(),
-      getOverrides(),
+      getAllOverrides(),
     ]);
 
     final availabilitiesResult = results[0];
@@ -50,8 +50,8 @@ class ScheduleCubit extends Cubit<ScheduleState> {
               emit(state.copyWith(isLoading: false, error: failure.message)),
           (overrides) => emit(state.copyWith(
             isLoading: false,
-            availabilities: availabilities as List<ProviderAvailability>,
-            overrides: overrides as List<ProviderAvailabilityOverride>,
+            availabilities: List<ProviderAvailability>.from(availabilities),
+            overrides: List<ProviderAvailabilityOverride>.from(overrides),
           )),
         );
       },
@@ -106,40 +106,92 @@ class ScheduleCubit extends Cubit<ScheduleState> {
   }
 
   // --- Overrides ---
-  Future<void> saveOverride(AddOverrideParams params) async {
-    final result = await addOverride(params);
+  Future<void> setDateUnavailable(DateTime date) async {
+    final override = ProviderAvailabilityOverride(
+      date: date,
+      isUnavailble: true,
+      slots: const [],
+    );
+    await _upsertOverride(override);
+  }
+
+  Future<void> addSlotToDate(
+      DateTime date, DateTime start, DateTime end) async {
+    final existing = state.overrides.firstWhere(
+      (o) => isSameDay(o.date, date),
+      orElse: () => ProviderAvailabilityOverride(
+        date: date,
+        isUnavailble: false,
+        slots: const [],
+      ),
+    );
+
+    // Convert the local DateTime (from UI) to UTC ISO String
+    // Example: Local 9AM (+7) -> UTC 2AM -> "2025-11-10T02:00:00.000Z"
+    final newSlot = TimeSlot(
+      startTime: start.toUtc().toIso8601String(),
+      endTime: end.toUtc().toIso8601String(),
+    );
+
+    final updatedSlots = List<TimeSlot>.from(existing.slots)..add(newSlot);
+
+    final updatedOverride = ProviderAvailabilityOverride(
+      date: date,
+      isUnavailble: false,
+      slots: updatedSlots,
+    );
+
+    await _upsertOverride(updatedOverride);
+  }
+
+  /// 3. Remove a specific slot from a date
+  Future<void> removeSlotFromDate(DateTime date, TimeSlot slotToRemove) async {
+    final existing = state.overrides.firstWhere(
+      (o) => isSameDay(o.date, date),
+      orElse: () => throw Exception("Override not found"),
+    );
+
+    final updatedSlots = List<TimeSlot>.from(existing.slots)
+      ..remove(slotToRemove);
+
+    final updatedOverride = ProviderAvailabilityOverride(
+      date: date,
+      isUnavailble: false,
+      slots: updatedSlots,
+    );
+
+    await _upsertOverride(updatedOverride);
+  }
+
+  ///  Delete the override entirely (Revert to Weekly)
+  Future<void> revertToWeekly(DateTime date) async {
+    final dateStr = DateFormat('yyyy-MM-dd').format(date);
+    emit(state.copyWith(isLoading: true));
+    final result = await deleteOverride(dateStr);
     result.fold(
-      (failure) =>
-          emit(state.copyWith(error: failure.message, successMessage: null)),
+      (failure) {
+        log('Failed to delete override: ${failure.message}',
+            name: 'ScheduleCubit');
+        emit(state.copyWith(isLoading: false, error: failure.message));
+      },
       (_) {
         emit(state.copyWith(
-            successMessage: 'Date override added!', error: null));
+            isLoading: false, successMessage: 'Reverted to weekly schedule'));
         loadSchedules();
       },
     );
   }
 
-  Future<void> updateOverrideRule(UpdateOverrideParams params) async {
-    final result = await updateOverride(params);
+  /// Helper to call the Update/Upsert usecase
+  Future<void> _upsertOverride(ProviderAvailabilityOverride override) async {
+    emit(state.copyWith(isLoading: true));
+    final result = await updateOverride(override);
     result.fold(
       (failure) =>
-          emit(state.copyWith(error: failure.message, successMessage: null)),
+          emit(state.copyWith(isLoading: false, error: failure.message)),
       (_) {
         emit(state.copyWith(
-            successMessage: 'Date override updated!', error: null));
-        loadSchedules();
-      },
-    );
-  }
-
-  Future<void> deleteOverrideRule(int id) async {
-    final result = await deleteOverride(id);
-    result.fold(
-      (failure) =>
-          emit(state.copyWith(error: failure.message, successMessage: null)),
-      (_) {
-        emit(state.copyWith(
-            successMessage: 'Date override removed!', error: null));
+            isLoading: false, successMessage: 'Schedule updated successfully'));
         loadSchedules();
       },
     );

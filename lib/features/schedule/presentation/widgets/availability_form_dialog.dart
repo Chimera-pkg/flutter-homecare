@@ -103,7 +103,8 @@ class _AvailabilitFormyDialogState extends State<AvailabilityFormDialog> {
   Future<void> _selectTime(BuildContext context, bool isStart) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: (isStart ? _startTime : _endTime) ?? TimeOfDay.now(),
+      initialTime: (isStart ? _startTime : _endTime) ??
+          const TimeOfDay(hour: 9, minute: 0),
     );
     if (picked != null) {
       setState(() {

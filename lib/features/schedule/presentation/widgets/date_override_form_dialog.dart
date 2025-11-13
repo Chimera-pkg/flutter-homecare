@@ -2,18 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:m2health/const.dart';
-import 'package:m2health/features/schedule/domain/entities/provider_availability_override.dart';
-import 'package:m2health/features/schedule/domain/usecases/index.dart';
 import 'package:m2health/features/schedule/presentation/bloc/schedule_cubit.dart';
 
 class DateOverrideFormDialog extends StatefulWidget {
   final DateTime selectedDate;
-  final ProviderAvailabilityOverride? scheduleOverride;
 
-  const DateOverrideFormDialog(
-      {super.key, required this.selectedDate, this.scheduleOverride});
-
-  bool get isEditing => scheduleOverride != null;
+  const DateOverrideFormDialog({super.key, required this.selectedDate});
 
   @override
   State<DateOverrideFormDialog> createState() => _DateOverrideFormDialogState();
@@ -23,20 +17,11 @@ class _DateOverrideFormDialogState extends State<DateOverrideFormDialog> {
   TimeOfDay? _startTime;
   TimeOfDay? _endTime;
 
-  @override
-  void initState() {
-    super.initState();
-    if (widget.isEditing) {
-      _startTime =
-          TimeOfDay.fromDateTime(widget.scheduleOverride!.startDatetime);
-      _endTime = TimeOfDay.fromDateTime(widget.scheduleOverride!.endDatetime);
-    }
-  }
-
   Future<void> _selectTime(BuildContext context, bool isStart) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: (isStart ? _startTime : _endTime) ?? TimeOfDay.now(),
+      initialTime: (isStart ? _startTime : _endTime) ??
+          const TimeOfDay(hour: 9, minute: 0),
     );
     if (picked != null) {
       setState(() {
@@ -66,6 +51,7 @@ class _DateOverrideFormDialogState extends State<DateOverrideFormDialog> {
       return;
     }
 
+    // Combine date and time
     final startDateTime = widget.selectedDate.copyWith(
       hour: _startTime!.hour,
       minute: _startTime!.minute,
@@ -75,41 +61,30 @@ class _DateOverrideFormDialogState extends State<DateOverrideFormDialog> {
       minute: _endTime!.minute,
     );
 
-    if (widget.isEditing) {
-      final params = UpdateOverrideParams(
-        id: widget.scheduleOverride!.id,
-        startDatetime: startDateTime,
-        endDatetime: endDateTime,
-      );
-      context.read<ScheduleCubit>().updateOverrideRule(params);
-    } else {
-      final params = AddOverrideParams(
-        startDatetime: startDateTime,
-        endDatetime: endDateTime,
-      );
-      context.read<ScheduleCubit>().saveOverride(params);
-    }
+    // final tzStartDateTime = TZDateTime.from(startDateTime, tz.local);
+    // final tzEndDateTime = TZDateTime.from(endDateTime, tz.local);
+
+    // Call Cubit to Add Slot
+    context
+        .read<ScheduleCubit>()
+        .addSlotToDate(widget.selectedDate, startDateTime, endDateTime);
+
     Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Column(
-        children: [
-          const Text('Add Specific Hours'),
-          Text(
-            DateFormat('MMMM d, yyyy').format(widget.selectedDate),
-            style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
-                color: Colors.grey),
-          ),
-        ],
-      ),
+      backgroundColor: Colors.white,
+      title: const Text('Add Time Slot'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          Text(
+            DateFormat('MMMM d, yyyy').format(widget.selectedDate),
+            style: TextStyle(color: Colors.grey.shade900),
+          ),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -136,7 +111,7 @@ class _DateOverrideFormDialogState extends State<DateOverrideFormDialog> {
         ElevatedButton(
           onPressed: _onSave,
           style: ElevatedButton.styleFrom(backgroundColor: Const.aqua),
-          child: const Text('Save', style: TextStyle(color: Colors.white)),
+          child: const Text('Add', style: TextStyle(color: Colors.white)),
         ),
       ],
     );
@@ -154,9 +129,16 @@ class _TimePickerChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      child: Chip(
-        label: Text(time?.format(context) ?? label),
-        backgroundColor: Colors.grey.shade200,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          time?.format(context) ?? label,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }

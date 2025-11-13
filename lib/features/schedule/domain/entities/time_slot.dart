@@ -1,14 +1,14 @@
 import 'package:equatable/equatable.dart';
 
 class TimeSlot extends Equatable {
-  final String startISO;
-  final String endISO;
+  final String startTime;
+  final String endTime;
 
   const TimeSlot({
-    required this.startISO,
-    required this.endISO,
+    required this.startTime,
+    required this.endTime,
   });
 
   @override
-  List<Object?> get props => [startISO, endISO];
+  List<Object?> get props => [startTime, endTime];
 }

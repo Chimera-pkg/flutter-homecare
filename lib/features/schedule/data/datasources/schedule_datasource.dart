@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
+import 'package:intl/intl.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/features/schedule/data/models/provider_availability_model.dart';
 import 'package:m2health/features/schedule/data/models/provider_availability_override_model.dart';
@@ -14,12 +15,11 @@ abstract class ScheduleRemoteDatasource {
       int id, Map<String, dynamic> data);
   Future<void> deleteAvailability(int id);
 
-  Future<List<ProviderAvailabilityOverrideModel>> getOverrides();
-  Future<ProviderAvailabilityOverrideModel> addOverride(
-      Map<String, dynamic> data);
-  Future<ProviderAvailabilityOverrideModel> updateOverride(
-      int id, Map<String, dynamic> data);
-  Future<void> deleteOverride(int id);
+  // --- Overrides ---
+  Future<List<ProviderAvailabilityOverrideModel>> getAllOverrides();
+  Future<ProviderAvailabilityOverrideModel> getOverrideByDate(String date);
+  Future<void> updateOverride(ProviderAvailabilityOverrideModel data);
+  Future<void> deleteOverrideByDate(String date);
 
   Future<List<TimeSlotModel>> getAvailableSlots(String date, String? timezone);
 }
@@ -35,13 +35,25 @@ class ScheduleRemoteDatasourceImpl implements ScheduleRemoteDatasource {
 
   @override
   Future<List<ProviderAvailabilityModel>> getAvailabilities() async {
-    final response = await dio.get(
-      Const.API_SCHEDULE_AVAILABILITY,
-      options: await _getAuthHeaders(),
-    );
-    return (response.data['data'] as List)
-        .map((e) => ProviderAvailabilityModel.fromJson(e))
-        .toList();
+    try {
+      final response = await dio.get(
+        Const.API_SCHEDULE_AVAILABILITY,
+        options: await _getAuthHeaders(),
+      );
+      return (response.data['data'] as List)
+          .map((e) => ProviderAvailabilityModel.fromJson(e))
+          .toList();
+    } catch (e, stackTrace) {
+      if (e is DioException) {
+        log('DioException: ${e.response?.data}',
+            name: 'ScheduleRemoteDatasourceImpl');
+      }
+      log('Error in getAvailabilities',
+          name: 'ScheduleRemoteDatasourceImpl',
+          error: e,
+          stackTrace: stackTrace);
+      rethrow;
+    }
   }
 
   @override
@@ -75,42 +87,67 @@ class ScheduleRemoteDatasourceImpl implements ScheduleRemoteDatasource {
   }
 
   @override
-  Future<List<ProviderAvailabilityOverrideModel>> getOverrides() async {
+  Future<List<ProviderAvailabilityOverrideModel>> getAllOverrides() async {
+    try {
+      final response = await dio.get(
+        Const.API_SCHEDULE_OVERRIDES,
+        options: await _getAuthHeaders(),
+      );
+      log('Response data: ${response.data}',
+          name: 'ScheduleRemoteDatasourceImpl');
+      return (response.data['data'] as List)
+          .map((e) => ProviderAvailabilityOverrideModel.fromJson(e))
+          .toList();
+    } catch (e, stackTrace) {
+      if (e is DioException) {
+        log('DioException: ${e.response?.data}',
+            name: 'ScheduleRemoteDatasourceImpl');
+      }
+      log('Error in getAllOverrides',
+          name: 'ScheduleRemoteDatasourceImpl',
+          error: e,
+          stackTrace: stackTrace);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<ProviderAvailabilityOverrideModel> getOverrideByDate(
+      String date) async {
     final response = await dio.get(
-      Const.API_SCHEDULE_OVERRIDES,
-      options: await _getAuthHeaders(),
-    );
-    return (response.data['data'] as List)
-        .map((e) => ProviderAvailabilityOverrideModel.fromJson(e))
-        .toList();
-  }
-
-  @override
-  Future<ProviderAvailabilityOverrideModel> addOverride(
-      Map<String, dynamic> data) async {
-    final response = await dio.post(
-      Const.API_SCHEDULE_OVERRIDES,
-      data: data,
+      '${Const.API_SCHEDULE_OVERRIDES}/$date',
       options: await _getAuthHeaders(),
     );
     return ProviderAvailabilityOverrideModel.fromJson(response.data['data']);
   }
 
   @override
-  Future<ProviderAvailabilityOverrideModel> updateOverride(
-      int id, Map<String, dynamic> data) async {
-    final response = await dio.put(
-      '${Const.API_SCHEDULE_OVERRIDES}/$id',
-      data: data,
-      options: await _getAuthHeaders(),
-    );
-    return ProviderAvailabilityOverrideModel.fromJson(response.data['data']);
+  Future<void> updateOverride(ProviderAvailabilityOverrideModel data) async {
+    final dateStr = DateFormat('yyyy-MM-dd').format(data.date);
+    try {
+      final payload = data.toJson();
+      await dio.put(
+        '${Const.API_SCHEDULE_OVERRIDES}',
+        data: payload,
+        options: await _getAuthHeaders(),
+      );
+    } catch (e, stackTrace) {
+      if (e is DioException) {
+        log('DioException: ${e.response?.data}',
+            name: 'ScheduleRemoteDatasourceImpl');
+      }
+      log('Error in updateOverride',
+          name: 'ScheduleRemoteDatasourceImpl',
+          error: e,
+          stackTrace: stackTrace);
+      rethrow;
+    }
   }
 
   @override
-  Future<void> deleteOverride(int id) async {
+  Future<void> deleteOverrideByDate(String date) async {
     await dio.delete(
-      '${Const.API_SCHEDULE_OVERRIDES}/$id',
+      '${Const.API_SCHEDULE_OVERRIDES}/$date',
       options: await _getAuthHeaders(),
     );
   }
