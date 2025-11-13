@@ -47,8 +47,6 @@ class _ProfilePageState extends State<ProfilePage> {
       builder: (context, asyncSnapshot) {
         final String? role = asyncSnapshot.data;
         final bool isPatient = role == 'patient';
-        final bool isProfessional =
-            ['nurse', 'pharmacist', 'radiologist'].contains(role);
         final bool isAdmin = role == 'admin';
 
         if (asyncSnapshot.connectionState == ConnectionState.waiting) {
@@ -89,7 +87,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: Column(
                       children: [
                         _ProfileHeader(
-                          name: profile.name, // Updated
+                          name: profile.name,
                           avatarUrl: profile.avatar,
                           lastUpdated: formatDateTime(profile.updatedAt),
                         ),
@@ -130,6 +128,8 @@ class _ProfilePageState extends State<ProfilePage> {
                           name: profile.name ?? 'N/A',
                           avatarUrl: profile.avatar,
                           lastUpdated: formatDateTime(profile.updatedAt),
+                          isVerified: profile.isVerified,
+                          verifiedAt: profile.verifiedAt,
                         ),
                         const SizedBox(height: 16),
                         _ProfessionalProfileSection(profile: profile),
@@ -159,11 +159,15 @@ class _ProfileHeader extends StatelessWidget {
   final String name;
   final String? avatarUrl;
   final String lastUpdated;
+  final bool? isVerified;
+  final DateTime? verifiedAt;
 
   const _ProfileHeader({
     required this.name,
     this.avatarUrl,
     required this.lastUpdated,
+    this.isVerified,
+    this.verifiedAt,
   });
 
   @override
@@ -185,14 +189,61 @@ class _ProfileHeader extends StatelessWidget {
                 style:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
+
+              // --- Verification Badge ---
+              if (isVerified != null) ...[
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: isVerified!
+                        ? Colors.green.withOpacity(0.1)
+                        : Colors.orange.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(
+                      color: isVerified! ? Colors.green : Colors.orange,
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        isVerified! ? Icons.verified : Icons.pending_outlined,
+                        size: 14,
+                        color: isVerified! ? Colors.green : Colors.orange,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        isVerified! ? 'Verified' : 'Unverified',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: isVerified! ? Colors.green : Colors.orange,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (isVerified! && verifiedAt != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    'Since: ${DateFormat('MMM dd, yyyy').format(verifiedAt!)}',
+                    style: TextStyle(color: Colors.grey.shade600, fontSize: 11),
+                  ),
+                ],
+                const SizedBox(height: 8),
+              ],
+              // -------------------------------
+
               const Text(
                 'Last updated:',
-                style: TextStyle(color: Colors.grey),
+                style: TextStyle(color: Colors.grey, fontSize: 12),
               ),
               Text(
                 lastUpdated,
-                style: const TextStyle(color: Colors.black),
+                style: const TextStyle(color: Colors.black, fontSize: 12),
               ),
             ],
           ),
@@ -202,6 +253,8 @@ class _ProfileHeader extends StatelessWidget {
   }
 }
 
+// ... [Rest of the file: _ProfileInformationSection, _HealthRecordsSection, etc.] ...
+// (Ensure you keep the existing sections _ProfileInformationSection, _HealthRecordsSection, _AppointmentSection, _ProfessionalProfileSection, _AdminSection, _LogoutButton, _ProfileListTile exactly as they were in the uploaded file)
 class _ProfileInformationSection extends StatelessWidget {
   const _ProfileInformationSection();
 
@@ -420,6 +473,7 @@ class _AdminSection extends StatelessWidget {
                 GoRouter.of(context).push(AppRoutes.manageServices);
               },
             ),
+            // Ensure this matches your previous Admin Section updates
             ListTile(
               leading:
                   const Icon(Icons.verified_user, color: Color(0xFF35C5CF)),
@@ -431,8 +485,7 @@ class _AdminSection extends StatelessWidget {
               ),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {
-                // Push to the new page
-                GoRouter.of(context).push(AppRoutes.adminProfessionals);
+                context.push(AppRoutes.adminProfessionals);
               },
             ),
           ],

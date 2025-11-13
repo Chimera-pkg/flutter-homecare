@@ -168,7 +168,7 @@ class _AdminProfessionalDetailViewState
                           TextStyle(color: Colors.grey.shade700, height: 1.5)),
 
                   const SizedBox(height: 24),
-                  const Text("Certificates (Proof)",
+                  const Text("Certificates",
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
