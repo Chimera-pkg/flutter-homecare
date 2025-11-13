@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2health/features/appointment/appointment_module.dart';
@@ -16,7 +17,10 @@ class AppointmentRoutes {
       name: AppRoutes.appointmentDetail,
       builder: (context, state) {
         final appointmentId = state.extra as int;
-        return DetailAppointmentPage(appointmentId: appointmentId);
+        return DetailAppointmentPage(
+          appointmentId: appointmentId,
+          key: UniqueKey(),
+        );
       },
     ),
     GoRoute(

@@ -67,8 +67,6 @@ class _FeedbackFormPageState extends State<FeedbackFormPage> {
                   // Go to appointment detail and clear the stack
                   GoRouter.of(context).goNamed(AppRoutes.appointmentDetail,
                       extra: widget.appointment.id!);
-                  GoRouter.of(context)
-                      .refresh(); // Refresh the route, so reload data on appointment detail page
                 },
               ),
             ),
