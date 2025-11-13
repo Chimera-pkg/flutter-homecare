@@ -12,6 +12,8 @@ class ProfessionalProfile extends Equatable {
   final String? jobTitle;
   final String? workingHours;
   final String? workPlace;
+  final bool isVerified;
+  final DateTime? verifiedAt;
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final List<Certificate> certificates;
@@ -27,6 +29,8 @@ class ProfessionalProfile extends Equatable {
     this.jobTitle,
     this.workingHours,
     this.workPlace,
+    this.isVerified = false,
+    this.verifiedAt,
     this.createdAt,
     this.updatedAt,
     this.certificates = const [],
@@ -44,6 +48,8 @@ class ProfessionalProfile extends Equatable {
         jobTitle,
         workingHours,
         workPlace,
+        isVerified,
+        verifiedAt,
         createdAt,
         updatedAt,
         certificates,
@@ -60,6 +66,8 @@ class ProfessionalProfile extends Equatable {
     String? jobTitle,
     String? workingHours,
     String? workPlace,
+    bool? isVerified,
+    DateTime? verifiedAt,
     DateTime? createdAt,
     DateTime? updatedAt,
     List<Certificate>? certificates,
@@ -74,6 +82,8 @@ class ProfessionalProfile extends Equatable {
       jobTitle: jobTitle ?? this.jobTitle,
       workingHours: workingHours ?? this.workingHours,
       workPlace: workPlace ?? this.workPlace,
+      isVerified: isVerified ?? this.isVerified,
+      verifiedAt: verifiedAt ?? this.verifiedAt,
       userId: userId ?? this.userId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,

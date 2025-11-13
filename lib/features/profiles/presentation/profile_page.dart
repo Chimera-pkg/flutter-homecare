@@ -420,6 +420,21 @@ class _AdminSection extends StatelessWidget {
                 GoRouter.of(context).push(AppRoutes.manageServices);
               },
             ),
+            ListTile(
+              leading:
+                  const Icon(Icons.verified_user, color: Color(0xFF35C5CF)),
+              title: const Text('Verify Professionals'),
+              titleTextStyle: const TextStyle(
+                fontSize: 16,
+                color: Colors.black,
+                fontWeight: FontWeight.normal,
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: () {
+                // Push to the new page
+                GoRouter.of(context).push(AppRoutes.adminProfessionals);
+              },
+            ),
           ],
         ),
       ),
