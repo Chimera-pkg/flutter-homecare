@@ -1,26 +1,27 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_services/nursing_services_bloc.dart';
-import 'package:m2health/cubit/personal/personal_cubit.dart';
-import 'package:m2health/cubit/nursing/personal/nursing_personal_cubit.dart';
-import 'package:m2health/cubit/pharmacogenomics/presentation/bloc/pharmacogenomics_cubit.dart';
-import 'package:m2health/cubit/pharmacogenomics/domain/repositories/pharmacogenomics_repository.dart';
-import 'package:m2health/cubit/pharmacogenomics/data/repositories/pharmacogenomics_repository_impl.dart';
-import 'package:m2health/cubit/pharmacogenomics/data/datasources/pharmacogenomics_remote_datasource_impl.dart';
-import 'package:m2health/cubit/pharmacogenomics/domain/usecases/get_pharmacogenomics.dart';
-import 'package:m2health/cubit/pharmacogenomics/domain/usecases/crud_pharmacogenomics.dart';
-import 'package:m2health/cubit/precision/precision_cubit.dart';
-import 'package:m2health/cubit/profiles/profile_cubit.dart';
+import 'package:m2health/features/diabetes/bloc/diabetes_form_cubit.dart';
+import 'package:m2health/features/medical_record/domain/usecases/delete_medical_record.dart';
+import 'package:m2health/features/medical_record/domain/usecases/get_medical_records.dart';
+import 'package:m2health/features/medical_record/presentation/bloc/medical_record_bloc.dart';
+import 'package:m2health/features/pharmacogenomics/domain/usecases/delete_pharmacogenomics.dart';
+import 'package:m2health/features/pharmacogenomics/domain/usecases/store_pharmacogenomics.dart';
+import 'package:m2health/features/pharmacogenomics/presentation/bloc/pharmacogenomics_cubit.dart';
+import 'package:m2health/features/pharmacogenomics/domain/usecases/get_pharmacogenomics.dart';
+import 'package:m2health/features/precision/bloc/nutrition_assessment_cubit.dart';
+import 'package:m2health/features/profiles/domain/usecases/index.dart';
+import 'package:m2health/features/profiles/presentation/bloc/certificate_cubit.dart';
+import 'package:m2health/features/profiles/presentation/bloc/profile_cubit.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:m2health/route/app_router.dart';
-// import 'package:m2health/views/dashboard.dart';
-// import 'package:m2health/views/favourites.dart';
-import 'package:m2health/cubit/appointment/appointment_cubit.dart';
-import 'package:m2health/cubit/appointment/provider_appointment_cubit.dart';
+import 'package:m2health/service_locator.dart';
+import 'package:m2health/features/appointment/bloc/appointment_cubit.dart';
+import 'package:m2health/features/appointment/bloc/provider_appointment_cubit.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-// import 'package:navbar_router/navbar_router.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+import 'package:flutter_timezone/flutter_timezone.dart';
 
 import 'const.dart';
 import './AppLanguage.dart';
@@ -30,133 +31,59 @@ import 'package:provider/provider.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 
-// nursing module
-import 'package:m2health/cubit/nursingclean/data/datasources/nursing_remote_datasource.dart';
-import 'package:m2health/cubit/nursingclean/data/repositories/nursing_repository_impl.dart';
-import 'package:m2health/cubit/nursingclean/domain/repositories/nursing_repository.dart';
-import 'package:m2health/cubit/nursingclean/domain/usecases/create_nursing_case.dart';
-import 'package:m2health/cubit/nursingclean/domain/usecases/get_nursing_cases.dart';
-import 'package:m2health/cubit/nursingclean/domain/usecases/get_nursing_services.dart';
-import 'package:m2health/cubit/nursingclean/domain/usecases/get_medical_records.dart';
-import 'package:m2health/cubit/nursingclean/domain/usecases/update_nursing_case.dart';
-import 'package:m2health/cubit/nursingclean/domain/usecases/get_professionals.dart';
-import 'package:m2health/cubit/nursingclean/domain/usecases/toggle_favorite.dart';
-import 'package:m2health/cubit/nursingclean/presentation/bloc/nursing_case/nursing_case_bloc.dart';
-import 'package:m2health/cubit/nursingclean/presentation/bloc/professional/professional_bloc.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await setupLocator();
   AppLanguage appLanguage = AppLanguage();
   await appLanguage.fetchLocale();
+
+  // Timezone setup
+  tz.initializeTimeZones();
+  final String currentTimeZone =
+      (await FlutterTimezone.getLocalTimezone()).identifier;
+  tz.setLocalLocation(tz.getLocation(currentTimeZone));
+
   runApp(
     MultiBlocProvider(
       providers: [
         Provider<Dio>(
-          create: (context) => Dio(),
+          create: (context) => sl<Dio>(),
         ),
-        BlocProvider<PrecisionCubit>(
-          create: (context) => PrecisionCubit(),
+        BlocProvider<NutritionAssessmentCubit>(
+          create: (context) => NutritionAssessmentCubit(sl<Dio>()),
         ),
-        BlocProvider(create: (context) => AppointmentCubit(Dio())),
-        BlocProvider(create: (context) => ProviderAppointmentCubit(Dio())),
+        BlocProvider(create: (context) => AppointmentCubit(sl<Dio>())),
+        BlocProvider(create: (context) => ProviderAppointmentCubit(sl<Dio>())),
         BlocProvider(
-            create: (context) => PersonalCubit()..loadPersonalDetails()),
+            create: (context) => ProfileCubit(
+                  getProfileUseCase: sl<GetProfile>(),
+                  updateProfileUseCase: sl<UpdateProfile>(),
+                  getProfessionalProfileUseCase: sl<GetProfessionalProfile>(),
+                  updateProfessionalProfileUseCase:
+                      sl<UpdateProfessionalProfile>(),
+                )),
         BlocProvider(
-            create: (context) => NursingPersonalCubit()..loadPersonalDetails()),
-        BlocProvider(create: (context) => ProfileCubit(Dio())),
-        BlocProvider(
-          create: (context) => ProfileCubit(context.read<Dio>()),
-        ),
-        // Pharmacogenomics Module Dependencies
-        Provider<PharmacogenomicsRepository>(
-          create: (context) => PharmacogenomicsRepositoryImpl(
-            remoteDataSource: PharmacogenomicsRemoteDataSourceImpl(
-              dio: context.read<Dio>(),
-            ),
-          ),
-        ),
-        Provider<GetPharmacogenomics>(
-          create: (context) => GetPharmacogenomics(
-            context.read<PharmacogenomicsRepository>(),
-          ),
-        ),
-        Provider<CreatePharmacogenomic>(
-          create: (context) => CreatePharmacogenomic(
-            context.read<PharmacogenomicsRepository>(),
-          ),
-        ),
-        Provider<UpdatePharmacogenomic>(
-          create: (context) => UpdatePharmacogenomic(
-            context.read<PharmacogenomicsRepository>(),
-          ),
-        ),
-        Provider<DeletePharmacogenomic>(
-          create: (context) => DeletePharmacogenomic(
-            context.read<PharmacogenomicsRepository>(),
+          create: (context) => CertificateCubit(
+            createCertificateUseCase: sl<CreateCertificate>(),
+            updateCertificateUseCase: sl<UpdateCertificate>(),
+            deleteCertificateUseCase: sl<DeleteCertificate>(),
           ),
         ),
         BlocProvider(
           create: (context) => PharmacogenomicsCubit(
-            getPharmacogenomics: context.read<GetPharmacogenomics>(),
-            createPharmacogenomic: context.read<CreatePharmacogenomic>(),
-            updatePharmacogenomic: context.read<UpdatePharmacogenomic>(),
-            deletePharmacogenomic: context.read<DeletePharmacogenomic>(),
+            getPharmacogenomics: sl<GetPharmacogenomics>(),
+            storePharmacogenomics: sl<StorePharmacogenomics>(),
+            deletePharmacogenomic: sl<DeletePharmacogenomic>(),
           ),
         ),
-        // Nursing Module Dependencies
-        RepositoryProvider<NursingRepository>(
-          create: (context) => NursingRepositoryImpl(
-            remoteDataSource:
-                NursingRemoteDataSourceImpl(dio: context.read<Dio>()),
-          ),
-        ),
-        Provider<GetNursingServices>(
-          create: (context) =>
-              GetNursingServices(context.read<NursingRepository>()),
-        ),
-        Provider<GetNursingCases>(
-          create: (context) =>
-              GetNursingCases(context.read<NursingRepository>()),
-        ),
-        Provider<CreateNursingCase>(
-          create: (context) =>
-              CreateNursingCase(context.read<NursingRepository>()),
-        ),
-        Provider<GetMedicalRecords>(
-          create: (context) =>
-              GetMedicalRecords(context.read<NursingRepository>()),
-        ),
-        Provider<UpdateNursingCase>(
-          create: (context) =>
-              UpdateNursingCase(context.read<NursingRepository>()),
-        ),
+        // Medical Record Module
         BlocProvider(
-          create: (context) => NursingServicesBloc(
-            getNursingServices: context.read<GetNursingServices>(),
+          create: (context) => MedicalRecordBloc(
+            getMedicalRecords: sl<GetMedicalRecords>(),
+            deleteMedicalRecord: sl<DeleteMedicalRecord>(),
           ),
         ),
-        BlocProvider(
-          create: (context) => NursingCaseBloc(
-            getNursingCases: context.read<GetNursingCases>(),
-            createNursingCase: context.read<CreateNursingCase>(),
-            getMedicalRecords: context.read<GetMedicalRecords>(),
-            updateNursingCase: context.read<UpdateNursingCase>(),
-          ),
-        ),
-        Provider<GetProfessionals>(
-          create: (context) =>
-              GetProfessionals(context.read<NursingRepository>()),
-        ),
-        Provider<ToggleFavorite>(
-          create: (context) =>
-              ToggleFavorite(context.read<NursingRepository>()),
-        ),
-        BlocProvider(
-          create: (context) => ProfessionalBloc(
-            getProfessionals: context.read<GetProfessionals>(),
-            toggleFavorite: context.read<ToggleFavorite>(),
-          ),
-        ),
+        BlocProvider(create: (context) => DiabetesFormCubit(sl<Dio>())),
       ],
       child: ChangeNotifierProvider(
         create: (context) => AppLanguage(),
@@ -239,9 +166,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => AppointmentCubit(Dio())),
-        BlocProvider(
-            create: (context) => PersonalCubit()..loadPersonalDetails()),
+        BlocProvider(create: (context) => AppointmentCubit(sl<Dio>())),
       ],
       child: AnimatedBuilder(
         animation: appSetting,
@@ -260,6 +185,33 @@ class _MyAppState extends State<MyApp> {
               cardTheme: const CardThemeData(
                 color: Colors.white,
                 surfaceTintColor: Colors.transparent,
+              ),
+              textSelectionTheme: TextSelectionThemeData(
+                cursorColor: Const.tosca,
+                selectionColor: Const.tosca.withValues(alpha: 0.4),
+              ),
+              inputDecorationTheme: InputDecorationTheme(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                  borderSide: const BorderSide(
+                    color: Colors.grey,
+                    width: 1.0,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                  borderSide: const BorderSide(
+                    color: Colors.grey,
+                    width: 1.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                  borderSide: const BorderSide(
+                    color: Const.tosca,
+                    width: 1.5,
+                  ),
+                ),
               ),
               textTheme: const TextTheme(
                 displayLarge: TextStyle(fontFamily: 'Poppins'),
@@ -291,7 +243,8 @@ class _MyAppState extends State<MyApp> {
                     DevicePreview.appBuilder(context, child),
                   ],
                 ),
-                bottomNavigationBar: _showBottomAppBar ? BottomAppBar() : null,
+                bottomNavigationBar:
+                    _showBottomAppBar ? const BottomAppBar() : null,
               );
             },
             localizationsDelegates: const [

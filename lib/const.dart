@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
 class Const {
-  // static const String BASE_URL = 'http://192.168.1.2:3333';
-  static const String BASE_URL = 'https://homecare-api.med-map.org';
   // static const String BASE_URL = 'http://192.168.0.114:3333';
+  static const String BASE_URL = 'https://homecare-api.med-map.org';
   static const String URL_API = BASE_URL + '/v1';
   static const String URL_IMG_PLACEHOLDER = 'https://placehold.co/100x100';
   static const String API_SERVICE_REQUESTS = URL_API + '/service-requests';
@@ -14,6 +13,10 @@ class Const {
   static const String API_PROFILE = URL_API + '/profiles';
   static const String API_MEDICAL_RECORDS = URL_API + '/medical-records';
   static const String API_PERSONAL_CASES = URL_API + '/personal-cases';
+  static const String API_CERTIFICATES = URL_API + '/certificates';
+  static const String API_DIABETES_PROFILE = '$URL_API/diabetes-profile';
+
+  static const String API_PERSONAL_ISSUES = '$URL_API/personal-issues';
 
   // Personal Cases
   static const String API_NURSING_PERSONAL_CASES =
@@ -22,7 +25,10 @@ class Const {
       URL_API + '/pharmacist/personal-cases';
 
   // Pharmacogenomics
-  static const String API_PHARMACOGENOMICS = URL_API + '/pharmacogenomics';
+  static const String API_PHARMACOGENOMICS = '$URL_API/pharmacogenomics';
+
+  // Wellness Genomics
+  static const String API_WELLNESS_GENOMICS = '$URL_API/wellness-genomics';
 
   static const String API_PHARMACIST_SERVICES =
       URL_API + '/pharmacist-services';
@@ -42,7 +48,18 @@ class Const {
   static const String API_PROVIDER_REJECT = URL_API + '/provider/appointments';
   static const String API_PROVIDER_COMPLETE =
       URL_API + '/provider/appointments';
-// end new api
+
+  static const String API_NUTRITION_ASSESSMENT =
+      '$URL_API/nutrition-assessments';
+
+  // Schedule Management
+  static const String API_SCHEDULE_AVAILABILITY =
+      '$URL_API/schedule/availability';
+  static const String API_SCHEDULE_OVERRIDES = '$URL_API/schedule/overrides';
+  static const String API_SCHEDULE_PREVIEW_SLOTS =
+      '$URL_API/schedule/preview-slots';
+  static const String API_SCHEDULE_SLOTS = '$URL_API/schedule/slots';
+
   static const String ROLE = 'role';
   static const String IS_LOGED_IN = 'is_logged_in';
   static const String TOKEN = 'token';
@@ -53,6 +70,8 @@ class Const {
   static const String OBJ_PROFILE = 'obj_profile';
 
   static const Color tosca = Color(0xFF00B0A7);
+  static const Color aqua = Color(0xFF35C5CF);
+  static const Color grayLight = Color(0xFFF8F9FA);
   static const Color primaryBlue = Color(0xFF4894FE);
   static const Color primaryTextColor = Color(0xFF414C6B);
   static const Color secondaryTextColor = Color(0xFFE4979E);
@@ -65,7 +84,7 @@ class Const {
   static const Color colorUnselect = Color(0xFF8696BB);
   static const Color colorDashboard = Color(0xFFF5EEFA);
   static const String submenu_report = 'assets/icons/submenu_report.png';
-  static const String submenu_event = 'assets/icons/submenu_event.png';
+  static const String submenu_event = ' assets/icons/submenu_event.png';
   static const String submenu_design = 'assets/icons/submenu_design.png';
   static const String submenu_privacy = 'assets/icons/submenu_privacy.png';
   static const String submenu_service = 'assets/icons/submenu_report.png';

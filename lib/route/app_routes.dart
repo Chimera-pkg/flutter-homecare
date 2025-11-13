@@ -22,13 +22,23 @@ class AppRoutes {
 
   // Appointment
   static const String appointmentDetail = '/appointment/detail';
-  static const String bookAppointment = '/appointment/book';
-  static const String providerAppointment = '/provider-appointment';
+  static const String providerAppointmentDetail = '/appointment/provider-detail';
+  static const String scheduleAppoointment = '/schedule-appointment';
+
+  static const String payment = '/payment';
 
   // Profile Detail
   static const String medicalRecord = '/medical-record';
   static const String pharmagenomics = '/pharmagenomics';
-  static const String editProfile = '/edit-profile';
+  static const String wellnessGenomics = '/wellness-genomics';
+  static const String profileBasicInfo = '/basic-info';
+  static const String profileMedicalHistory = '/medical-history';
+  static const String profileLifestyle = '/lifestyle';
+  static const String profilePhysicalSigns = '/physical-signs';
+  static const String editProfessionalProfile = '/edit-professional-profile';
+  static const String workingSchedule = '/working-schedule';
+  static const String manageServices = '/manage-services';
+  static const String adminProfessionals = '/admin-professionals';
 
   static const String partnership = '/request-partnership';
   static const String partnership_list = '/partnership-list';
@@ -38,6 +48,22 @@ class AppRoutes {
   static const String personal = '/personal';
   static const String nursing = '/nursing';
   static const String submenu = '/submenu';
+
+  // Precision Nutrition Module
+  static const String precisionNutritionAssessmentForm =
+      '$precisionNutrition/assessment/form';
+  static const String precisionNutritionAssessmentDetail =
+      '$precisionNutrition/assessment/detail';
+  static const String precisionNutritionPlan = '$precisionNutrition/plan';
+  static const String weeklyMealPlan = '$precisionNutrition/plan/meal';
+  static const String weeklyMealPlanDetail =
+      '$precisionNutrition/plan/meal/detail';
+  static const String implementationJourney =
+      '$precisionNutrition/implementation-journey';
+
+  // Diabetic Care Module
+  static const String diabeticProfileForm = '$diabeticCare/profile/form';
+  static const String diabeticProfileSummary = '$diabeticCare/profile/summary';
 
   // static const String home = '/';
   // static const String submenu = 'submenu';

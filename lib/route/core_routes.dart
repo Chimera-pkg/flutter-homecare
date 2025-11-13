@@ -1,14 +1,14 @@
-import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
-import 'package:m2health/cubit/appointment/appointment_module.dart';
+import 'package:m2health/features/appointment/appointment_module.dart';
 import 'package:m2health/main.dart';
 import 'package:m2health/route/app_routes.dart';
-import 'package:m2health/views/dashboard.dart';
-import 'package:m2health/views/favourites.dart';
-import 'package:m2health/views/medical_store.dart';
-import 'package:m2health/cubit/profiles/profile_page.dart';
-
-final _shellNavigatorKey = GlobalKey<NavigatorState>();
+import 'package:m2health/route/appointment_routes.dart';
+import 'package:m2health/route/dashboard_routes.dart';
+import 'package:m2health/route/navigator_keys.dart';
+import 'package:m2health/core/presentation/views/dashboard.dart';
+import 'package:m2health/core/presentation/views/favourites.dart';
+import 'package:m2health/core/presentation/views/medical_store.dart';
+import 'package:m2health/features/profiles/presentation/profile_page.dart';
 
 class CoreRoutes {
   static List<RouteBase> routes = [
@@ -18,11 +18,12 @@ class CoreRoutes {
       },
       branches: [
         StatefulShellBranch(
-          navigatorKey: _shellNavigatorKey,
+          navigatorKey: shellNavigatorKey,
           routes: [
             GoRoute(
               path: AppRoutes.dashboard,
-              builder: (context, state) => Dashboard(),
+              routes: DashboardRoutes.routes,
+              builder: (context, state) => const Dashboard(),
             ),
           ],
         ),
@@ -30,7 +31,8 @@ class CoreRoutes {
           routes: [
             GoRoute(
               path: AppRoutes.appointment,
-              builder: (context, state) => AppointmentPage(),
+              routes: AppointmentRoutes.routes,
+              builder: (context, state) => const UnifiedAppointmentPage(),
             ),
           ],
         ),
@@ -54,7 +56,7 @@ class CoreRoutes {
           routes: [
             GoRoute(
               path: AppRoutes.profile,
-              builder: (context, state) => ProfilePage(),
+              builder: (context, state) => const ProfilePage(),
             ),
           ],
         ),

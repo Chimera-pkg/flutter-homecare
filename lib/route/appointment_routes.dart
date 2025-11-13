@@ -1,28 +1,50 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:m2health/cubit/appointment/appointment_module.dart';
+import 'package:m2health/features/appointment/appointment_module.dart';
+import 'package:m2health/features/booking_appointment/schedule_appointment/presentation/bloc/schedule_appointment_cubit.dart';
+import 'package:m2health/features/booking_appointment/schedule_appointment/presentation/pages/schedule_appointment_page.dart';
 import 'package:m2health/route/app_routes.dart';
-import 'package:m2health/views/book_appointment.dart';
+import 'package:m2health/features/appointment/pages/provider_appointment_detail_page.dart';
+import 'package:m2health/route/navigator_keys.dart';
+import 'package:m2health/service_locator.dart';
 
 class AppointmentRoutes {
   static List<GoRoute> routes = [
     GoRoute(
-        path: '${AppRoutes.providerAppointment}/:providerType',
-        builder: (context, state) {
-          final providerType = state.pathParameters['providerType'];
-          return ProviderAppointmentPage(providerType: providerType);
-        }),
-    GoRoute(
-      path: AppRoutes.appointmentDetail,
+      parentNavigatorKey: rootNavigatorKey,
+      path: 'detail',
+      name: AppRoutes.appointmentDetail,
       builder: (context, state) {
-        final appointmentData = state.extra as Map<String, dynamic>;
-        return DetailAppointmentPage(appointmentData: appointmentData);
+        final appointmentId = state.extra as int;
+        return DetailAppointmentPage(
+          appointmentId: appointmentId,
+          key: UniqueKey(),
+        );
       },
     ),
     GoRoute(
-      path: AppRoutes.bookAppointment,
+      parentNavigatorKey: rootNavigatorKey,
+      path: 'provider-detail',
+      name: AppRoutes.providerAppointmentDetail,
       builder: (context, state) {
-        final data = state.extra as BookAppointmentPageData;
-        return BookAppointmentPage(data: data);
+        final id = state.extra as int;
+        return ProviderAppointmentDetailPage(appointmentId: id);
+      },
+    ),
+    GoRoute(
+      parentNavigatorKey: rootNavigatorKey,
+      path: 'schedule-appointment',
+      name: AppRoutes.scheduleAppoointment,
+      builder: (context, state) {
+        final data = state.extra as ScheduleAppointmentPageData;
+        return BlocProvider(
+          create: (context) => ScheduleAppointmentCubit(
+            getAvailableTimeSlots: sl(),
+            rescheduleAppointment: sl(),
+          ),
+          child: ScheduleAppointmentPage(data: data),
+        );
       },
     ),
   ];

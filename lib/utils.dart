@@ -9,7 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'views/pdf_screen.dart';
+import 'core/presentation/views/pdf_screen.dart';
 import 'package:share_plus/share_plus.dart';
 
 class Utils {
@@ -394,13 +394,13 @@ class EmailValidator implements StringValidator {
 //   return imageUrl;
 // }
 
-String getImageUrl(String imageUrl) {
-  if (imageUrl.contains('localhost:3334')) {
-    return imageUrl.replaceFirst(
-        'http://localhost:3334', 'https://homecare-api.med-map.org');
-  } else if (imageUrl.contains('localhost:3333')) {
-    return imageUrl.replaceFirst(
-        'http://localhost:3333', 'https://homecare-api.med-map.org');
-  }
-  return imageUrl;
-}
+// String getImageUrl(String imageUrl) {
+//   if (imageUrl.contains('localhost:3334')) {
+//     return imageUrl.replaceFirst(
+//         'http://localhost:3334', 'https://homecare-api.med-map.org');
+//   } else if (imageUrl.contains('localhost:3333')) {
+//     return imageUrl.replaceFirst(
+//         'http://localhost:3333', 'https://homecare-api.med-map.org');
+//   }
+//   return imageUrl;
+// }
