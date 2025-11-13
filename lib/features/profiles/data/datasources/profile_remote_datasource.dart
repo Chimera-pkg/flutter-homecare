@@ -18,6 +18,14 @@ abstract class ProfileRemoteDatasource {
   Future<ProfessionalProfileModel> getProfessionalProfile(String role);
   Future<void> updateProfessionalProfile(
       String role, Map<String, dynamic> data, File? avatar);
+
+  // Admin
+  Future<List<ProfessionalProfileModel>> getAdminProfessionals(
+      String role, String status);
+  Future<ProfessionalProfileModel> getAdminProfessionalDetail(
+      int id, String role);
+  Future<void> verifyProfessional(int id, String role);
+  Future<void> revokeVerification(int id, String role);
 }
 
 class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
@@ -149,6 +157,70 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
           'Failed to update professional profile data. Error: ${e.message}');
     } catch (e) {
       throw Exception('An unexpected error occurred: $e');
+    }
+  }
+
+  // --- Admin Methods ---
+  @override
+  Future<List<ProfessionalProfileModel>> getAdminProfessionals(
+      String role, String status) async {
+    try {
+      final response = await dio.get(
+        '${Const.URL_API}/admin/professionals',
+        queryParameters: {
+          'provider_type': role,
+          'status': status, // 'verified' or 'unverified'
+        },
+        options: await _getAuthHeaders(),
+      );
+
+      final List data = response.data['data'];
+      return data.map((e) => ProfessionalProfileModel.fromJson(e)).toList();
+    } on DioException catch (e) {
+      throw Exception('Failed to fetch professionals: ${e.message}');
+    }
+  }
+
+  @override
+  Future<ProfessionalProfileModel> getAdminProfessionalDetail(
+      int id, String role) async {
+    try {
+      final response = await dio.get(
+        '${Const.URL_API}/admin/professionals/$id',
+        queryParameters: {'provider_type': role},
+        options: await _getAuthHeaders(),
+      );
+
+      final data = response.data['data'];
+      return ProfessionalProfileModel.fromJson(data);
+    } on DioException catch (e) {
+      throw Exception('Failed to fetch professional detail: ${e.message}');
+    }
+  }
+
+  @override
+  Future<void> verifyProfessional(int id, String role) async {
+    try {
+      await dio.post(
+        '${Const.URL_API}/professionals/$id/verify',
+        queryParameters: {'provider_type': role},
+        options: await _getAuthHeaders(),
+      );
+    } on DioException catch (e) {
+      throw Exception('Failed to verify professional: ${e.message}');
+    }
+  }
+
+  @override
+  Future<void> revokeVerification(int id, String role) async {
+    try {
+      await dio.post(
+        '${Const.URL_API}/professionals/$id/revoke',
+        queryParameters: {'provider_type': role},
+        options: await _getAuthHeaders(),
+      );
+    } on DioException catch (e) {
+      throw Exception('Failed to revoke verification: ${e.message}');
     }
   }
 }

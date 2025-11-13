@@ -542,12 +542,14 @@ class CertificateCard extends StatelessWidget {
   final Certificate certification;
   final VoidCallback onEdit;
   final VoidCallback onRemove;
+  final bool withActions;
 
   const CertificateCard({
     super.key,
     required this.certification,
     required this.onEdit,
     required this.onRemove,
+    this.withActions = true,
   });
 
   String formatDate(String dateStr) {
@@ -612,31 +614,32 @@ class CertificateCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: onEdit,
-                      child: const Text(
-                        'Edit',
-                        style: TextStyle(color: Const.aqua),
+                if (withActions)
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: onEdit,
+                        child: const Text(
+                          'Edit',
+                          style: TextStyle(color: Const.aqua),
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      height: 12,
-                      width: 1,
-                      color: Colors.grey.shade300,
-                    ),
-                    const SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: onRemove,
-                      child: const Text(
-                        'Remove',
-                        style: TextStyle(color: Colors.red),
+                      const SizedBox(width: 8),
+                      Container(
+                        height: 12,
+                        width: 1,
+                        color: Colors.grey.shade300,
                       ),
-                    ),
-                  ],
-                ),
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: onRemove,
+                        child: const Text(
+                          'Remove',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    ],
+                  ),
               ],
             ),
           ),

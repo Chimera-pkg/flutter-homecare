@@ -13,6 +13,8 @@ class ProfessionalProfileModel extends ProfessionalProfile {
     super.jobTitle,
     super.workingHours,
     super.workPlace,
+    super.isVerified,
+    super.verifiedAt,
     super.createdAt,
     super.updatedAt,
     super.certificates = const [],
@@ -30,6 +32,10 @@ class ProfessionalProfileModel extends ProfessionalProfile {
       jobTitle: json['job_title'],
       workingHours: json['working_hours'] ?? '',
       workPlace: json['workplace'] ?? '',
+      isVerified: json['is_verified'] == 1 || json['is_verified'] == true,
+      verifiedAt: json['verified_at'] != null
+          ? DateTime.parse(json['verified_at'])
+          : null,
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'])
           : null,
