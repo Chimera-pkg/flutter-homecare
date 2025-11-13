@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:m2health/core/error/failures.dart';
 import 'package:m2health/features/schedule/data/datasources/schedule_datasource.dart';
+import 'package:m2health/features/schedule/data/models/provider_availability_override_model.dart';
 import 'package:m2health/features/schedule/domain/entities/provider_availability.dart';
 import 'package:m2health/features/schedule/domain/entities/provider_availability_override.dart';
 import 'package:m2health/features/schedule/domain/entities/time_slot.dart';
@@ -13,7 +14,8 @@ class ScheduleRepositoryImpl implements ScheduleRepository {
   ScheduleRepositoryImpl({required this.remoteDatasource});
 
   @override
-  Future<Either<Failure, List<ProviderAvailability>>> getAvailabilities() async {
+  Future<Either<Failure, List<ProviderAvailability>>>
+      getAvailabilities() async {
     try {
       final result = await remoteDatasource.getAvailabilities();
       return Right(result);
@@ -49,8 +51,7 @@ class ScheduleRepositoryImpl implements ScheduleRepository {
         'end_time': params.endTime,
         if (params.timezone != null) 'timezone': params.timezone,
       };
-      final result =
-          await remoteDatasource.updateAvailability(params.id, data);
+      final result = await remoteDatasource.updateAvailability(params.id, data);
       return Right(result);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -68,10 +69,9 @@ class ScheduleRepositoryImpl implements ScheduleRepository {
   }
 
   @override
-  Future<Either<Failure, List<ProviderAvailabilityOverride>>>
-      getOverrides() async {
+  Future<Either<Failure, List<ProviderAvailabilityOverride>>> getAllOverrides() async {
     try {
-      final result = await remoteDatasource.getOverrides();
+      final result = await remoteDatasource.getAllOverrides();
       return Right(result);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -79,40 +79,21 @@ class ScheduleRepositoryImpl implements ScheduleRepository {
   }
 
   @override
-  Future<Either<Failure, ProviderAvailabilityOverride>> addOverride(
-      AddOverrideParams params) async {
+  Future<Either<Failure, Unit>> updateOverride(
+      ProviderAvailabilityOverride params) async {
     try {
-      final data = {
-        'start_datetime': params.startDatetime.toIso8601String(),
-        'end_datetime': params.endDatetime.toIso8601String(),
-        'is_available': true, // Logic is "replace", so always true
-      };
-      final result = await remoteDatasource.addOverride(data);
-      return Right(result);
+      final model = ProviderAvailabilityOverrideModel.fromEntity(params);
+      await remoteDatasource.updateOverride(model);
+      return const Right(unit);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
   }
 
   @override
-  Future<Either<Failure, ProviderAvailabilityOverride>> updateOverride(
-      UpdateOverrideParams params) async {
+  Future<Either<Failure, Unit>> deleteOverride(String date) async {
     try {
-      final data = {
-        'start_datetime': params.startDatetime.toIso8601String(),
-        'end_datetime': params.endDatetime.toIso8601String(),
-      };
-      final result = await remoteDatasource.updateOverride(params.id, data);
-      return Right(result);
-    } catch (e) {
-      return Left(ServerFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, Unit>> deleteOverride(int id) async {
-    try {
-      await remoteDatasource.deleteOverride(id);
+      await remoteDatasource.deleteOverrideByDate(date);
       return const Right(unit);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -123,7 +104,8 @@ class ScheduleRepositoryImpl implements ScheduleRepository {
   Future<Either<Failure, List<TimeSlot>>> getSlotsPreview(
       GetSlotsPreviewParams params) async {
     try {
-      final result = await remoteDatasource.getAvailableSlots(params.date, params.timezone);
+      final result = await remoteDatasource.getAvailableSlots(
+          params.date, params.timezone);
       return Right(result);
     } catch (e) {
       return Left(ServerFailure(e.toString()));

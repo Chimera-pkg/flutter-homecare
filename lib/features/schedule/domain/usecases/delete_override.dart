@@ -6,7 +6,7 @@ class DeleteOverride {
   final ScheduleRepository repository;
   DeleteOverride(this.repository);
 
-  Future<Either<Failure, Unit>> call(int id) async {
-    return await repository.deleteOverride(id);
+  Future<Either<Failure, Unit>> call(String date) async {
+    return await repository.deleteOverride(date);
   }
 }

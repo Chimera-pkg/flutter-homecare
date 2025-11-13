@@ -8,8 +8,8 @@ class TimeSlotModel extends TimeSlot {
 
   factory TimeSlotModel.fromJson(Map<String, dynamic> json) {
     return TimeSlotModel(
-      startTime: DateTime.parse(json['startISO']),
-      endTime: DateTime.parse(json['endISO']),
+      startTime: DateTime.parse(json['start_time']),
+      endTime: DateTime.parse(json['end_time']),
     );
   }
 }

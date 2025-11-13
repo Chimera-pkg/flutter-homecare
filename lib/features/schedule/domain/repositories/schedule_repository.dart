@@ -13,12 +13,11 @@ abstract class ScheduleRepository {
       UpdateAvailabilityParams params);
   Future<Either<Failure, Unit>> deleteAvailability(int id);
 
-  Future<Either<Failure, List<ProviderAvailabilityOverride>>> getOverrides();
-  Future<Either<Failure, ProviderAvailabilityOverride>> addOverride(
-      AddOverrideParams params);
-  Future<Either<Failure, ProviderAvailabilityOverride>> updateOverride(
-      UpdateOverrideParams params);
-  Future<Either<Failure, Unit>> deleteOverride(int id);
+
+  Future<Either<Failure, List<ProviderAvailabilityOverride>>> getAllOverrides();
+  Future<Either<Failure, Unit>> updateOverride(
+      ProviderAvailabilityOverride params);
+  Future<Either<Failure, Unit>> deleteOverride(String date);
 
   Future<Either<Failure, List<TimeSlot>>> getSlotsPreview(
       GetSlotsPreviewParams params);

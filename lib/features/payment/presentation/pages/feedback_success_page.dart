@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:m2health/const.dart';
-import 'package:m2health/route/app_routes.dart';
 
 class FeedbackSuccessPage extends StatelessWidget {
   final Function onButtonPressed;

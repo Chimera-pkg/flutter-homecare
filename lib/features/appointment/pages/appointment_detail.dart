@@ -12,7 +12,6 @@ import 'package:m2health/features/booking_appointment/add_on_services/domain/ent
 import 'package:m2health/features/booking_appointment/personal_issue/domain/entities/personal_issue.dart';
 import 'package:m2health/features/booking_appointment/professional_directory/domain/entities/professional_entity.dart';
 import 'package:m2health/features/booking_appointment/schedule_appointment/presentation/pages/schedule_appointment_page.dart';
-import 'package:m2health/features/payment/presentation/pages/payment_page.dart';
 import 'package:m2health/features/profiles/domain/entities/profile.dart';
 import 'package:m2health/route/app_routes.dart';
 import 'package:m2health/service_locator.dart';

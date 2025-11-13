@@ -163,3 +163,9 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# dependency_overrides:
+#   # Force an older version of web that doesn't crash on Windows
+#   web: 0.4.0
+#   # Downgrade http slightly to be compatible with web 0.5.1
+#   http: 1.2.0
