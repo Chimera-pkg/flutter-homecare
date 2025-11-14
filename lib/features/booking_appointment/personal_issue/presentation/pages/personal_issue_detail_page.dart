@@ -78,7 +78,7 @@ class PersonalIssueDetailPage extends StatelessWidget {
                   Icon(Icons.access_time, size: 16, color: Colors.grey[600]),
                   const SizedBox(width: 8),
                   Text(
-                    "Created on: ${DateFormat('EEEE, MMM d, y').format(issue.updatedAt!)}",
+                    "Created on: ${DateFormat('EEEE, MMM d, y, HH:yy').format(issue.updatedAt!)}",
                     style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                   ),
                 ],
