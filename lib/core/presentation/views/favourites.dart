@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2health/route/app_routes.dart';
+import 'package:m2health/service_locator.dart';
 import 'package:m2health/utils.dart';
 import 'package:m2health/const.dart';
 
@@ -58,7 +59,7 @@ class _FavouritesPageState extends State<FavouritesPage> {
       final userId = await Utils.getSpString(Const.USER_ID);
       final token = await Utils.getSpString(Const.TOKEN);
 
-      final response = await Dio().get(
+      final response = await sl<Dio>().get(
         Const.API_FAVORITES,
         queryParameters: {
           'user_id': userId,
@@ -99,7 +100,7 @@ class _FavouritesPageState extends State<FavouritesPage> {
     try {
       final userId = await Utils.getSpString(Const.USER_ID);
       final token = await Utils.getSpString(Const.TOKEN);
-      final dio = Dio();
+      final dio = sl<Dio>();
       dio.options.headers['Authorization'] = 'Bearer $token';
 
       if (isFavorite) {

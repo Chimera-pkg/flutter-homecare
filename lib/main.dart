@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:m2health/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:m2health/features/diabetes/bloc/diabetes_form_cubit.dart';
 import 'package:m2health/features/medical_record/domain/usecases/delete_medical_record.dart';
 import 'package:m2health/features/medical_record/domain/usecases/get_medical_records.dart';
@@ -13,6 +14,7 @@ import 'package:m2health/features/profiles/presentation/bloc/certificate_cubit.d
 import 'package:m2health/features/profiles/presentation/bloc/profile_cubit.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:m2health/route/app_router.dart';
+import 'package:m2health/route/navigator_keys.dart';
 import 'package:m2health/service_locator.dart';
 import 'package:m2health/features/appointment/bloc/appointment_cubit.dart';
 import 'package:m2health/features/appointment/bloc/provider_appointment_cubit.dart';
@@ -49,6 +51,7 @@ void main() async {
         Provider<Dio>(
           create: (context) => sl<Dio>(),
         ),
+        BlocProvider(create: (context) => sl<AuthCubit>()),
         BlocProvider<NutritionAssessmentCubit>(
           create: (context) => NutritionAssessmentCubit(sl<Dio>()),
         ),
@@ -172,6 +175,7 @@ class _MyAppState extends State<MyApp> {
         animation: appSetting,
         builder: (BuildContext context, Widget? child) {
           return MaterialApp.router(
+            scaffoldMessengerKey: rootScaffoldMessengerKey,
             debugShowCheckedModeBanner: false,
             title: 'm2health',
             theme: ThemeData(

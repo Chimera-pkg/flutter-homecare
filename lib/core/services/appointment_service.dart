@@ -4,14 +4,13 @@ import 'package:dio/dio.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/core/domain/entities/appointment_entity.dart';
 import 'package:m2health/core/error/failures.dart';
-import 'package:m2health/features/appointment/models/appointment.dart';
 import 'package:m2health/features/appointment/models/paginated_appointment_response.dart';
 // ignore: unused_import
 import 'package:m2health/core/data/models/appointment_model.dart';
-import 'package:m2health/features/booking_appointment/nursing/domain/usecases/create_nursing_appointment.dart';
 import 'package:m2health/features/profiles/data/models/profile_model.dart';
 import 'package:m2health/features/profiles/domain/entities/profile.dart';
 import 'package:m2health/core/data/models/provider_appointment.dart';
+import 'package:m2health/service_locator.dart';
 import 'package:m2health/utils.dart';
 
 class AppointmentService {
@@ -308,7 +307,7 @@ class AppointmentService {
         throw Exception('Token is null');
       }
 
-      final response = await Dio().get(
+      final response = await sl<Dio>().get(
         '${Const.URL_API}/profiles', // Assuming this is the correct endpoint
         options: Options(
           headers: {

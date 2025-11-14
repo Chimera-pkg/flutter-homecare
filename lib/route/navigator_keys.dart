@@ -1,5 +1,7 @@
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 final rootNavigatorKey = GlobalKey<NavigatorState>();
 final shellNavigatorKey = GlobalKey<NavigatorState>();
+
+final rootScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
