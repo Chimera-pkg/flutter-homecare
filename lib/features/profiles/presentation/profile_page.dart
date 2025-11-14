@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:m2health/const.dart';
+import 'package:m2health/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:m2health/features/profiles/domain/entities/professional_profile.dart';
 import 'package:m2health/features/profiles/domain/entities/profile.dart';
 import 'package:m2health/features/profiles/presentation/bloc/profile_cubit.dart';
@@ -506,7 +507,7 @@ class _LogoutButton extends StatelessWidget {
         onPressed: () async {
           await Utils.clearSp();
           if (context.mounted) {
-            GoRouter.of(context).go(AppRoutes.signIn);
+            context.read<AuthCubit>().loggedOut();
           }
         },
         icon: const Icon(Icons.logout, color: Colors.red),

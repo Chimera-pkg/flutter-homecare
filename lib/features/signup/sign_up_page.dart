@@ -2,6 +2,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:m2health/const.dart';
 import 'package:m2health/route/app_routes.dart';
 import 'sign_up_cubit.dart';
 
@@ -55,9 +56,7 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sign Up'),
-      ),
+      appBar: AppBar(),
       backgroundColor: Colors.white,
       body: BlocProvider(
         create: (context) => SignUpCubit(),
@@ -112,9 +111,9 @@ class _SignUpPageState extends State<SignUpPage> {
                     const Text(
                       'Create Account',
                       style: TextStyle(
-                        fontSize: 30,
+                        fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF35C5CF), // Turquoise green color
+                        color: Const.aqua,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -122,7 +121,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     const Text(
                       "Create an account so you can explore all the\nexisting jobs",
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                         fontSize: 12,
                         color: Colors.black,
                       ),
@@ -254,19 +253,23 @@ class _SignUpPageState extends State<SignUpPage> {
                       width: 300,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF35C5CF),
+                          backgroundColor: Const.aqua,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15.0),
                           ),
                           elevation: 5.0,
                           side: BorderSide.none,
-                          padding: const EdgeInsets.all(12.0),
+                          padding: const EdgeInsets.all(16.0),
                         ),
                         onPressed: state is SignUpLoading
                             ? null
                             : () => _submitForm(context),
-                        child: const Text('Sign Up'),
+                        child: const Text('Sign Up',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            )),
                       ),
                     ),
                     if (state is SignUpLoading)
@@ -278,7 +281,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       },
                       child: const Text(
                         'Already have an account',
-                        style: TextStyle(color: Color(0xFF35C5CF)),
+                        style: TextStyle(color: Const.aqua),
                       ),
                     ),
                     const SizedBox(height: 20),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:m2health/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:m2health/features/diabetes/bloc/diabetes_form_cubit.dart';
 import 'package:m2health/features/medical_record/domain/usecases/delete_medical_record.dart';
 import 'package:m2health/features/medical_record/domain/usecases/get_medical_records.dart';
@@ -49,6 +50,7 @@ void main() async {
         Provider<Dio>(
           create: (context) => sl<Dio>(),
         ),
+        BlocProvider(create: (context) => sl<AuthCubit>()),
         BlocProvider<NutritionAssessmentCubit>(
           create: (context) => NutritionAssessmentCubit(sl<Dio>()),
         ),
