@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/domain/entities/personal_issue.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/presentation/bloc/personal_issues_cubit.dart';
@@ -186,6 +187,20 @@ class _PersonalIssuesPageState extends State<PersonalIssuesPage> {
                                                   _showDeleteConfirmationDialog(
                                                       context, issue.id!);
                                                 },
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              Icon(Icons.access_time,
+                                                  size: 16,
+                                                  color: Colors.grey[600]),
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                "Created on: ${DateFormat('MMM d, y, HH:yy').format(issue.createdAt!)}",
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.grey[600]),
                                               ),
                                             ],
                                           ),
