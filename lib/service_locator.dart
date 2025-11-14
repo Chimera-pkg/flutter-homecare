@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
+import 'package:m2health/core/network/token_expiration_interceptor.dart';
 import 'package:m2health/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:m2health/features/booking_appointment/injection.dart';
 import 'package:m2health/features/medical_record/injection.dart';
@@ -14,7 +15,11 @@ final sl = GetIt.instance;
 
 Future<void> setupLocator() async {
   // External Dependencies (like Dio, SharedPreferences, etc.)
-  sl.registerLazySingleton(() => Dio());
+  sl.registerLazySingleton<Dio>(() {
+    final dio = Dio();
+    dio.interceptors.add(TokenExpirationInterceptor());
+    return dio;
+  });
   sl.registerLazySingleton(() => AuthCubit());
   sl.registerLazySingleton(() => AppointmentService(sl()));
 

@@ -5,6 +5,7 @@ import 'package:m2health/const.dart';
 import 'package:m2health/core/data/models/appointment_model.dart';
 import 'package:m2health/core/domain/entities/appointment_entity.dart';
 import 'package:m2health/features/appointment/appointment_module.dart';
+import 'package:m2health/service_locator.dart';
 import 'package:m2health/utils.dart';
 import 'package:meta/meta.dart';
 import 'package:m2health/core/services/appointment_service.dart';
@@ -29,7 +30,7 @@ class ProviderAppointmentCubit extends Cubit<ProviderAppointmentState> {
       if (providerType != null) {
         queryParam['provider_type'] = providerType;
       }
-      final response = await Dio().get(
+      final response = await sl<Dio>().get(
         Const.API_PROVIDER_APPOINTMENTS,
         queryParameters: queryParam,
         options: Options(

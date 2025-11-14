@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:m2health/service_locator.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'dart:io';
 
@@ -38,7 +39,7 @@ class _FileViewerPageState extends State<FileViewerPage> {
   }
 
   Future<Uint8List> _downloadFile(String url) async {
-    final response = await Dio().get<List<int>>(
+    final response = await sl<Dio>().get<List<int>>(
       url,
       options: Options(responseType: ResponseType.bytes),
     );

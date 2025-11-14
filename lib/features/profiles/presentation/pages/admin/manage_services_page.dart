@@ -5,6 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'dart:async';
 import 'package:m2health/const.dart';
 import 'package:m2health/core/data/models/service_config.dart';
+import 'package:m2health/service_locator.dart';
 import 'package:m2health/utils.dart';
 
 sealed class ServicesState extends Equatable {
@@ -33,7 +34,7 @@ class ServicesError extends ServicesState {
 
 class ServicesCubit extends Cubit<ServicesState> {
   final String serviceType;
-  final Dio _dio = Dio();
+  final Dio _dio = sl<Dio>();
 
   ServicesCubit(this.serviceType) : super(ServicesInitial()) {
     _dio.interceptors.add(InterceptorsWrapper(
