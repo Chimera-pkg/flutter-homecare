@@ -89,7 +89,7 @@ class Const {
   static const String submenu_privacy = 'assets/icons/submenu_privacy.png';
   static const String submenu_service = 'assets/icons/submenu_report.png';
   static const String submenu_partnership = 'assets/icons/submenu_event.png';
-  static const String banner = 'assets/icons/medmap_care_banner.svg';
+  static const String banner = 'assets/icons/m2health_care_banner.svg';
   static const String svgLogo = 'assets/icons/medmap_logo.svg';
   static const String imgMenuTenders = 'assets/images/menu_tenders.png';
   static const String imgMenuDistributors =
