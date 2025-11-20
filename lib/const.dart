@@ -38,6 +38,9 @@ class Const {
   static const String API_PROVIDERS_AVAILABLE =
       URL_API + '/providers/available';
   static const String API_SERVICE_TITLES = URL_API + '/service-titles';
+  static const String API_SCREENING_SERVICE = '$URL_API/screening-services';
+  static const String API_ADMIN_SCREENING_SERVICES =
+      '$URL_API/admin/screening-services';
   static const String API_FAVORITES = URL_API + '/favorites';
   // Existing constants...
   static const String API_PROVIDER_APPOINTMENTS =

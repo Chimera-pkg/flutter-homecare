@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:m2health/features/pharmacogenomics/presentation/pharmagenomical_pages.dart';
 import 'package:m2health/features/profiles/domain/entities/professional_profile.dart';
 import 'package:m2health/features/profiles/presentation/pages/admin/admin_professionals_page.dart';
+import 'package:m2health/features/profiles/presentation/pages/admin/manage_health_screening_page.dart';
 import 'package:m2health/features/profiles/presentation/pages/admin/manage_services_page.dart';
 import 'package:m2health/features/profiles/presentation/pages/edit_lifestyle_n_selfcare_page.dart';
 import 'package:m2health/features/profiles/presentation/pages/edit_medical_history_n_risk_factor_page.dart';
@@ -94,6 +95,12 @@ class ProfileDetailRoutes {
       path: AppRoutes.adminProfessionals,
       builder: (context, state) {
         return const AdminProfessionalsPage();
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.manageHealthScreening,
+      builder: (context, state) {
+        return const ManageHealthScreeningPage();
       },
     ),
   ];
