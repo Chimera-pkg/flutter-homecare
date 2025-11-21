@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:m2health/features/booking_appointment/add_on_services/domain/entities/add_on_service.dart';
 import 'package:m2health/features/profiles/domain/entities/certificate.dart';
 
 class ProfessionalProfile extends Equatable {
@@ -17,6 +18,7 @@ class ProfessionalProfile extends Equatable {
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final List<Certificate> certificates;
+  final List<AddOnService> providedServices;
 
   const ProfessionalProfile({
     required this.id,
@@ -34,6 +36,7 @@ class ProfessionalProfile extends Equatable {
     this.createdAt,
     this.updatedAt,
     this.certificates = const [],
+    this.providedServices = const [],
   });
 
   @override
@@ -53,6 +56,7 @@ class ProfessionalProfile extends Equatable {
         createdAt,
         updatedAt,
         certificates,
+        providedServices,
       ];
 
   ProfessionalProfile copyWith({
@@ -71,6 +75,7 @@ class ProfessionalProfile extends Equatable {
     DateTime? createdAt,
     DateTime? updatedAt,
     List<Certificate>? certificates,
+    List<AddOnService>? providedServices,
   }) {
     return ProfessionalProfile(
       id: id ?? this.id,
@@ -88,6 +93,7 @@ class ProfessionalProfile extends Equatable {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       certificates: certificates ?? this.certificates,
+      providedServices: providedServices ?? this.providedServices
     );
   }
 }
