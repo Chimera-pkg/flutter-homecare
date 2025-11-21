@@ -18,9 +18,17 @@ class ManageServicesLoading extends ManageServicesState {}
 class ManageServicesLoaded extends ManageServicesState {
   final List<AddOnService> allServices;
   final List<AddOnService> selectedServices;
-  ManageServicesLoaded(this.allServices, this.selectedServices);
+  final bool isHomeScreeningAuthorized;
+
+  ManageServicesLoaded(
+    this.allServices,
+    this.selectedServices, {
+    this.isHomeScreeningAuthorized = false,
+  });
+
   @override
-  List<Object> get props => [allServices, selectedServices];
+  List<Object> get props =>
+      [allServices, selectedServices, isHomeScreeningAuthorized];
 }
 
 class ManageServicesSaving extends ManageServicesState {}
@@ -44,7 +52,8 @@ class ManageServicesCubit extends Cubit<ManageServicesState> {
     required this.role,
   }) : super(ManageServicesInitial());
 
-  Future<void> loadServices(List<AddOnService> currentServices) async {
+  Future<void> loadServices(List<AddOnService> currentServices,
+      {bool isHomeScreeningAuthorized = false}) async {
     emit(ManageServicesLoading());
 
     try {
@@ -72,7 +81,11 @@ class ManageServicesCubit extends Cubit<ManageServicesState> {
             (services) => allAvailableServices = services);
       }
 
-      emit(ManageServicesLoaded(allAvailableServices, currentServices));
+      emit(ManageServicesLoaded(
+        allAvailableServices,
+        currentServices,
+        isHomeScreeningAuthorized: isHomeScreeningAuthorized,
+      ));
     } catch (e) {
       log('Error loading services: $e');
       emit(ManageServicesError(e.toString()));
@@ -85,14 +98,17 @@ class ManageServicesCubit extends Cubit<ManageServicesState> {
       final currentSelected =
           List<AddOnService>.from(currentState.selectedServices);
 
-      // Check by ID
       if (currentSelected.any((s) => s.id == service.id)) {
         currentSelected.removeWhere((s) => s.id == service.id);
       } else {
         currentSelected.add(service);
       }
 
-      emit(ManageServicesLoaded(currentState.allServices, currentSelected));
+      emit(ManageServicesLoaded(
+        currentState.allServices,
+        currentSelected,
+        isHomeScreeningAuthorized: currentState.isHomeScreeningAuthorized,
+      ));
     }
   }
 
@@ -104,19 +120,32 @@ class ManageServicesCubit extends Cubit<ManageServicesState> {
           List<AddOnService>.from(currentState.selectedServices);
 
       if (select) {
-        // Add services that are not already selected
         for (var service in categoryServices) {
           if (!currentSelected.any((s) => s.id == service.id)) {
             currentSelected.add(service);
           }
         }
       } else {
-        // Remove services present in this category
         final idsToRemove = categoryServices.map((s) => s.id).toSet();
         currentSelected.removeWhere((s) => idsToRemove.contains(s.id));
       }
 
-      emit(ManageServicesLoaded(currentState.allServices, currentSelected));
+      emit(ManageServicesLoaded(
+        currentState.allServices,
+        currentSelected,
+        isHomeScreeningAuthorized: currentState.isHomeScreeningAuthorized,
+      ));
+    }
+  }
+
+  void toggleHomeScreeningAuthorization(bool value) {
+    if (state is ManageServicesLoaded) {
+      final currentState = state as ManageServicesLoaded;
+      emit(ManageServicesLoaded(
+        currentState.allServices,
+        currentState.selectedServices,
+        isHomeScreeningAuthorized: value,
+      ));
     }
   }
 
@@ -127,12 +156,20 @@ class ManageServicesCubit extends Cubit<ManageServicesState> {
 
       try {
         final ids = currentState.selectedServices.map((e) => e.id).toList();
-        await profileRemoteDatasource.updateProvidedServices(role, ids);
+        await profileRemoteDatasource.updateProvidedServices(
+          role,
+          ids,
+          isHomeScreeningAuthorized:
+              role == 'nurse' ? currentState.isHomeScreeningAuthorized : null,
+        );
         emit(ManageServicesSuccess());
       } catch (e) {
         emit(ManageServicesError(e.toString()));
         emit(ManageServicesLoaded(
-            currentState.allServices, currentState.selectedServices));
+          currentState.allServices,
+          currentState.selectedServices,
+          isHomeScreeningAuthorized: currentState.isHomeScreeningAuthorized,
+        ));
       }
     }
   }

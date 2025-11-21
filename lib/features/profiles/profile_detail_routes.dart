@@ -88,7 +88,10 @@ class ProfileDetailRoutes {
                   profileRemoteDatasource: sl(),
                   addOnRepository: sl(),
                   role: args.role,
-                )..loadServices(args.currentServices),
+                )..loadServices(
+                    args.currentServices,
+                    isHomeScreeningAuthorized: args.isHomeScreeningAuthorized,
+                  ),
             child: const ManageProvidedServicesPage());
       },
     ),

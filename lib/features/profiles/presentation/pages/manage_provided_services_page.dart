@@ -8,7 +8,13 @@ import 'package:collection/collection.dart'; // For groupBy
 class ManageServicesArgs {
   final String role;
   final List<AddOnService> currentServices;
-  ManageServicesArgs({required this.role, required this.currentServices});
+  final bool isHomeScreeningAuthorized;
+
+  ManageServicesArgs({
+    required this.role,
+    required this.currentServices,
+    this.isHomeScreeningAuthorized = false,
+  });
 }
 
 class ManageProvidedServicesPage extends StatefulWidget {
@@ -59,15 +65,53 @@ class _ManageProvidedServicesPageState
             final groupedServices =
                 groupBy(state.allServices, (AddOnService s) => s.serviceType);
 
+            // Check if nurse
+            final isNurse = context.read<ManageServicesCubit>().role == 'nurse';
+
             return Column(
               children: [
+                if (isNurse)
+                  Container(
+                    margin: const EdgeInsets.all(16),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withValues(alpha: 0.05),
+                      border:
+                          Border.all(color: Const.aqua.withValues(alpha: 0.3)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: SwitchListTile(
+                      title: const Text(
+                        "Authorized for Home Screening",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, color: Colors.black87),
+                      ),
+                      subtitle: const Text(
+                        "Enable this to receive home screening requests.",
+                        style: TextStyle(fontSize: 12),
+                      ),
+                      value: state.isHomeScreeningAuthorized,
+                      activeThumbColor: Const.aqua,
+                      inactiveTrackColor: Colors.transparent,
+                      onChanged: (bool value) {
+                        context
+                            .read<ManageServicesCubit>()
+                            .toggleHomeScreeningAuthorization(value);
+                      },
+                    ),
+                  ),
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    "Select the services you provide to patients. These will appear in search results.",
-                    style: TextStyle(color: Colors.grey[600]),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Select the services you provide to patients.",
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
                   ),
                 ),
+                const SizedBox(height: 10),
                 Expanded(
                   child: ListView.builder(
                     itemCount: groupedServices.length,
@@ -164,7 +208,6 @@ class _ManageProvidedServicesPageState
       title = "Radiology Services";
     }
 
-    // Check if all services in this category are currently selected
     final areAllSelected = services.isNotEmpty &&
         services.every((s) =>
             state.selectedServices.any((selected) => selected.id == s.id));

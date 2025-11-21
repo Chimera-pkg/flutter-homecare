@@ -18,7 +18,8 @@ abstract class ProfileRemoteDatasource {
   Future<ProfessionalProfileModel> getProfessionalProfile(String role);
   Future<void> updateProfessionalProfile(
       String role, Map<String, dynamic> data, File? avatar);
-  Future<void> updateProvidedServices(String role, List<int> serviceIds);
+  Future<void> updateProvidedServices(String role, List<int> serviceIds,
+      {bool? isHomeScreeningAuthorized});
 
   // Admin
   Future<List<ProfessionalProfileModel>> getAdminProfessionals(
@@ -162,7 +163,8 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
   }
 
   @override
-  Future<void> updateProvidedServices(String role, List<int> serviceIds) async {
+  Future<void> updateProvidedServices(String role, List<int> serviceIds,
+      {bool? isHomeScreeningAuthorized}) async {
     try {
       String endpoint;
       switch (role) {
@@ -179,9 +181,14 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
           throw Exception('Invalid role');
       }
 
+      final Map<String, dynamic> data = {'service_ids': serviceIds};
+      if (isHomeScreeningAuthorized != null) {
+        data['is_home_screening_authorized'] = isHomeScreeningAuthorized;
+      }
+
       await dio.put(
         endpoint,
-        data: {'service_ids': serviceIds},
+        data: data,
         options: await _getAuthHeaders(),
       );
     } on DioException catch (e) {

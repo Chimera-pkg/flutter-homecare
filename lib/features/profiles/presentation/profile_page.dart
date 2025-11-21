@@ -405,8 +405,8 @@ class _ProfessionalProfileSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Professional Profile',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              'Professional Panel',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
             ),
             ListTile(
               leading: const Icon(
@@ -427,7 +427,7 @@ class _ProfessionalProfileSection extends StatelessWidget {
                 Icons.list_alt,
                 color: Color(0xFF35C5CF),
               ),
-              title: const Text('Manage Provided Services'),
+              title: const Text('My Services'),
               trailing: const Icon(
                 Icons.arrow_forward_ios,
                 size: 16,
@@ -440,6 +440,7 @@ class _ProfessionalProfileSection extends StatelessWidget {
                   AppRoutes.editProfessionalServices,
                   extra: ManageServicesArgs(
                     role: role,
+                    isHomeScreeningAuthorized: profile.isHomeScreeningAuthorized ?? false,
                     currentServices: profile.providedServices,
                   ),
                 );
