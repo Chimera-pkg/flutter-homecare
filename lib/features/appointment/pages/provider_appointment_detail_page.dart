@@ -4,13 +4,13 @@ import 'package:intl/intl.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/core/domain/entities/appointment_entity.dart';
 import 'package:m2health/core/extensions/string_extensions.dart';
+import 'package:m2health/core/presentation/views/file_viewer_page.dart';
 import 'package:m2health/features/appointment/bloc/provider_appointment_cubit.dart';
 import 'package:m2health/features/appointment/bloc/provider_appointment_detail_cubit.dart';
 import 'package:m2health/features/appointment/pages/screening_report_submission_page.dart';
 import 'package:m2health/features/appointment/widgets/provider_appointment_action_dialog.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/domain/entities/personal_issue.dart';
 import 'package:m2health/service_locator.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ProviderAppointmentDetailPage extends StatelessWidget {
   final int appointmentId;
@@ -331,12 +331,18 @@ class _ScreeningRequestInfo extends StatelessWidget {
                   title: Text('Report #${report.id}'),
                   subtitle: Text(report.file.extname.toUpperCase()),
                   trailing: IconButton(
-                    icon: const Icon(Icons.download),
-                    onPressed: () async {
-                      final uri = Uri.parse(report.file.url);
-                      if (await canLaunchUrl(uri)) {
-                        await launchUrl(uri);
-                      }
+                    icon: const Icon(
+                        Icons.visibility), // Changed icon to visibility
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FileViewerPage(
+                            url: report.file.url,
+                            title: 'Lab Report #${report.id}',
+                          ),
+                        ),
+                      );
                     },
                   ),
                 ),
@@ -437,9 +443,13 @@ class _PersonalCaseInfo extends StatelessWidget {
                         itemBuilder: (context, imageIndex) {
                           return Padding(
                             padding: const EdgeInsets.only(right: 8.0),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.network(images[imageIndex]),
+                            child: GestureDetector(
+                              onTap: () =>
+                                  _showFullImage(context, images[imageIndex]),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(images[imageIndex]),
+                              ),
                             ),
                           );
                         },
@@ -463,6 +473,18 @@ class _PersonalCaseInfo extends StatelessWidget {
             },
           )
       ],
+    );
+  }
+
+  void _showFullImage(BuildContext context, String imageUrl) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FileViewerPage(
+          url: imageUrl,
+          title: 'Issue Image',
+        ),
+      ),
     );
   }
 }

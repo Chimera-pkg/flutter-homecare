@@ -6,10 +6,10 @@ import 'package:m2health/const.dart';
 import 'package:m2health/core/domain/entities/appointment_entity.dart';
 import 'package:m2health/core/domain/entities/service_entity.dart';
 import 'package:m2health/core/extensions/string_extensions.dart';
+import 'package:m2health/core/presentation/views/file_viewer_page.dart';
 import 'package:m2health/features/appointment/bloc/appointment_cubit.dart';
 import 'package:m2health/features/appointment/bloc/appointment_detail_cubit.dart';
 import 'package:m2health/features/appointment/widgets/cancel_appoinment_dialog.dart';
-import 'package:m2health/features/booking_appointment/add_on_services/domain/entities/add_on_service.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/domain/entities/personal_issue.dart';
 import 'package:m2health/features/booking_appointment/professional_directory/domain/entities/professional_entity.dart';
 import 'package:m2health/features/booking_appointment/schedule_appointment/presentation/pages/schedule_appointment_page.dart';
@@ -18,7 +18,6 @@ import 'package:m2health/route/app_routes.dart';
 import 'package:m2health/service_locator.dart';
 import 'package:m2health/core/services/appointment_service.dart';
 import 'package:m2health/core/presentation/widgets/gradient_button.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class DetailAppointmentPage extends StatefulWidget {
   final int appointmentId;
@@ -294,12 +293,18 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
                     title: Text('Report #${report.id}'),
                     subtitle: Text(report.file.extname.toUpperCase()),
                     trailing: IconButton(
-                      icon: const Icon(Icons.download),
-                      onPressed: () async {
-                        final uri = Uri.parse(report.file.url);
-                        if (await canLaunchUrl(uri)) {
-                          await launchUrl(uri);
-                        }
+                      icon: const Icon(
+                          Icons.visibility), // Changed icon to visibility
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => FileViewerPage(
+                              url: report.file.url,
+                              title: 'Lab Report #${report.id}',
+                            ),
+                          ),
+                        );
                       },
                     ),
                   ),
@@ -367,11 +372,15 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
                             itemBuilder: (context, imageIndex) {
                               return Padding(
                                 padding: const EdgeInsets.all(4.0),
-                                child: Image.network(
-                                  images[imageIndex],
-                                  width: 100,
-                                  height: 100,
-                                  fit: BoxFit.cover,
+                                child: GestureDetector(
+                                  onTap: () => _showFullImage(
+                                      context, images[imageIndex]),
+                                  child: Image.network(
+                                    images[imageIndex],
+                                    width: 100,
+                                    height: 100,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               );
                             },
@@ -661,6 +670,18 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
                 spacing: 8,
                 children: buttons,
               ));
+  }
+
+  void _showFullImage(BuildContext context, String imageUrl) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FileViewerPage(
+          url: imageUrl,
+          title: 'Issue Image', // Optional: Custom title
+        ),
+      ),
+    );
   }
 }
 
