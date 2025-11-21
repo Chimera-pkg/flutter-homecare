@@ -325,10 +325,30 @@ class _ScreeningRequestInfo extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           ...reports.map((report) => Card(
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(color: Colors.grey.shade200)),
                 margin: const EdgeInsets.only(bottom: 8),
                 child: ListTile(
-                  leading: const Icon(Icons.description, color: Colors.red),
-                  title: Text('Report #${report.id}'),
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                        report.file.extname == 'pdf'
+                            ? Icons.picture_as_pdf
+                            : Icons.insert_drive_file,
+                        color: Colors.red),
+                  ),
+                  title: Text(
+                    'Report #${report.id}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                   subtitle: Text(report.file.extname.toUpperCase()),
                   trailing: IconButton(
                     icon: const Icon(
@@ -502,6 +522,11 @@ class _ActionButtons extends StatelessWidget {
     }
 
     if (appointment.status.toLowerCase() == 'cancelled') {
+      return const SizedBox.shrink();
+    }
+
+    if (appointment.status.toLowerCase() == 'completed' &&
+        appointment.type != 'screening') {
       return const SizedBox.shrink();
     }
 

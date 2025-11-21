@@ -462,17 +462,18 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
                       appointment.screeningRequestData?.status ==
                           'sample_collected')
                     ElevatedButton(
-                      onPressed: () {
-                        context
-                            .read<ProviderAppointmentCubit>()
-                            .markReportReady(
-                                appointment.screeningRequestData!.id);
+                      onPressed: () async {
+                        // Navigate to appointment detail page to upload report
+                        GoRouter.of(context).pushNamed(
+                          AppRoutes.providerAppointmentDetail,
+                          extra: appointment.id,
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         foregroundColor: Colors.white,
                       ),
-                      child: const Text('Mark Report Ready'),
+                      child: const Text('Upload Report'),
                     ),
                 ],
               ),

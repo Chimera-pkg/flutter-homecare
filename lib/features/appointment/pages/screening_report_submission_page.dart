@@ -34,8 +34,13 @@ class ScreeningReportSubmissionView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Manage Lab Reports',
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Upload Lab Reports',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
       ),
       body: BlocConsumer<ScreeningReportCubit, ScreeningReportState>(
         listener: (context, state) {
