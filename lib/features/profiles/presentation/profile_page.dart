@@ -440,7 +440,8 @@ class _ProfessionalProfileSection extends StatelessWidget {
                   AppRoutes.editProfessionalServices,
                   extra: ManageServicesArgs(
                     role: role,
-                    isHomeScreeningAuthorized: profile.isHomeScreeningAuthorized ?? false,
+                    isHomeScreeningAuthorized:
+                        profile.isHomeScreeningAuthorized ?? false,
                     currentServices: profile.providedServices,
                   ),
                 );
@@ -501,20 +502,6 @@ class _AdminSection extends StatelessWidget {
             ),
             ListTile(
               leading:
-                  const Icon(Icons.verified_user, color: Color(0xFF35C5CF)),
-              title: const Text('Verify Professionals'),
-              titleTextStyle: const TextStyle(
-                fontSize: 16,
-                color: Colors.black,
-                fontWeight: FontWeight.normal,
-              ),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-              onTap: () {
-                context.push(AppRoutes.adminProfessionals);
-              },
-            ),
-            ListTile(
-              leading:
                   const Icon(Icons.health_and_safety, color: Color(0xFF35C5CF)),
               title: const Text('Manage Health Screening'),
               titleTextStyle: const TextStyle(
@@ -525,6 +512,20 @@ class _AdminSection extends StatelessWidget {
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {
                 context.push(AppRoutes.manageHealthScreening);
+              },
+            ),
+            ListTile(
+              leading:
+                  const Icon(Icons.verified_user, color: Color(0xFF35C5CF)),
+              title: const Text('Verify Professionals'),
+              titleTextStyle: const TextStyle(
+                fontSize: 16,
+                color: Colors.black,
+                fontWeight: FontWeight.normal,
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: () {
+                context.push(AppRoutes.adminProfessionals);
               },
             ),
           ],
