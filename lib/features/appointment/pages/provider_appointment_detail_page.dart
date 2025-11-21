@@ -353,39 +353,56 @@ class _PersonalCaseInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String? services;
+    List<String>? servicesList;
     List<PersonalIssue>? issues;
 
     if (appointment.providerType == 'nurse') {
       final personalCase = appointment.nursingCase;
-      services =
-          personalCase?.addOnServices.map((e) => e.name).join(', ') ?? 'None';
+      servicesList = personalCase?.addOnServices.map((e) => e.name).toList();
       issues = personalCase?.issues;
     } else if (appointment.providerType == 'pharmacist') {
       final personalCase = appointment.pharmacyCase;
-      services =
-          personalCase?.addOnServices.map((e) => e.name).join(', ') ?? 'None';
+      servicesList = personalCase?.addOnServices.map((e) => e.name).toList();
       issues = personalCase?.issues;
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (services != null)
-          Text.rich(
+        if (servicesList != null && servicesList.isNotEmpty) ...[
+          const Text(
+            'Services:',
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 8),
+          ...servicesList.asMap().entries.map((entry) {
+            final index = entry.key + 1;
+            final name = entry.value;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 4.0),
+              child: Text(
+                '$index. $name',
+                style: const TextStyle(
+                    color: Colors.black, fontWeight: FontWeight.w600),
+              ),
+            );
+          }),
+        ] else ...[
+          const Text.rich(
             TextSpan(
               text: 'Services: ',
-              style: const TextStyle(fontWeight: FontWeight.w500),
+              style: TextStyle(fontWeight: FontWeight.w500),
               children: [
                 TextSpan(
-                  text: services,
-                  style: const TextStyle(
+                  text: 'None',
+                  style: TextStyle(
                       color: Colors.black, fontWeight: FontWeight.w600),
                 )
               ],
             ),
           ),
-        const SizedBox(height: 8),
+        ],
+        const SizedBox(height: 16),
         if (issues != null && issues.isNotEmpty)
           ListView.builder(
             shrinkWrap: true,
@@ -393,26 +410,24 @@ class _PersonalCaseInfo extends StatelessWidget {
             itemCount: issues.length,
             itemBuilder: (context, issueIndex) {
               final issue = issues![issueIndex];
-              final description = issue.description;
               final images = issue.imageUrls;
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text.rich(
-                    TextSpan(
-                      text: 'Description:\n',
-                      style: const TextStyle(fontWeight: FontWeight.w500),
-                      children: [
-                        TextSpan(
-                          text: description,
-                          style:
-                              const TextStyle(color: Colors.black, height: 1.5),
-                        )
-                      ],
+                  Text(
+                    issue.title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 4),
+                  Text(
+                    issue.description,
+                    style: const TextStyle(height: 1.5),
+                  ),
+                  const SizedBox(height: 4),
                   if (images.isNotEmpty)
                     SizedBox(
                       height: 80,
@@ -430,6 +445,18 @@ class _PersonalCaseInfo extends StatelessWidget {
                         },
                       ),
                     ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(Icons.access_time,
+                          size: 16, color: Colors.grey[600]),
+                      const SizedBox(width: 8),
+                      Text(
+                        "Created on: ${DateFormat('MMM d, y, HH:yy').format(issue.createdAt!)}",
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 16),
                 ],
               );

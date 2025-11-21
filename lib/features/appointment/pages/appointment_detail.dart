@@ -377,6 +377,19 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
                             },
                           ),
                         ),
+                      Row(
+                        children: [
+                          Icon(Icons.access_time,
+                              size: 16, color: Colors.grey[600]),
+                          const SizedBox(width: 8),
+                          Text(
+                            "Created on: ${DateFormat('MMM d, y, HH:yy').format(issue.createdAt!)}",
+                            style: TextStyle(
+                                fontSize: 12, color: Colors.grey[600]),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
                     ],
                   ),
                 );
