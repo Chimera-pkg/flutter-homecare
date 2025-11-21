@@ -6,9 +6,11 @@ import 'package:m2health/core/domain/entities/appointment_entity.dart';
 import 'package:m2health/core/extensions/string_extensions.dart';
 import 'package:m2health/features/appointment/bloc/provider_appointment_cubit.dart';
 import 'package:m2health/features/appointment/bloc/provider_appointment_detail_cubit.dart';
+import 'package:m2health/features/appointment/pages/screening_report_submission_page.dart';
 import 'package:m2health/features/appointment/widgets/provider_appointment_action_dialog.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/domain/entities/personal_issue.dart';
 import 'package:m2health/service_locator.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProviderAppointmentDetailPage extends StatelessWidget {
   final int appointmentId;
@@ -80,9 +82,18 @@ class ProviderAppointmentDetailView extends StatelessWidget {
               const SizedBox(height: 24),
               _buildSectionTitle('Patient Information'),
               _PatientInfoTable(appointment: appointment),
-              const SizedBox(height: 24),
-              _buildSectionTitle('Personal Case'),
-              _PersonalCaseInfo(appointment: appointment),
+              if (appointment.type == 'screening')
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  const SizedBox(height: 24),
+                  _buildSectionTitle('Lab Test Information'),
+                  _ScreeningRequestInfo(appointment: appointment),
+                ])
+              else
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  const SizedBox(height: 24),
+                  _buildSectionTitle('Personal Case'),
+                  _PersonalCaseInfo(appointment: appointment),
+                ]),
             ],
           ),
         ),
@@ -93,7 +104,7 @@ class ProviderAppointmentDetailView extends StatelessWidget {
 
   Widget _buildSectionTitle(String title) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
+      padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
         title,
         style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
@@ -243,6 +254,99 @@ class _PatientInfoTable extends StatelessWidget {
   }
 }
 
+class _ScreeningRequestInfo extends StatelessWidget {
+  final AppointmentEntity appointment;
+  const _ScreeningRequestInfo({required this.appointment});
+
+  @override
+  Widget build(BuildContext context) {
+    final screeningData = appointment.screeningRequestData;
+    if (screeningData == null) {
+      return const Text('No screening request data available.');
+    }
+    final reports = screeningData.reports;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Text(
+              'Status',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+            ),
+            const Spacer(),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: Const.aqua.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                screeningData.status.replaceAll('_', ' ').toUpperCase(),
+                style: const TextStyle(
+                  color: Const.aqua,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Requested Services: ',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8),
+        ...screeningData.services.asMap().entries.map(
+          (entry) {
+            final index = entry.key + 1;
+            final service = entry.value;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 4.0),
+              child: Text(
+                '$index. ${service.name}',
+                style: const TextStyle(fontSize: 14),
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 8),
+        if (reports.isNotEmpty && screeningData.status == 'report_ready') ...[
+          const Text(
+            'Reports',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 8),
+          ...reports.map((report) => Card(
+                margin: const EdgeInsets.only(bottom: 8),
+                child: ListTile(
+                  leading: const Icon(Icons.description, color: Colors.red),
+                  title: Text('Report #${report.id}'),
+                  subtitle: Text(report.file.extname.toUpperCase()),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.download),
+                    onPressed: () async {
+                      final uri = Uri.parse(report.file.url);
+                      if (await canLaunchUrl(uri)) {
+                        await launchUrl(uri);
+                      }
+                    },
+                  ),
+                ),
+              ))
+        ]
+      ],
+    );
+  }
+}
+
 class _PersonalCaseInfo extends StatelessWidget {
   final AppointmentEntity appointment;
   const _PersonalCaseInfo({required this.appointment});
@@ -342,14 +446,19 @@ class _ActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    void _refreshAppointmentDetail() {
+    void refreshAppointmentDetail() {
       context
           .read<ProviderAppointmentDetailCubit>()
           .fetchProviderAppointmentById(appointment.id!);
     }
 
-    if (appointment.status.toLowerCase() == 'completed' ||
-        appointment.status.toLowerCase() == 'cancelled') {
+    if (appointment.status.toLowerCase() == 'cancelled') {
+      return const SizedBox.shrink();
+    }
+
+    if (appointment.screeningRequestData != null &&
+        appointment.type == 'screening' &&
+        appointment.screeningRequestData!.status == 'report_ready') {
       return const SizedBox.shrink();
     }
 
@@ -381,7 +490,7 @@ class _ActionButtons extends StatelessWidget {
                 duration: const Duration(seconds: 2),
               ),
             );
-            _refreshAppointmentDetail();
+            refreshAppointmentDetail();
           } else if (state is ProviderAppointmentError) {
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
             ScaffoldMessenger.of(context).showSnackBar(
@@ -401,6 +510,9 @@ class _ActionButtons extends StatelessWidget {
         },
         child: Builder(builder: (context) {
           final status = appointment.status.toLowerCase();
+          final isScreening =
+              appointment.type == 'screening'; // Home Health Screening
+          final screeningData = appointment.screeningRequestData;
 
           if (status == 'pending') {
             return Column(
@@ -426,13 +538,6 @@ class _ActionButtons extends StatelessWidget {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () {
-                          // await context
-                          //     .read<ProviderAppointmentCubit>()
-                          //     .rejectAppointment(appointment.id!);
-
-                          // await context
-                          //     .read<ProviderAppointmentDetailCubit>()
-                          //     .fetchProviderAppointmentById(appointment.id!);
                           showDeclineAppointmentDialog(
                               context, appointment.id!);
                         },
@@ -466,15 +571,23 @@ class _ActionButtons extends StatelessWidget {
                         ),
                         child: ElevatedButton(
                           onPressed: () {
-                            showAcceptAppointmentDialog(
-                                context, appointment.id!);
+                            if (isScreening && screeningData != null) {
+                              context
+                                  .read<ProviderAppointmentCubit>()
+                                  .acceptAppointment(
+                                    appointment.id!,
+                                    screeningId: screeningData.id,
+                                  );
+                            } else {
+                              showAcceptAppointmentDialog(
+                                  context, appointment.id!);
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             minimumSize: const Size(double.infinity, 50),
-                            backgroundColor: Colors
-                                .transparent, // Make button background transparent
+                            backgroundColor: Colors.transparent,
                             foregroundColor: Colors.white,
-                            shadowColor: Colors.transparent, // Remove shadow
+                            shadowColor: Colors.transparent,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -492,20 +605,69 @@ class _ActionButtons extends StatelessWidget {
               ],
             );
           } else if (status == 'accepted') {
+            if (isScreening) {
+              return ElevatedButton(
+                onPressed: () {
+                  if (screeningData != null) {
+                    context
+                        .read<ProviderAppointmentCubit>()
+                        .confirmSampleCollected(screeningData.id);
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                  backgroundColor: Const.aqua,
+                  foregroundColor: Colors.white,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                child: const Text('Confirm Sample Collected'),
+              );
+            } else {
+              return ElevatedButton(
+                onPressed: () async {
+                  showCompleteAppointmentDialog(context, appointment.id!);
+                },
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                child: const Text('Mark as Completed'),
+              );
+            }
+          } else if (status == 'completed' &&
+              isScreening &&
+              screeningData?.status == 'sample_collected') {
             return ElevatedButton(
               onPressed: () async {
-                // await context
-                //     .read<ProviderAppointmentCubit>()
-                //     .completeAppointment(appointment.id!);
-                // await context
-                //     .read<ProviderAppointmentDetailCubit>()
-                //     .fetchProviderAppointmentById(appointment.id!);
-
-                showCompleteAppointmentDialog(context, appointment.id!);
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ScreeningReportSubmissionPage(
+                      appointmentId: appointment.id!,
+                    ),
+                  ),
+                );
+                refreshAppointmentDetail();
               },
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
-                backgroundColor: Colors.green,
+                backgroundColor: Colors.blue,
                 foregroundColor: Colors.white,
                 shadowColor: Colors.transparent,
                 shape: RoundedRectangleBorder(
@@ -516,7 +678,7 @@ class _ActionButtons extends StatelessWidget {
                   fontSize: 16,
                 ),
               ),
-              child: const Text('Mark as Completed'),
+              child: const Text('Upload Reports'),
             );
           }
           return const SizedBox.shrink();

@@ -181,6 +181,44 @@ class AppointmentService {
     }
   }
 
+  // --- Screening Specific Actions ---
+
+  Future<void> acceptScreeningRequest(int screeningRequestId) async {
+    try {
+      final token = await Utils.getSpString(Const.TOKEN);
+      await _dio.post(
+        '${Const.URL_API}/screening-requests/$screeningRequestId/accept',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+    } catch (e) {
+      throw Exception('Error accepting screening request: $e');
+    }
+  }
+
+  Future<void> confirmScreeningSampleCollected(int screeningRequestId) async {
+    try {
+      final token = await Utils.getSpString(Const.TOKEN);
+      await _dio.post(
+        '${Const.URL_API}/screening-requests/$screeningRequestId/sample-collected',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+    } catch (e) {
+      throw Exception('Error confirming sample collection: $e');
+    }
+  }
+
+  Future<void> markScreeningReportReady(int screeningRequestId) async {
+    try {
+      final token = await Utils.getSpString(Const.TOKEN);
+      await _dio.post(
+        '${Const.URL_API}/screening-requests/$screeningRequestId/report-ready',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+    } catch (e) {
+      throw Exception('Error marking report ready: $e');
+    }
+  }
+
   /// Fetch provider appointments
   Future<List<ProviderAppointment>> fetchProviderAppointments(
       String providerType) async {

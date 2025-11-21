@@ -408,8 +408,21 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
                         ),
                         const SizedBox(width: 8),
                         ElevatedButton(
-                          onPressed: () => showAcceptAppointmentDialog(
-                              context, appointment.id!),
+                          onPressed: () {
+                            if (appointment.type == 'screening' &&
+                                appointment.screeningRequestData != null) {
+                              context
+                                  .read<ProviderAppointmentCubit>()
+                                  .acceptAppointment(
+                                    appointment.id!,
+                                    screeningId:
+                                        appointment.screeningRequestData!.id,
+                                  );
+                            } else {
+                              showAcceptAppointmentDialog(
+                                  context, appointment.id!);
+                            }
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF35C5CF),
                             foregroundColor: Colors.white,
@@ -421,13 +434,45 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
                     ),
                   if (status.toLowerCase() == 'accepted')
                     ElevatedButton(
-                      onPressed: () => showCompleteAppointmentDialog(
-                          context, appointment.id!),
+                      onPressed: () {
+                        if (appointment.type == 'screening' &&
+                            appointment.screeningRequestData != null) {
+                          context
+                              .read<ProviderAppointmentCubit>()
+                              .confirmSampleCollected(
+                                appointment.screeningRequestData!.id,
+                              );
+                        } else {
+                          showCompleteAppointmentDialog(
+                              context, appointment.id!);
+                        }
+                      },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
+                        backgroundColor: appointment.type == 'screening'
+                            ? Const.aqua
+                            : Colors.green,
                         foregroundColor: Colors.white,
                       ),
-                      child: const Text('Mark Complete'),
+                      child: Text(appointment.type == 'screening'
+                          ? 'Confirm Sample'
+                          : 'Mark Complete'),
+                    ),
+                  if (status.toLowerCase() == 'completed' &&
+                      appointment.type == 'screening' &&
+                      appointment.screeningRequestData?.status ==
+                          'sample_collected')
+                    ElevatedButton(
+                      onPressed: () {
+                        context
+                            .read<ProviderAppointmentCubit>()
+                            .markReportReady(
+                                appointment.screeningRequestData!.id);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: const Text('Mark Report Ready'),
                     ),
                 ],
               ),

@@ -55,11 +55,15 @@ class ProviderAppointmentCubit extends Cubit<ProviderAppointmentState> {
     }
   }
 
-  Future<void> acceptAppointment(int appointmentId) async {
+  Future<void> acceptAppointment(int appointmentId, {int? screeningId}) async {
     try {
-      log('Accepting appointment $appointmentId');
+      log('Accepting appointment $appointmentId (screeningId: $screeningId)', name: 'ProviderAppointmentCubit');
 
-      await _appointmentService.acceptProviderAppointment(appointmentId);
+      if (screeningId != null) {
+        await _appointmentService.acceptScreeningRequest(screeningId);
+      } else {
+        await _appointmentService.acceptProviderAppointment(appointmentId);
+      }
 
       emit(ProviderAppointmentChangeSucceed(
           message: 'Appointment accepted successfully'));
@@ -105,6 +109,37 @@ class ProviderAppointmentCubit extends Cubit<ProviderAppointmentState> {
       log('Error completing appointment: $e');
       emit(ProviderAppointmentError(
           'Error completing appointment: ${e.toString()}'));
+    }
+  }
+
+  Future<void> confirmSampleCollected(int screeningId) async {
+    try {
+      log('Confirming sample collected for screening $screeningId');
+      await _appointmentService.confirmScreeningSampleCollected(screeningId);
+
+      emit(ProviderAppointmentChangeSucceed(
+          message: 'Sample collection confirmed successfully'));
+
+      fetchProviderAppointments();
+    } catch (e) {
+      log('Error confirming sample: $e');
+      emit(
+          ProviderAppointmentError('Error confirming sample: ${e.toString()}'));
+    }
+  }
+
+  Future<void> markReportReady(int screeningId) async {
+    try {
+      log('Marking report ready for screening $screeningId');
+      await _appointmentService.markScreeningReportReady(screeningId);
+
+      emit(ProviderAppointmentChangeSucceed(message: 'Report marked as ready'));
+
+      fetchProviderAppointments();
+    } catch (e) {
+      log('Error marking report ready: $e');
+      emit(ProviderAppointmentError(
+          'Error marking report ready: ${e.toString()}'));
     }
   }
 }

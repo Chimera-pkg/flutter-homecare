@@ -1,15 +1,12 @@
-import 'package:equatable/equatable.dart';
+import 'package:m2health/core/domain/entities/service_entity.dart';
 
-class AddOnService extends Equatable {
-  final int? id;
-  final String name;
-  final double price;
+class AddOnService extends ServiceEntity {
   final String serviceType;
 
   const AddOnService({
-    required this.id,
-    required this.name,
-    required this.price,
+    required super.id,
+    required super.name,
+    required super.price,
     required this.serviceType,
   });
 
