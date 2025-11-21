@@ -16,7 +16,7 @@ class Dashboard extends StatefulWidget {
     super.key,
   });
   @override
-  _DashboardState createState() => _DashboardState();
+  State<Dashboard> createState() => _DashboardState();
 }
 
 class _DashboardState extends State<Dashboard> {
@@ -57,14 +57,17 @@ class _DashboardState extends State<Dashboard> {
 
   final List<Map<String, String>> services = [
     {'image': 'assets/icons/ilu_physio.png', 'name': 'Physiotherapy'},
-    {'image': 'assets/icons/ilu_precision.png', 'name': 'Precision\nNutrition'},
+    {
+      'image': 'assets/icons/ilu_remote_monitoring.png',
+      'name': 'Remote Patient Monitoring'
+    },
     {
       'image': 'assets/icons/ilu_ocuTherapy.png',
       'name': 'Occupational\nTherapy'
     },
-    {'image': 'assets/icons/ilu_sleep.png', 'name': 'Sleep & Mental\nHealth'},
     {'image': 'assets/icons/ilu_health.png', 'name': 'Health Risk\nAssessment'},
     {'image': 'assets/icons/ilu_dietitian.jpg', 'name': 'Dietitian Services'},
+    {'image': 'assets/icons/ilu_sleep.png', 'name': 'Sleep & Mental\nHealth'},
   ];
 
   @override
@@ -357,11 +360,12 @@ class _DashboardState extends State<Dashboard> {
                             ),
                             RectangularIconWithTitle(
                               onTap: () {
-                                context.push(AppRoutes.remotePatientMonitoring);
+                                context.push(AppRoutes.precisionNutrition);
                               },
-                              iconPath: 'assets/icons/ic_remote_monitoring.png',
+                              iconPath:
+                                  'assets/icons/ic_precision_nutrition.png',
                               title: AppLocalizations.of(context)!
-                                  .translate('remote_monitoring'),
+                                  .translate('precision_nutrition'),
                               backgroundColor:
                                   const Color.fromRGBO(154, 225, 255, 0.33),
                               titleColor: Colors.black,
@@ -458,8 +462,9 @@ class _DashboardState extends State<Dashboard> {
                             return GestureDetector(
                                 onTap: () {
                                   if (services[index]['name'] ==
-                                      'Precision\nNutrition') {
-                                    context.push(AppRoutes.precisionNutrition);
+                                      'Remote Patient Monitoring') {
+                                    context.push(
+                                        AppRoutes.remotePatientMonitoring);
                                   } else {
                                     showDialog(
                                       context: context,

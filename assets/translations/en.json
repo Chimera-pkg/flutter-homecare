@@ -54,14 +54,13 @@
   "home_nursing": "Home\nNursing",
   "diabetic_care": "Diabetic\nCare",
   "home_screening": "Home Health Screening",
-  "remote_monitoring": "Remote Patient\nMonitoring",
+  "precision_nutrition": "Precision Nutrition",
   "2nd_opinion": "2nd Opinion for\nMedical Image",
   "nursing": "Home Nursing",
   "allied_services" : "Allied Health",
+  "remote_monitoring": "Remote Patient Monitoring",
   "health_coaching" : "Health Coaching",
   "diabetic_care2" : "Diabetic Care",
   "home_health" : "Home Health Screening",
   "teleradiology" : "Teleradiology"
-  
-
 }

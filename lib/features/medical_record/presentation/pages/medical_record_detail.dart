@@ -6,7 +6,7 @@ import 'package:m2health/features/medical_record/domain/entities/medical_record.
 import 'package:m2health/features/medical_record/presentation/bloc/medical_record_bloc.dart';
 import 'package:m2health/features/medical_record/presentation/bloc/medical_record_event.dart';
 import 'package:m2health/features/medical_record/presentation/bloc/medical_record_state.dart';
-import 'package:m2health/features/medical_record/presentation/pages/file_viewer_page.dart';
+import 'package:m2health/core/presentation/views/file_viewer_page.dart';
 import 'package:m2health/features/medical_record/presentation/pages/medical_record_form_page.dart';
 
 class MedicalRecordDetailPage extends StatelessWidget {

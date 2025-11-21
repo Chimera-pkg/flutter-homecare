@@ -7,6 +7,7 @@ import 'package:m2health/features/profiles/domain/entities/professional_profile.
 import 'package:m2health/features/profiles/domain/entities/profile.dart';
 import 'package:m2health/features/profiles/presentation/bloc/profile_cubit.dart';
 import 'package:m2health/features/profiles/presentation/bloc/profile_state.dart';
+import 'package:m2health/features/profiles/presentation/pages/manage_provided_services_page.dart';
 import 'package:m2health/route/app_routes.dart';
 import 'package:m2health/utils.dart';
 import 'package:go_router/go_router.dart';
@@ -254,8 +255,6 @@ class _ProfileHeader extends StatelessWidget {
   }
 }
 
-// ... [Rest of the file: _ProfileInformationSection, _HealthRecordsSection, etc.] ...
-// (Ensure you keep the existing sections _ProfileInformationSection, _HealthRecordsSection, _AppointmentSection, _ProfessionalProfileSection, _AdminSection, _LogoutButton, _ProfileListTile exactly as they were in the uploaded file)
 class _ProfileInformationSection extends StatelessWidget {
   const _ProfileInformationSection();
 
@@ -406,8 +405,8 @@ class _ProfessionalProfileSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Professional Profile',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              'Professional Panel',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
             ),
             ListTile(
               leading: const Icon(
@@ -421,6 +420,33 @@ class _ProfessionalProfileSection extends StatelessWidget {
               ),
               onTap: () {
                 context.push(AppRoutes.editProfessionalProfile, extra: profile);
+              },
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.list_alt,
+                color: Color(0xFF35C5CF),
+              ),
+              title: const Text('My Services'),
+              trailing: const Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+              ),
+              onTap: () async {
+                final role = await Utils.getSpString(Const.ROLE);
+                if (role == null) return;
+
+                await GoRouter.of(context).pushNamed(
+                  AppRoutes.editProfessionalServices,
+                  extra: ManageServicesArgs(
+                    role: role,
+                    isHomeScreeningAuthorized:
+                        profile.isHomeScreeningAuthorized ?? false,
+                    currentServices: profile.providedServices,
+                  ),
+                );
+
+                context.read<ProfileCubit>().loadProfile();
               },
             ),
             ListTile(
@@ -474,7 +500,20 @@ class _AdminSection extends StatelessWidget {
                 GoRouter.of(context).push(AppRoutes.manageServices);
               },
             ),
-            // Ensure this matches your previous Admin Section updates
+            ListTile(
+              leading:
+                  const Icon(Icons.health_and_safety, color: Color(0xFF35C5CF)),
+              title: const Text('Manage Health Screening'),
+              titleTextStyle: const TextStyle(
+                fontSize: 16,
+                color: Colors.black,
+                fontWeight: FontWeight.normal,
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: () {
+                context.push(AppRoutes.manageHealthScreening);
+              },
+            ),
             ListTile(
               leading:
                   const Icon(Icons.verified_user, color: Color(0xFF35C5CF)),

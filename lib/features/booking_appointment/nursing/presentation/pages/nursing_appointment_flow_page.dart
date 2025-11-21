@@ -157,6 +157,7 @@ class _NursingAppointmentFlowPageState
                   ),
                   child: SearchProfessionalPage(
                     role: 'nurse',
+                    serviceIds: state.selectedAddOnServices.map((e) => e.id).toList(),
                     onProfessionalSelected: (prof) {
                       context
                           .read<NursingAppointmentFlowBloc>()

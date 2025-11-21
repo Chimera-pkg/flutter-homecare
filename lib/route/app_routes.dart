@@ -36,9 +36,11 @@ class AppRoutes {
   static const String profileLifestyle = '/lifestyle';
   static const String profilePhysicalSigns = '/physical-signs';
   static const String editProfessionalProfile = '/edit-professional-profile';
+  static const String editProfessionalServices = '/edit-professional-services';
   static const String workingSchedule = '/working-schedule';
   static const String manageServices = '/manage-services';
   static const String adminProfessionals = '/admin-professionals';
+  static const String manageHealthScreening = '/manage-health-screening';
 
   static const String partnership = '/request-partnership';
   static const String partnership_list = '/partnership-list';

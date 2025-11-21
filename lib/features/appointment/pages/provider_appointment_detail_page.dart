@@ -4,8 +4,10 @@ import 'package:intl/intl.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/core/domain/entities/appointment_entity.dart';
 import 'package:m2health/core/extensions/string_extensions.dart';
+import 'package:m2health/core/presentation/views/file_viewer_page.dart';
 import 'package:m2health/features/appointment/bloc/provider_appointment_cubit.dart';
 import 'package:m2health/features/appointment/bloc/provider_appointment_detail_cubit.dart';
+import 'package:m2health/features/appointment/pages/screening_report_submission_page.dart';
 import 'package:m2health/features/appointment/widgets/provider_appointment_action_dialog.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/domain/entities/personal_issue.dart';
 import 'package:m2health/service_locator.dart';
@@ -80,9 +82,18 @@ class ProviderAppointmentDetailView extends StatelessWidget {
               const SizedBox(height: 24),
               _buildSectionTitle('Patient Information'),
               _PatientInfoTable(appointment: appointment),
-              const SizedBox(height: 24),
-              _buildSectionTitle('Personal Case'),
-              _PersonalCaseInfo(appointment: appointment),
+              if (appointment.type == 'screening')
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  const SizedBox(height: 24),
+                  _buildSectionTitle('Lab Test Information'),
+                  _ScreeningRequestInfo(appointment: appointment),
+                ])
+              else
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  const SizedBox(height: 24),
+                  _buildSectionTitle('Personal Case'),
+                  _PersonalCaseInfo(appointment: appointment),
+                ]),
             ],
           ),
         ),
@@ -93,7 +104,7 @@ class ProviderAppointmentDetailView extends StatelessWidget {
 
   Widget _buildSectionTitle(String title) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
+      padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
         title,
         style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
@@ -243,45 +254,181 @@ class _PatientInfoTable extends StatelessWidget {
   }
 }
 
+class _ScreeningRequestInfo extends StatelessWidget {
+  final AppointmentEntity appointment;
+  const _ScreeningRequestInfo({required this.appointment});
+
+  @override
+  Widget build(BuildContext context) {
+    final screeningData = appointment.screeningRequestData;
+    if (screeningData == null) {
+      return const Text('No screening request data available.');
+    }
+    final reports = screeningData.reports;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Text(
+              'Status',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+            ),
+            const Spacer(),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: Const.aqua.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                screeningData.status.replaceAll('_', ' ').toUpperCase(),
+                style: const TextStyle(
+                  color: Const.aqua,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Requested Services: ',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8),
+        ...screeningData.services.asMap().entries.map(
+          (entry) {
+            final index = entry.key + 1;
+            final service = entry.value;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 4.0),
+              child: Text(
+                '$index. ${service.name}',
+                style: const TextStyle(fontSize: 14),
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 8),
+        if (reports.isNotEmpty && screeningData.status == 'report_ready') ...[
+          const Text(
+            'Reports',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 8),
+          ...reports.map((report) => Card(
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(color: Colors.grey.shade200)),
+                margin: const EdgeInsets.only(bottom: 8),
+                child: ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                        report.file.extname == 'pdf'
+                            ? Icons.picture_as_pdf
+                            : Icons.insert_drive_file,
+                        color: Colors.red),
+                  ),
+                  title: Text(
+                    'Report #${report.id}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  subtitle: Text(report.file.extname.toUpperCase()),
+                  trailing: IconButton(
+                    icon: const Icon(
+                        Icons.visibility), // Changed icon to visibility
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FileViewerPage(
+                            url: report.file.url,
+                            title: 'Lab Report #${report.id}',
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ))
+        ]
+      ],
+    );
+  }
+}
+
 class _PersonalCaseInfo extends StatelessWidget {
   final AppointmentEntity appointment;
   const _PersonalCaseInfo({required this.appointment});
 
   @override
   Widget build(BuildContext context) {
-    String? services;
+    List<String>? servicesList;
     List<PersonalIssue>? issues;
 
     if (appointment.providerType == 'nurse') {
       final personalCase = appointment.nursingCase;
-      services =
-          personalCase?.addOnServices.map((e) => e.name).join(', ') ?? 'None';
+      servicesList = personalCase?.addOnServices.map((e) => e.name).toList();
       issues = personalCase?.issues;
     } else if (appointment.providerType == 'pharmacist') {
       final personalCase = appointment.pharmacyCase;
-      services =
-          personalCase?.addOnServices.map((e) => e.name).join(', ') ?? 'None';
+      servicesList = personalCase?.addOnServices.map((e) => e.name).toList();
       issues = personalCase?.issues;
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (services != null)
-          Text.rich(
+        if (servicesList != null && servicesList.isNotEmpty) ...[
+          const Text(
+            'Services:',
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 8),
+          ...servicesList.asMap().entries.map((entry) {
+            final index = entry.key + 1;
+            final name = entry.value;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 4.0),
+              child: Text(
+                '$index. $name',
+                style: const TextStyle(
+                    color: Colors.black, fontWeight: FontWeight.w600),
+              ),
+            );
+          }),
+        ] else ...[
+          const Text.rich(
             TextSpan(
               text: 'Services: ',
-              style: const TextStyle(fontWeight: FontWeight.w500),
+              style: TextStyle(fontWeight: FontWeight.w500),
               children: [
                 TextSpan(
-                  text: services,
-                  style: const TextStyle(
+                  text: 'None',
+                  style: TextStyle(
                       color: Colors.black, fontWeight: FontWeight.w600),
                 )
               ],
             ),
           ),
-        const SizedBox(height: 8),
+        ],
+        const SizedBox(height: 16),
         if (issues != null && issues.isNotEmpty)
           ListView.builder(
             shrinkWrap: true,
@@ -289,26 +436,24 @@ class _PersonalCaseInfo extends StatelessWidget {
             itemCount: issues.length,
             itemBuilder: (context, issueIndex) {
               final issue = issues![issueIndex];
-              final description = issue.description;
               final images = issue.imageUrls;
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text.rich(
-                    TextSpan(
-                      text: 'Description:\n',
-                      style: const TextStyle(fontWeight: FontWeight.w500),
-                      children: [
-                        TextSpan(
-                          text: description,
-                          style:
-                              const TextStyle(color: Colors.black, height: 1.5),
-                        )
-                      ],
+                  Text(
+                    issue.title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 4),
+                  Text(
+                    issue.description,
+                    style: const TextStyle(height: 1.5),
+                  ),
+                  const SizedBox(height: 4),
                   if (images.isNotEmpty)
                     SizedBox(
                       height: 80,
@@ -318,20 +463,48 @@ class _PersonalCaseInfo extends StatelessWidget {
                         itemBuilder: (context, imageIndex) {
                           return Padding(
                             padding: const EdgeInsets.only(right: 8.0),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.network(images[imageIndex]),
+                            child: GestureDetector(
+                              onTap: () =>
+                                  _showFullImage(context, images[imageIndex]),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(images[imageIndex]),
+                              ),
                             ),
                           );
                         },
                       ),
                     ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(Icons.access_time,
+                          size: 16, color: Colors.grey[600]),
+                      const SizedBox(width: 8),
+                      Text(
+                        "Created on: ${DateFormat('MMM d, y, HH:yy').format(issue.createdAt!)}",
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 16),
                 ],
               );
             },
           )
       ],
+    );
+  }
+
+  void _showFullImage(BuildContext context, String imageUrl) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FileViewerPage(
+          url: imageUrl,
+          title: 'Issue Image',
+        ),
+      ),
     );
   }
 }
@@ -342,14 +515,24 @@ class _ActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    void _refreshAppointmentDetail() {
+    void refreshAppointmentDetail() {
       context
           .read<ProviderAppointmentDetailCubit>()
           .fetchProviderAppointmentById(appointment.id!);
     }
 
-    if (appointment.status.toLowerCase() == 'completed' ||
-        appointment.status.toLowerCase() == 'cancelled') {
+    if (appointment.status.toLowerCase() == 'cancelled') {
+      return const SizedBox.shrink();
+    }
+
+    if (appointment.status.toLowerCase() == 'completed' &&
+        appointment.type != 'screening') {
+      return const SizedBox.shrink();
+    }
+
+    if (appointment.screeningRequestData != null &&
+        appointment.type == 'screening' &&
+        appointment.screeningRequestData!.status == 'report_ready') {
       return const SizedBox.shrink();
     }
 
@@ -381,7 +564,7 @@ class _ActionButtons extends StatelessWidget {
                 duration: const Duration(seconds: 2),
               ),
             );
-            _refreshAppointmentDetail();
+            refreshAppointmentDetail();
           } else if (state is ProviderAppointmentError) {
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
             ScaffoldMessenger.of(context).showSnackBar(
@@ -401,6 +584,9 @@ class _ActionButtons extends StatelessWidget {
         },
         child: Builder(builder: (context) {
           final status = appointment.status.toLowerCase();
+          final isScreening =
+              appointment.type == 'screening'; // Home Health Screening
+          final screeningData = appointment.screeningRequestData;
 
           if (status == 'pending') {
             return Column(
@@ -426,13 +612,6 @@ class _ActionButtons extends StatelessWidget {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () {
-                          // await context
-                          //     .read<ProviderAppointmentCubit>()
-                          //     .rejectAppointment(appointment.id!);
-
-                          // await context
-                          //     .read<ProviderAppointmentDetailCubit>()
-                          //     .fetchProviderAppointmentById(appointment.id!);
                           showDeclineAppointmentDialog(
                               context, appointment.id!);
                         },
@@ -466,15 +645,23 @@ class _ActionButtons extends StatelessWidget {
                         ),
                         child: ElevatedButton(
                           onPressed: () {
-                            showAcceptAppointmentDialog(
-                                context, appointment.id!);
+                            if (isScreening && screeningData != null) {
+                              context
+                                  .read<ProviderAppointmentCubit>()
+                                  .acceptAppointment(
+                                    appointment.id!,
+                                    screeningId: screeningData.id,
+                                  );
+                            } else {
+                              showAcceptAppointmentDialog(
+                                  context, appointment.id!);
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             minimumSize: const Size(double.infinity, 50),
-                            backgroundColor: Colors
-                                .transparent, // Make button background transparent
+                            backgroundColor: Colors.transparent,
                             foregroundColor: Colors.white,
-                            shadowColor: Colors.transparent, // Remove shadow
+                            shadowColor: Colors.transparent,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -492,20 +679,69 @@ class _ActionButtons extends StatelessWidget {
               ],
             );
           } else if (status == 'accepted') {
+            if (isScreening) {
+              return ElevatedButton(
+                onPressed: () {
+                  if (screeningData != null) {
+                    context
+                        .read<ProviderAppointmentCubit>()
+                        .confirmSampleCollected(screeningData.id);
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                  backgroundColor: Const.aqua,
+                  foregroundColor: Colors.white,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                child: const Text('Confirm Sample Collected'),
+              );
+            } else {
+              return ElevatedButton(
+                onPressed: () async {
+                  showCompleteAppointmentDialog(context, appointment.id!);
+                },
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                child: const Text('Mark as Completed'),
+              );
+            }
+          } else if (status == 'completed' &&
+              isScreening &&
+              screeningData?.status == 'sample_collected') {
             return ElevatedButton(
               onPressed: () async {
-                // await context
-                //     .read<ProviderAppointmentCubit>()
-                //     .completeAppointment(appointment.id!);
-                // await context
-                //     .read<ProviderAppointmentDetailCubit>()
-                //     .fetchProviderAppointmentById(appointment.id!);
-
-                showCompleteAppointmentDialog(context, appointment.id!);
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ScreeningReportSubmissionPage(
+                      appointmentId: appointment.id!,
+                    ),
+                  ),
+                );
+                refreshAppointmentDetail();
               },
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
-                backgroundColor: Colors.green,
+                backgroundColor: Colors.blue,
                 foregroundColor: Colors.white,
                 shadowColor: Colors.transparent,
                 shape: RoundedRectangleBorder(
@@ -516,7 +752,7 @@ class _ActionButtons extends StatelessWidget {
                   fontSize: 16,
                 ),
               ),
-              child: const Text('Mark as Completed'),
+              child: const Text('Upload Reports'),
             );
           }
           return const SizedBox.shrink();

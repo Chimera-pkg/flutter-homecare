@@ -8,8 +8,14 @@ class ProfessionalRepositoryImpl implements ProfessionalRepository {
   ProfessionalRepositoryImpl({required this.remoteDataSource});
 
   @override
-  Future<List<ProfessionalEntity>> getProfessionals(String role) async {
-    final professionals = await remoteDataSource.getProfessionals(role);
+  Future<List<ProfessionalEntity>> getProfessionals(String role,
+      {String? name,
+      List<int>? serviceIds,
+      bool? isHomeScreeningAuthorized}) async {
+    final professionals = await remoteDataSource.getProfessionals(role,
+        name: name,
+        serviceIds: serviceIds,
+        isHomeScreeningAuthorized: isHomeScreeningAuthorized);
     return professionals;
   }
 

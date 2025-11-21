@@ -4,11 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/core/domain/entities/appointment_entity.dart';
+import 'package:m2health/core/domain/entities/service_entity.dart';
 import 'package:m2health/core/extensions/string_extensions.dart';
+import 'package:m2health/core/presentation/views/file_viewer_page.dart';
 import 'package:m2health/features/appointment/bloc/appointment_cubit.dart';
 import 'package:m2health/features/appointment/bloc/appointment_detail_cubit.dart';
 import 'package:m2health/features/appointment/widgets/cancel_appoinment_dialog.dart';
-import 'package:m2health/features/booking_appointment/add_on_services/domain/entities/add_on_service.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/domain/entities/personal_issue.dart';
 import 'package:m2health/features/booking_appointment/professional_directory/domain/entities/professional_entity.dart';
 import 'package:m2health/features/booking_appointment/schedule_appointment/presentation/pages/schedule_appointment_page.dart';
@@ -16,7 +17,7 @@ import 'package:m2health/features/profiles/domain/entities/profile.dart';
 import 'package:m2health/route/app_routes.dart';
 import 'package:m2health/service_locator.dart';
 import 'package:m2health/core/services/appointment_service.dart';
-import 'package:m2health/core/presentation/widgets/gradient_button.dart'; // Assuming you have this
+import 'package:m2health/core/presentation/widgets/gradient_button.dart';
 
 class DetailAppointmentPage extends StatefulWidget {
   final int appointmentId;
@@ -65,7 +66,6 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
             return const Center(child: Text('Something went wrong.'));
           },
         ),
-        // Use bottomNavigationBar for the action buttons
         bottomNavigationBar:
             BlocBuilder<AppointmentDetailCubit, AppointmentDetailState>(
           builder: (context, state) {
@@ -91,7 +91,11 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
           const SizedBox(height: 16),
           _buildPatientInfo(appointment.patientProfile!),
           const SizedBox(height: 16),
-          _buildConcernInfo(appointment),
+          // Conditional rendering based on appointment type
+          if (appointment.type == 'screening')
+            _buildScreeningInfo(appointment)
+          else
+            _buildConcernInfo(appointment),
           const SizedBox(height: 16),
           _buildPaymentSummary(appointment),
         ],
@@ -218,16 +222,114 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
             text: profile.homeAddress ?? 'N/A',
             isFlexible: true,
           ),
-          const SizedBox(height: 12),
-          // Placeholder for map
-          // const Card(
-          //   child: SizedBox(
-          //     height: 200,
-          //     child: Center(
-          //       child: Text('Google Map Placeholder'),
-          //     ),
-          //   ),
-          // ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScreeningInfo(AppointmentEntity appointment) {
+    final screeningData = appointment.screeningRequestData;
+    if (screeningData == null) return const SizedBox.shrink();
+    if (appointment.payment == null) {
+      // Hardcoded check for unpaid appointments
+      return const SizedBox.shrink();
+    }
+
+    final reports = screeningData.reports;
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Lab Test Information',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              const Text(
+                'Status',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Const.aqua.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  screeningData.status.replaceAll('_', ' ').toUpperCase(),
+                  style: const TextStyle(
+                    color: Const.aqua,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (reports.isNotEmpty && screeningData.status == 'report_ready') ...[
+            const Text(
+              'Reports',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 8),
+            ...reports.map((report) => Card(
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: Colors.grey.shade200)),
+                  margin: const EdgeInsets.only(bottom: 8),
+                  child: ListTile(
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                          report.file.extname == 'pdf'
+                              ? Icons.picture_as_pdf
+                              : Icons.insert_drive_file,
+                          color: Colors.red),
+                    ),
+                    title: Text(
+                      'Report #${report.id}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    subtitle: Text(report.file.extname.toUpperCase()),
+                    trailing: IconButton(
+                      icon: const Icon(
+                          Icons.visibility), // Changed icon to visibility
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => FileViewerPage(
+                              url: report.file.url,
+                              title: 'Lab Report #${report.id}',
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ))
+          ]
         ],
       ),
     );
@@ -290,37 +392,61 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
                             itemBuilder: (context, imageIndex) {
                               return Padding(
                                 padding: const EdgeInsets.all(4.0),
-                                child: Image.network(
-                                  images[imageIndex],
-                                  width: 100,
-                                  height: 100,
-                                  fit: BoxFit.cover,
+                                child: GestureDetector(
+                                  onTap: () => _showFullImage(
+                                      context, images[imageIndex]),
+                                  child: Image.network(
+                                    images[imageIndex],
+                                    width: 100,
+                                    height: 100,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               );
                             },
                           ),
                         ),
+                      Row(
+                        children: [
+                          Icon(Icons.access_time,
+                              size: 16, color: Colors.grey[600]),
+                          const SizedBox(width: 8),
+                          Text(
+                            "Created on: ${DateFormat('MMM d, y, HH:yy').format(issue.createdAt!)}",
+                            style: TextStyle(
+                                fontSize: 12, color: Colors.grey[600]),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
                     ],
                   ),
                 );
               },
-            ),
+            )
+          else
+            const Text('No specific problem details provided.'),
         ],
       ),
     );
   }
 
   Widget _buildPaymentSummary(AppointmentEntity appointment) {
-    List<AddOnService> addOns = [];
-    if (appointment.providerType == 'nurse') {
+    List<ServiceEntity> services = [];
+    if (appointment.type == 'nursing') {
       final nursingCase = appointment.nursingCase;
       if (nursingCase != null && nursingCase.addOnServices.isNotEmpty) {
-        addOns = nursingCase.addOnServices;
+        services = nursingCase.addOnServices;
       }
-    } else if (appointment.providerType == 'pharmacist') {
+    } else if (appointment.type == 'pharmacy') {
       final pharmacyCase = appointment.pharmacyCase;
       if (pharmacyCase != null && pharmacyCase.addOnServices.isNotEmpty) {
-        addOns = pharmacyCase.addOnServices;
+        services = pharmacyCase.addOnServices;
+      }
+    } else if (appointment.type == 'screening') {
+      final screeningRequest = appointment.screeningRequestData;
+      if (screeningRequest != null && screeningRequest.services.isNotEmpty) {
+        services = screeningRequest.services;
       }
     }
 
@@ -359,7 +485,6 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
               ],
             ),
             const SizedBox(height: 8),
-            // TODO: Order completed date still use updatedat
             Row(
               children: [
                 const Text('Order Completed'),
@@ -375,10 +500,10 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          if (addOns.isEmpty)
-            const Text('No add-on services selected.')
+          if (services.isEmpty)
+            const Text('No services selected.')
           else
-            ...addOns.map(
+            ...services.map(
               (addOn) => Padding(
                 padding: const EdgeInsets.only(bottom: 8.0),
                 child: Row(
@@ -416,8 +541,6 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
     );
   }
 
-  // --- ACTION BUTTONS ---
-
   Widget _buildActionButtons(
       BuildContext context, AppointmentEntity appointment) {
     final status = appointment.status.toLowerCase();
@@ -447,13 +570,10 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
           builder: (BuildContext dialogContext) {
             return CancelAppoinmentDialog(
               onPressYes: () {
-                // Call the list cubit to update the list
                 context
                     .read<AppointmentCubit>()
                     .cancelAppointment(appointment.id!);
-                // Pop dialog
                 Navigator.of(dialogContext).pop();
-                // Pop detail page
                 context.pop();
               },
             );
@@ -501,7 +621,6 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
       text: 'Book Again',
       onPressed: () {
         // TODO: Handle Book Again logic
-        // context.push(AppRoutes.nursingFlowStart);
       },
     );
 
@@ -530,7 +649,7 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
       case 'pending':
         if (appointment.payment == null) {
           buttons = [payButton, cancelButton];
-          isHorizontalLayout = false; // user vertical layout
+          isHorizontalLayout = false;
         } else {
           buttons = [cancelButton, rescheduleButton];
         }
@@ -571,6 +690,18 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
                 spacing: 8,
                 children: buttons,
               ));
+  }
+
+  void _showFullImage(BuildContext context, String imageUrl) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FileViewerPage(
+          url: imageUrl,
+          title: 'Issue Image', // Optional: Custom title
+        ),
+      ),
+    );
   }
 }
 
@@ -625,7 +756,7 @@ class _StatusTag extends StatelessWidget {
         return Colors.red;
       case 'pending':
       case 'accepted':
-        return const Color(0xFFE59500); // Orange
+        return const Color(0xFFE59500);
       default:
         return Colors.grey;
     }

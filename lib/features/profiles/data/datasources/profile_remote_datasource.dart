@@ -18,6 +18,8 @@ abstract class ProfileRemoteDatasource {
   Future<ProfessionalProfileModel> getProfessionalProfile(String role);
   Future<void> updateProfessionalProfile(
       String role, Map<String, dynamic> data, File? avatar);
+  Future<void> updateProvidedServices(String role, List<int> serviceIds,
+      {bool? isHomeScreeningAuthorized});
 
   // Admin
   Future<List<ProfessionalProfileModel>> getAdminProfessionals(
@@ -157,6 +159,40 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
           'Failed to update professional profile data. Error: ${e.message}');
     } catch (e) {
       throw Exception('An unexpected error occurred: $e');
+    }
+  }
+
+  @override
+  Future<void> updateProvidedServices(String role, List<int> serviceIds,
+      {bool? isHomeScreeningAuthorized}) async {
+    try {
+      String endpoint;
+      switch (role) {
+        case 'nurse':
+          endpoint = '${Const.API_NURSE_SERVICES}/my-services';
+          break;
+        case 'pharmacist':
+          endpoint = '${Const.API_PHARMACIST_SERVICES}/my-services';
+          break;
+        case 'radiologist':
+          endpoint = '${Const.API_RADIOLOGIST_SERVICES}/my-services';
+          break;
+        default:
+          throw Exception('Invalid role');
+      }
+
+      final Map<String, dynamic> data = {'service_ids': serviceIds};
+      if (isHomeScreeningAuthorized != null) {
+        data['is_home_screening_authorized'] = isHomeScreeningAuthorized;
+      }
+
+      await dio.put(
+        endpoint,
+        data: data,
+        options: await _getAuthHeaders(),
+      );
+    } on DioException catch (e) {
+      throw Exception('Failed to update services: ${e.message}');
     }
   }
 

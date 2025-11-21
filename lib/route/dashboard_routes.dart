@@ -6,7 +6,7 @@ import 'package:m2health/route/navigator_keys.dart';
 import 'package:m2health/features/booking_appointment/pharmacy/presentation/pages/pharmacy_services_page.dart';
 import '../features/precision/screens/precision_nutrition_page.dart';
 import '../features/diabetes/diabetic_care.dart';
-import '../core/presentation/views/home_health_screening.dart';
+import '../features/home_health_screening/presentation/pages/home_health_screening.dart';
 import '../core/presentation/views/remote_patient_monitoring.dart';
 import '../core/presentation/views/second_opinion.dart';
 import 'app_routes.dart';

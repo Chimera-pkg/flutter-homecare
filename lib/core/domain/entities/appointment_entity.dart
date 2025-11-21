@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:m2health/features/home_health_screening/data/models/screening_request_data.dart';
 import 'package:m2health/features/payment/domain/entities/payment.dart';
 import 'package:m2health/features/booking_appointment/nursing/domain/entities/nursing_case.dart';
 import 'package:m2health/features/booking_appointment/pharmacy/domain/entities/pharmacy_case.dart';
@@ -22,6 +23,7 @@ class AppointmentEntity extends Equatable {
   final ProfessionalEntity? provider;
   final NursingCase? nursingCase;
   final PharmacyCase? pharmacyCase;
+  final ScreeningRequestData? screeningRequestData;
   final Profile? patientProfile;
   final Payment? payment;
 
@@ -41,6 +43,7 @@ class AppointmentEntity extends Equatable {
     this.provider,
     this.nursingCase,
     this.pharmacyCase,
+    this.screeningRequestData,
     this.patientProfile,
     this.payment,
   });
@@ -60,5 +63,10 @@ class AppointmentEntity extends Equatable {
         providerId,
         providerType,
         provider,
+        nursingCase,
+        pharmacyCase,
+        screeningRequestData,
+        patientProfile,
+        payment,
       ];
 }

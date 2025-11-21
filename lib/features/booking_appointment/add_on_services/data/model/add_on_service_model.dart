@@ -2,7 +2,7 @@ import 'package:m2health/features/booking_appointment/add_on_services/domain/ent
 
 class AddOnServiceModel extends AddOnService {
   const AddOnServiceModel({
-    super.id,
+    required super.id,
     required super.name,
     required super.price,
     required super.serviceType,

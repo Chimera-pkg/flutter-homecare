@@ -1,3 +1,4 @@
+import 'package:m2health/features/home_health_screening/data/models/screening_request_data.dart';
 import 'package:m2health/features/payment/data/model/payment_model.dart';
 import 'package:m2health/features/booking_appointment/nursing/data/models/nursing_personal_case.dart';
 import 'package:m2health/core/domain/entities/appointment_entity.dart';
@@ -22,6 +23,7 @@ class AppointmentModel extends AppointmentEntity {
     super.provider,
     super.nursingCase,
     super.pharmacyCase,
+    super.screeningRequestData,
     super.patientProfile,
     super.payment,
   });
@@ -44,6 +46,9 @@ class AppointmentModel extends AppointmentEntity {
         ? PharmacyPersonalCaseModel.fromJson(
             appointmentJson['pharmacy_request_data'])
         : null;
+    final screeningRequest = appointmentJson['screening_request_data'] != null
+        ? ScreeningRequestData.fromJson(appointmentJson['screening_request_data'])
+        : null;
     return AppointmentModel(
       id: appointmentJson['id'],
       userId: appointmentJson['user_id'],
@@ -60,6 +65,7 @@ class AppointmentModel extends AppointmentEntity {
       provider: provider,
       nursingCase: nursingCase,
       pharmacyCase: pharmacyCase,
+      screeningRequestData: screeningRequest,
       patientProfile: patient,
       payment: payment,
     );

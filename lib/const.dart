@@ -38,6 +38,9 @@ class Const {
   static const String API_PROVIDERS_AVAILABLE =
       URL_API + '/providers/available';
   static const String API_SERVICE_TITLES = URL_API + '/service-titles';
+  static const String API_SCREENING_SERVICE = '$URL_API/screening-services';
+  static const String API_ADMIN_SCREENING_SERVICES =
+      '$URL_API/admin/screening-services';
   static const String API_FAVORITES = URL_API + '/favorites';
   // Existing constants...
   static const String API_PROVIDER_APPOINTMENTS =
@@ -89,7 +92,7 @@ class Const {
   static const String submenu_privacy = 'assets/icons/submenu_privacy.png';
   static const String submenu_service = 'assets/icons/submenu_report.png';
   static const String submenu_partnership = 'assets/icons/submenu_event.png';
-  static const String banner = 'assets/icons/medmap_care_banner.svg';
+  static const String banner = 'assets/icons/m2health_care_banner.svg';
   static const String svgLogo = 'assets/icons/medmap_logo.svg';
   static const String imgMenuTenders = 'assets/images/menu_tenders.png';
   static const String imgMenuDistributors =
