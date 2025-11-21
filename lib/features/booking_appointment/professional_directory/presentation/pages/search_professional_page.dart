@@ -8,11 +8,13 @@ import 'package:m2health/features/booking_appointment/professional_directory/pre
 
 class SearchProfessionalPage extends StatefulWidget {
   final String role;
+  final List<int> serviceIds;
   final Function(ProfessionalEntity) onProfessionalSelected;
 
   const SearchProfessionalPage({
     super.key,
     required this.role,
+    this.serviceIds = const [],
     required this.onProfessionalSelected,
   });
 
@@ -24,7 +26,9 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
   @override
   void initState() {
     super.initState();
-    context.read<ProfessionalBloc>().add(GetProfessionalsEvent(widget.role));
+    context
+        .read<ProfessionalBloc>()
+        .add(GetProfessionalsEvent(widget.role, serviceIds: widget.serviceIds));
   }
 
   String getTitle(String role) {
@@ -61,8 +65,25 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
+              onChanged: (value) {
+                // Implement search logic if needed, or just filter locally
+              },
             ),
             const SizedBox(height: 16),
+            if (widget.serviceIds.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: Row(
+                  children: [
+                    Icon(Icons.filter_list, size: 16, color: Colors.grey[600]),
+                    const SizedBox(width: 8),
+                    Text(
+                      "Filtering by ${widget.serviceIds.length} selected services",
+                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
             Expanded(
               child: BlocBuilder<ProfessionalBloc, ProfessionalState>(
                 builder: (context, state) {
@@ -70,6 +91,11 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
                     return const Center(child: CircularProgressIndicator());
                   } else if (state is ProfessionalLoaded) {
                     final professionals = state.professionals;
+                    if (professionals.isEmpty) {
+                      return const Center(
+                          child: Text(
+                              'No professionals found matching your criteria.'));
+                    }
                     return ListView.builder(
                       itemCount: professionals.length,
                       itemBuilder: (context, index) {
@@ -152,19 +178,6 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
                                             onPressed: () {
                                               widget.onProfessionalSelected(
                                                   professional);
-
-                                              // Navigator.push(
-                                              //   context,
-                                              //   MaterialPageRoute(
-                                              //     builder: (context) =>
-                                              //         ProfessionalDetailsPage(
-                                              //       professionalId:
-                                              //           professional.id,
-                                              //       role:
-                                              //           widget.role,
-                                              //     ),
-                                              //   ),
-                                              // );
                                             },
                                             child: const Text(
                                               'Appointment',

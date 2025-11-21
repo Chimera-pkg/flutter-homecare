@@ -17,8 +17,9 @@ class ProfessionalBloc extends Bloc<ProfessionalEvent, ProfessionalState> {
     on<GetProfessionalsEvent>((event, emit) async {
       emit(ProfessionalLoading());
       try {
-        final professionals = await getProfessionals(event.role);
-        log('Fetched professionals: $professionals');
+        final professionals =
+            await getProfessionals(event.role, serviceIds: event.serviceIds);
+        log('Fetched professionals: ${professionals.length}');
         emit(ProfessionalLoaded(professionals));
       } catch (e) {
         emit(ProfessionalError(e.toString()));
@@ -26,10 +27,7 @@ class ProfessionalBloc extends Bloc<ProfessionalEvent, ProfessionalState> {
     });
 
     on<ToggleFavoriteEvent>((event, emit) async {
-      // Here you would typically update the favorite status and then reload the list
-      // For now, we will just placeholder the call
       await toggleFavorite(event.professionalId, event.isFavorite);
-
       // TODO: Refresh the professionals list after toggling favorite
     });
   }

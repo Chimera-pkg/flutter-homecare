@@ -9,11 +9,12 @@ abstract class ProfessionalEvent extends Equatable {
 
 class GetProfessionalsEvent extends ProfessionalEvent {
   final String role;
+  final List<int>? serviceIds;
 
-  const GetProfessionalsEvent(this.role);
+  const GetProfessionalsEvent(this.role, {this.serviceIds});
 
   @override
-  List<Object> get props => [role];
+  List<Object> get props => [role, serviceIds ?? []];
 }
 
 class ToggleFavoriteEvent extends ProfessionalEvent {

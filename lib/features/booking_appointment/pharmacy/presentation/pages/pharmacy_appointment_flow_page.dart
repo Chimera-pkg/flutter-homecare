@@ -157,6 +157,8 @@ class PharmacyAppointmentFlowPageState
                   ),
                   child: SearchProfessionalPage(
                     role: 'pharmacist',
+                    serviceIds:
+                        state.selectedAddOnServices.map((e) => e.id).toList(),
                     onProfessionalSelected: (prof) {
                       context
                           .read<PharmacyAppointmentFlowBloc>()
