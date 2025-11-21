@@ -9,12 +9,16 @@ abstract class ProfessionalEvent extends Equatable {
 
 class GetProfessionalsEvent extends ProfessionalEvent {
   final String role;
+  final String? name;
   final List<int>? serviceIds;
+  final bool? isHomeScreeningAuthorized;
 
-  const GetProfessionalsEvent(this.role, {this.serviceIds});
+  const GetProfessionalsEvent(this.role,
+      {this.name, this.serviceIds, this.isHomeScreeningAuthorized});
 
   @override
-  List<Object> get props => [role, serviceIds ?? []];
+  List<Object> get props =>
+      [role, name ?? '', serviceIds ?? [], isHomeScreeningAuthorized ?? false];
 }
 
 class ToggleFavoriteEvent extends ProfessionalEvent {

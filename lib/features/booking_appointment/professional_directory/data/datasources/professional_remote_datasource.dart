@@ -10,8 +10,12 @@ class ProfessionalRemoteDatasource {
 
   ProfessionalRemoteDatasource(this.dio);
 
-  Future<List<ProfessionalModel>> getProfessionals(String role,
-      {String? name, List<int>? serviceIds}) async {
+  Future<List<ProfessionalModel>> getProfessionals(
+    String role, {
+    String? name,
+    List<int>? serviceIds,
+    bool? isHomeScreeningAuthorized,
+  }) async {
     try {
       final token = await Utils.getSpString(Const.TOKEN);
       final queryParams = {
@@ -19,6 +23,8 @@ class ProfessionalRemoteDatasource {
         if (name != null) 'name': name,
         if (serviceIds != null && serviceIds.isNotEmpty)
           'service_ids[]': serviceIds,
+        if (isHomeScreeningAuthorized != null)
+          'is_home_screening_authorized': isHomeScreeningAuthorized,
       };
       log('Fetching professionals with params: $queryParams',
           name: 'ProfessionalRemoteDatasource');

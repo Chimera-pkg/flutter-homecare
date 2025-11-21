@@ -120,6 +120,8 @@ class _HomeHealthScreeningFlowPageState
                       getProfessionals: sl(), toggleFavorite: sl()),
                   child: SearchProfessionalPage(
                     role: 'nurse',
+                    isHomeScreeningAuthorized:
+                        true, // Filter for home screening
                     onProfessionalSelected: (prof) {
                       context
                           .read<HomeHealthScreeningFlowBloc>()

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:m2health/core/presentation/widgets/star_rating.dart';
@@ -9,12 +11,14 @@ import 'package:m2health/features/booking_appointment/professional_directory/pre
 class SearchProfessionalPage extends StatefulWidget {
   final String role;
   final List<int> serviceIds;
+  final bool isHomeScreeningAuthorized;
   final Function(ProfessionalEntity) onProfessionalSelected;
 
   const SearchProfessionalPage({
     super.key,
     required this.role,
     this.serviceIds = const [],
+    this.isHomeScreeningAuthorized = false,
     required this.onProfessionalSelected,
   });
 
@@ -23,12 +27,38 @@ class SearchProfessionalPage extends StatefulWidget {
 }
 
 class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
+  Timer? _debounce;
+  final TextEditingController _searchController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
-    context
-        .read<ProfessionalBloc>()
-        .add(GetProfessionalsEvent(widget.role, serviceIds: widget.serviceIds));
+    _fetchProfessionals();
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _fetchProfessionals({String query = ''}) {
+    context.read<ProfessionalBloc>().add(
+          GetProfessionalsEvent(
+            widget.role,
+            name: query,
+            serviceIds: widget.serviceIds,
+            isHomeScreeningAuthorized: widget.isHomeScreeningAuthorized,
+          ),
+        );
+  }
+
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      _fetchProfessionals(query: query);
+    });
   }
 
   String getTitle(String role) {
@@ -58,6 +88,7 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
         child: Column(
           children: [
             TextField(
+              controller: _searchController,
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.search),
                 hintText: getTitle(widget.role),
@@ -65,9 +96,7 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
-              onChanged: (value) {
-                // Implement search logic if needed, or just filter locally
-              },
+              onChanged: _onSearchChanged,
             ),
             const SizedBox(height: 16),
             if (widget.serviceIds.isNotEmpty)

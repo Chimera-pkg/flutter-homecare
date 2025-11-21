@@ -17,8 +17,12 @@ class ProfessionalBloc extends Bloc<ProfessionalEvent, ProfessionalState> {
     on<GetProfessionalsEvent>((event, emit) async {
       emit(ProfessionalLoading());
       try {
-        final professionals =
-            await getProfessionals(event.role, serviceIds: event.serviceIds);
+        final professionals = await getProfessionals(
+          event.role,
+          name: event.name,
+          serviceIds: event.serviceIds,
+          isHomeScreeningAuthorized: event.isHomeScreeningAuthorized,
+        );
         log('Fetched professionals: ${professionals.length}');
         emit(ProfessionalLoaded(professionals));
       } catch (e) {
