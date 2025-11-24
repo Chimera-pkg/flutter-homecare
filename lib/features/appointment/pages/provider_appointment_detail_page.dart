@@ -68,37 +68,47 @@ class ProviderAppointmentDetailView extends StatelessWidget {
         : null;
     final hour = endHour != null ? '$startHour - $endHour' : startHour;
 
-    return Column(
-      children: [
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.all(20.0),
-            children: [
-              _PatientHeader(appointment: appointment),
-              const SizedBox(height: 24),
-              _buildSectionTitle('Schedule Appointment'),
-              _InfoRow(icon: Icons.calendar_today_outlined, text: date),
-              _InfoRow(icon: Icons.access_time_outlined, text: hour),
-              const SizedBox(height: 24),
-              _buildSectionTitle('Patient Information'),
-              _PatientInfoTable(appointment: appointment),
-              if (appointment.type == 'screening')
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  const SizedBox(height: 24),
-                  _buildSectionTitle('Lab Test Information'),
-                  _ScreeningRequestInfo(appointment: appointment),
-                ])
-              else
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  const SizedBox(height: 24),
-                  _buildSectionTitle('Personal Case'),
-                  _PersonalCaseInfo(appointment: appointment),
-                ]),
-            ],
+    return RefreshIndicator(
+      onRefresh: () async {
+        context
+            .read<ProviderAppointmentDetailCubit>()
+            .fetchProviderAppointmentById(appointment.id!);
+      },
+      child: Column(
+        children: [
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(20.0),
+              children: [
+                _PatientHeader(appointment: appointment),
+                const SizedBox(height: 24),
+                _buildSectionTitle('Schedule Appointment'),
+                _InfoRow(icon: Icons.calendar_today_outlined, text: date),
+                _InfoRow(icon: Icons.access_time_outlined, text: hour),
+                const SizedBox(height: 24),
+                _buildSectionTitle('Patient Information'),
+                _PatientInfoTable(appointment: appointment),
+                if (appointment.type == 'screening')
+                  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 24),
+                        _buildSectionTitle('Lab Test Information'),
+                        _ScreeningRequestInfo(appointment: appointment),
+                      ])
+                else
+                  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 24),
+                        _PersonalCaseInfo(appointment: appointment),
+                      ]),
+              ],
+            ),
           ),
-        ),
-        _ActionButtons(appointment: appointment),
-      ],
+          _ActionButtons(appointment: appointment),
+        ],
+      ),
     );
   }
 
@@ -180,7 +190,7 @@ class _PatientHeader extends StatelessWidget {
                   appointment.status.toTitleCase(),
                   style: TextStyle(
                     color: statusColor,
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.w500,
                     fontSize: 12,
                   ),
                 ),
@@ -286,10 +296,10 @@ class _ScreeningRequestInfo extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                screeningData.status.replaceAll('_', ' ').toUpperCase(),
+                screeningData.status.replaceAll('_', ' ').toTitleCase(),
                 style: const TextStyle(
                   color: Const.aqua,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
@@ -297,7 +307,7 @@ class _ScreeningRequestInfo extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         const Text(
-          'Requested Services: ',
+          'Services Requested: ',
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
@@ -392,15 +402,18 @@ class _PersonalCaseInfo extends StatelessWidget {
       issues = personalCase?.issues;
     }
 
+    // sort issues by updatedAt descending
+    issues?.sort((a, b) => b.updatedAt!.compareTo(a.updatedAt!));
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const Text(
+          'Services Requested',
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+        ),
+        const SizedBox(height: 8),
         if (servicesList != null && servicesList.isNotEmpty) ...[
-          const Text(
-            'Services:',
-            style: TextStyle(fontWeight: FontWeight.w500),
-          ),
-          const SizedBox(height: 8),
           ...servicesList.asMap().entries.map((entry) {
             final index = entry.key + 1;
             final name = entry.value;
@@ -409,26 +422,21 @@ class _PersonalCaseInfo extends StatelessWidget {
               child: Text(
                 '$index. $name',
                 style: const TextStyle(
-                    color: Colors.black, fontWeight: FontWeight.w600),
+                    color: Colors.black, fontWeight: FontWeight.w500),
               ),
             );
           }),
-        ] else ...[
-          const Text.rich(
-            TextSpan(
-              text: 'Services: ',
-              style: TextStyle(fontWeight: FontWeight.w500),
-              children: [
-                TextSpan(
-                  text: 'None',
-                  style: TextStyle(
-                      color: Colors.black, fontWeight: FontWeight.w600),
-                )
-              ],
-            ),
+        ] else
+          const Text(
+            'None',
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
           ),
-        ],
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
+        const Text(
+          'Patient Issues',
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+        ),
+        const SizedBox(height: 8),
         if (issues != null && issues.isNotEmpty)
           ListView.builder(
             shrinkWrap: true,
@@ -442,13 +450,13 @@ class _PersonalCaseInfo extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    issue.title,
+                    '${issueIndex + 1}. ${issue.title}',
                     style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   const SizedBox(height: 4),
+                  const Text('Description:'),
                   Text(
                     issue.description,
                     style: const TextStyle(height: 1.5),
@@ -482,7 +490,7 @@ class _PersonalCaseInfo extends StatelessWidget {
                           size: 16, color: Colors.grey[600]),
                       const SizedBox(width: 8),
                       Text(
-                        "Created on: ${DateFormat('MMM d, y, HH:yy').format(issue.createdAt!)}",
+                        "Created on: ${DateFormat('MMM d, y, HH:mm').format(issue.updatedAt!)}",
                         style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       ),
                     ],

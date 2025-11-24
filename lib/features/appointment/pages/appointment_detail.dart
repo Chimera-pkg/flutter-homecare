@@ -344,6 +344,9 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
       issues = appointment.pharmacyCase?.issues;
     }
 
+    // sort issues by updatedAt descending
+    issues?.sort((a, b) => b.updatedAt!.compareTo(a.updatedAt!));
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -412,7 +415,7 @@ class _DetailAppointmentPageState extends State<DetailAppointmentPage> {
                               size: 16, color: Colors.grey[600]),
                           const SizedBox(width: 8),
                           Text(
-                            "Created on: ${DateFormat('MMM d, y, HH:yy').format(issue.createdAt!)}",
+                            "Created on: ${DateFormat('MMM d, y, HH:mm').format(issue.updatedAt!)}",
                             style: TextStyle(
                                 fontSize: 12, color: Colors.grey[600]),
                           ),
