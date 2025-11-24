@@ -9,7 +9,8 @@ import 'package:m2health/utils.dart';
 abstract class PersonalIssueRemoteDataSource {
   Future<List<PersonalIssue>> getPersonalIssues(String serviceType);
   Future<PersonalIssueModel> createPersonalIssue(PersonalIssueModel data);
-  Future<void> updatePersonalIssue(int id, PersonalIssueModel data);
+  Future<PersonalIssueModel> updatePersonalIssue(
+      int id, PersonalIssueModel data);
   Future<void> deletePersonalIssue(int issueId);
 }
 
@@ -42,7 +43,8 @@ class PersonalIssueRemoteDataSourceImpl
   }
 
   @override
-  Future<PersonalIssueModel> createPersonalIssue(PersonalIssueModel data) async {
+  Future<PersonalIssueModel> createPersonalIssue(
+      PersonalIssueModel data) async {
     final token = await Utils.getSpString(Const.TOKEN);
 
     List<MultipartFile> imageFiles = [];
@@ -82,30 +84,52 @@ class PersonalIssueRemoteDataSourceImpl
   }
 
   @override
-  Future<void> updatePersonalIssue(int id, PersonalIssueModel data) async {
+  Future<PersonalIssueModel> updatePersonalIssue(
+      int id, PersonalIssueModel data) async {
     final token = await Utils.getSpString(Const.TOKEN);
 
-    List<MultipartFile> imageFiles = [];
-    for (final image in data.images) {
-      imageFiles.add(await MultipartFile.fromFile(image.path));
+    final payloadMap = <String, dynamic>{
+      ...data.toJson(),
+    };
+
+    if (data.newImages.isNotEmpty) {
+      final List<MultipartFile> imageFiles = [];
+      final List<int> imageIndices = [];
+      for (final entry in data.newImages.entries) {
+        imageFiles.add(await MultipartFile.fromFile(entry.value.path));
+        imageIndices.add(entry.key);
+      }
+      payloadMap['images[]'] = imageFiles;
+      payloadMap['images_indices[]'] = imageIndices;
     }
 
-    final payload = FormData.fromMap({
-      ...data.toJson(),
-      if (imageFiles.isNotEmpty) 'images': imageFiles,
-    });
+    final payload = FormData.fromMap(payloadMap);
+    log('Update payload: $payloadMap',
+        name: 'PersonalIssueRemoteDataSourceImpl');
 
-    final response = await dio.put(
-      '${Const.API_PERSONAL_ISSUES}/$id',
-      data: payload,
-      options: Options(
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
-      ),
-    );
-    if (response.statusCode != 200) {
-      throw Exception('Failed to update nursing issue');
+    try {
+      final response = await dio.put(
+        '${Const.API_PERSONAL_ISSUES}/$id',
+        data: payload,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'multipart/form-data',
+          },
+        ),
+      );
+      log('Update personal issue success. Response data: ${response.data}',
+          name: 'PersonalIssueRemoteDataSourceImpl');
+      return PersonalIssueModel.fromJson(response.data['data']);
+    } catch (e) {
+      if (e is DioException) {
+        log('DioError during updatePersonalIssue: ${e.response?.data}',
+            name: 'PersonalIssueRemoteDataSourceImpl');
+        rethrow;
+      }
+      log('Error during updatePersonalIssue: $e',
+          name: 'PersonalIssueRemoteDataSourceImpl');
+      rethrow;
     }
   }
 

@@ -7,7 +7,7 @@ import 'package:m2health/const.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/domain/entities/personal_issue.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/presentation/bloc/personal_issues_cubit.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/presentation/bloc/personal_issues_state.dart';
-import 'package:m2health/features/booking_appointment/personal_issue/presentation/pages/add_issue_page.dart';
+import 'package:m2health/features/booking_appointment/personal_issue/presentation/pages/issue_form_page.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/presentation/pages/personal_issue_detail_page.dart';
 
 class PersonalIssuesPage extends StatefulWidget {
@@ -212,15 +212,49 @@ class _PersonalIssuesPageState extends State<PersonalIssuesPage> {
                                                         ),
                                                       ),
                                                     ),
-                                                    IconButton(
-                                                      icon: const Icon(
-                                                          Icons.delete,
-                                                          color: Colors.red),
-                                                      onPressed: () {
-                                                        _showDeleteConfirmationDialog(
-                                                            context, issue.id!);
+                                                    PopupMenuButton<String>(
+                                                      onSelected: (value) {
+                                                        if (value == 'edit') {
+                                                          final issuesCubit =
+                                                              context.read<
+                                                                  PersonalIssuesCubit>();
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  BlocProvider
+                                                                      .value(
+                                                                value:
+                                                                    issuesCubit,
+                                                                child: IssueFormPage(
+                                                                    issue:
+                                                                        issue),
+                                                              ),
+                                                            ),
+                                                          );
+                                                        } else if (value ==
+                                                            'delete') {
+                                                          _showDeleteConfirmationDialog(
+                                                              context,
+                                                              issue.id!);
+                                                        }
                                                       },
-                                                    )
+                                                      itemBuilder: (BuildContext
+                                                              context) =>
+                                                          <PopupMenuEntry<
+                                                              String>>[
+                                                        const PopupMenuItem<
+                                                            String>(
+                                                          value: 'edit',
+                                                          child: Text('Edit'),
+                                                        ),
+                                                        const PopupMenuItem<
+                                                            String>(
+                                                          value: 'delete',
+                                                          child: Text('Delete'),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ],
                                                 ),
                                                 Row(
@@ -231,7 +265,7 @@ class _PersonalIssuesPageState extends State<PersonalIssuesPage> {
                                                             Colors.grey[600]),
                                                     const SizedBox(width: 8),
                                                     Text(
-                                                      "Created on: ${DateFormat('MMM d, y, HH:yy').format(issue.createdAt!)}",
+                                                      "Updated on: ${DateFormat('MMM d, y, HH:mm').format(issue.updatedAt!)}",
                                                       style: TextStyle(
                                                           fontSize: 12,
                                                           color:
@@ -242,8 +276,7 @@ class _PersonalIssuesPageState extends State<PersonalIssuesPage> {
                                                 const SizedBox(height: 8),
                                                 Text(issue.description),
                                                 const SizedBox(height: 8),
-                                                if (issue.images.isNotEmpty ||
-                                                    issue.imageUrls.isNotEmpty)
+                                                if (issue.imageUrls.isNotEmpty)
                                                   Wrap(
                                                     spacing: 8.0,
                                                     runSpacing: 8.0,
@@ -253,15 +286,15 @@ class _PersonalIssuesPageState extends State<PersonalIssuesPage> {
                                                             .map((imageUrl) {
                                                       return Image.network(
                                                         imageUrl,
-                                                        width: 100,
-                                                        height: 100,
+                                                        width: 80,
+                                                        height: 80,
                                                         fit: BoxFit.cover,
                                                         errorBuilder: (context,
                                                             error, stackTrace) {
                                                           return Image.asset(
                                                             'assets/images/no_img.jpg',
-                                                            width: 100,
-                                                            height: 100,
+                                                            width: 80,
+                                                            height: 80,
                                                             fit: BoxFit.cover,
                                                           );
                                                         },
@@ -303,7 +336,7 @@ class _PersonalIssuesPageState extends State<PersonalIssuesPage> {
                             MaterialPageRoute(
                               builder: (context) => BlocProvider.value(
                                 value: issuesCubit,
-                                child: const AddIssuePage(),
+                                child: const IssueFormPage(),
                               ),
                             ),
                           );

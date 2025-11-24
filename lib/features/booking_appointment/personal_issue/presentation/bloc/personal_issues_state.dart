@@ -19,6 +19,9 @@ final class PersonalIssuesState extends Equatable {
   final ActionStatus createStatus;
   final String? createErrorMessage;
 
+  final ActionStatus updateStatus;
+  final String? updateErrorMessage;
+
   final ActionStatus deleteStatus;
   final String? deleteErrorMessage;
 
@@ -30,6 +33,8 @@ final class PersonalIssuesState extends Equatable {
     this.loadErrorMessage,
     this.createStatus = ActionStatus.initial,
     this.createErrorMessage,
+    this.updateStatus = ActionStatus.initial,
+    this.updateErrorMessage,
     this.deleteStatus = ActionStatus.initial,
     this.deleteErrorMessage,
   });
@@ -42,6 +47,8 @@ final class PersonalIssuesState extends Equatable {
         loadErrorMessage,
         createStatus,
         createErrorMessage,
+        updateStatus,
+        updateErrorMessage,
         deleteStatus,
         deleteErrorMessage,
       ];
@@ -54,6 +61,8 @@ final class PersonalIssuesState extends Equatable {
     String? loadErrorMessage,
     ActionStatus? createStatus,
     String? createErrorMessage,
+    ActionStatus? updateStatus,
+    String? updateErrorMessage,
     ActionStatus? deleteStatus,
     String? deleteErrorMessage,
   }) {
@@ -65,6 +74,8 @@ final class PersonalIssuesState extends Equatable {
       loadErrorMessage: loadErrorMessage ?? this.loadErrorMessage,
       createStatus: createStatus ?? this.createStatus,
       createErrorMessage: createErrorMessage ?? this.createErrorMessage,
+      updateStatus: updateStatus ?? this.updateStatus,
+      updateErrorMessage: updateErrorMessage ?? this.updateErrorMessage,
       deleteStatus: deleteStatus ?? this.deleteStatus,
       deleteErrorMessage: deleteErrorMessage ?? this.deleteErrorMessage,
     );

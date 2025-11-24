@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:m2health/core/presentation/views/file_viewer_page.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/domain/entities/personal_issue.dart';
 
 class PersonalIssueDetailPage extends StatelessWidget {
@@ -78,7 +79,7 @@ class PersonalIssueDetailPage extends StatelessWidget {
                   Icon(Icons.access_time, size: 16, color: Colors.grey[600]),
                   const SizedBox(width: 8),
                   Text(
-                    "Created on: ${DateFormat('EEEE, MMM d, y, HH:yy').format(issue.updatedAt!)}",
+                    "Updated on: ${DateFormat('EEEE, MMM d, y, HH:mm').format(issue.updatedAt!)}",
                     style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                   ),
                 ],
@@ -150,14 +151,24 @@ class PersonalIssueDetailPage extends StatelessWidget {
           return ClipRRect(
             borderRadius: BorderRadius.circular(16.0),
             child: imageItem is String
-                ? Image.network(
-                    imageItem, // Remote image URL
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                          color: Colors.grey[200],
-                          child: const Icon(Icons.error));
+                ? GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FileViewerPage(url: imageItem),
+                        ),
+                      );
                     },
+                    child: Image.network(
+                      imageItem, // Remote image URL
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                            color: Colors.grey[200],
+                            child: const Icon(Icons.error));
+                      },
+                    ),
                   )
                 : Image.file(
                     imageItem as File, // Local image File

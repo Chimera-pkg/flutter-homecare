@@ -123,6 +123,7 @@ class _NursingAppointmentFlowPageState
                     serviceType: 'nursing',
                     getPersonalIssues: sl(),
                     createPersonalIssue: sl(),
+                    updatePersonalIssue: sl(),
                     deletePersonalIssue: sl(),
                   ),
                   child: PersonalIssuesPage(

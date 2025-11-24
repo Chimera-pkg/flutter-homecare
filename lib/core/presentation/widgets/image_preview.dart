@@ -72,22 +72,45 @@ class ImagePreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget imageDisplay = Container(
+      width: 100,
+      height: 100,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: _buildImage(),
+      ),
+    );
+
+    // Add an override indicator if a new image is selected over an initial one.
+    if (imageFile != null &&
+        initialImageUrl != null &&
+        initialImageUrl!.isNotEmpty) {
+      imageDisplay = Stack(
+        alignment: Alignment.center,
+        children: [
+          imageDisplay,
+          Container(
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.4),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: const Icon(Icons.cached, color: Colors.white, size: 32),
+          ),
+        ],
+      );
+    }
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Container(
-          width: 100,
-          height: 100,
-          decoration: BoxDecoration(
-            color: Colors.grey.shade200,
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(color: Colors.grey.shade300),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: _buildImage(),
-          ),
-        ),
+        imageDisplay,
         const SizedBox(width: 10),
         Expanded(
           child: Column(

@@ -5,17 +5,20 @@ import 'package:m2health/features/booking_appointment/personal_issue/domain/enti
 import 'package:m2health/features/booking_appointment/personal_issue/domain/usecases/create_personal_issue.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/domain/usecases/delete_personal_issue.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/domain/usecases/get_personal_issues.dart';
+import 'package:m2health/features/booking_appointment/personal_issue/domain/usecases/update_personal_issue.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/presentation/bloc/personal_issues_state.dart';
 
 class PersonalIssuesCubit extends Cubit<PersonalIssuesState> {
   final GetPersonalIssues getPersonalIssues;
   final CreatePersonalIssue createPersonalIssue;
+  final UpdatePersonalIssue updatePersonalIssue;
   final DeletePersonalIssue deletePersonalIssue;
 
   PersonalIssuesCubit({
     required String serviceType,
     required this.getPersonalIssues,
     required this.createPersonalIssue,
+    required this.updatePersonalIssue,
     required this.deletePersonalIssue,
   }) : super(PersonalIssuesState.initial(serviceType: serviceType));
 
@@ -82,6 +85,33 @@ class PersonalIssuesCubit extends Cubit<PersonalIssuesState> {
         emit(state.copyWith(
           createStatus: ActionStatus.success,
           selectedIssueIds: newSelectedIds,
+        ));
+        await loadNursingIssues();
+      },
+    );
+  }
+
+  Future<void> updateIssue(int issueId, PersonalIssue issue) async {
+    emit(state.copyWith(
+      updateStatus: ActionStatus.loading,
+      updateErrorMessage: null,
+    ));
+    log('Updating issue: ${issue.title}, ${issue.description}, images count: ${issue.images.length}',
+        name: 'PersonalIssuesCubit');
+    final result = await updatePersonalIssue(issueId, issue);
+    result.fold(
+      (failure) {
+        log('Failed to update issue: ${failure.toString()}',
+            name: 'PersonalIssuesCubit');
+        emit(state.copyWith(
+          updateStatus: ActionStatus.error,
+          updateErrorMessage: 'Failed to update issue. Please try again.',
+        ));
+      },
+      (updatedIssue) async {
+        log('Issue updated successfully', name: 'PersonalIssuesCubit');
+        emit(state.copyWith(
+          updateStatus: ActionStatus.success,
         ));
         await loadNursingIssues();
       },
