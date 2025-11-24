@@ -8,7 +8,7 @@ class CreatePersonalIssue {
 
   CreatePersonalIssue(this.repository);
 
-  Future<Either<Failure, Unit>> call(PersonalIssue issue) async {
+  Future<Either<Failure, PersonalIssue>> call(PersonalIssue issue) async {
     return await repository.createPersonalIssue(issue);
   }
 }

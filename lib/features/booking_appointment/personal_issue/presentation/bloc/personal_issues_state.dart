@@ -11,6 +11,7 @@ enum ActionStatus {
 final class PersonalIssuesState extends Equatable {
   final String serviceType;
   final List<PersonalIssue> issues;
+  final List<int> selectedIssueIds;
 
   final ActionStatus loadStatus;
   final String? loadErrorMessage;
@@ -24,6 +25,7 @@ final class PersonalIssuesState extends Equatable {
   const PersonalIssuesState({
     required this.serviceType,
     this.issues = const [],
+    this.selectedIssueIds = const [],
     this.loadStatus = ActionStatus.initial,
     this.loadErrorMessage,
     this.createStatus = ActionStatus.initial,
@@ -35,6 +37,7 @@ final class PersonalIssuesState extends Equatable {
   @override
   List<Object?> get props => [
         issues,
+        selectedIssueIds,
         loadStatus,
         loadErrorMessage,
         createStatus,
@@ -46,6 +49,7 @@ final class PersonalIssuesState extends Equatable {
   PersonalIssuesState copyWith({
     String? serviceType,
     List<PersonalIssue>? issues,
+    List<int>? selectedIssueIds,
     ActionStatus? loadStatus,
     String? loadErrorMessage,
     ActionStatus? createStatus,
@@ -56,6 +60,7 @@ final class PersonalIssuesState extends Equatable {
     return PersonalIssuesState(
       serviceType: serviceType ?? this.serviceType,
       issues: issues ?? this.issues,
+      selectedIssueIds: selectedIssueIds ?? this.selectedIssueIds,
       loadStatus: loadStatus ?? this.loadStatus,
       loadErrorMessage: loadErrorMessage ?? this.loadErrorMessage,
       createStatus: createStatus ?? this.createStatus,

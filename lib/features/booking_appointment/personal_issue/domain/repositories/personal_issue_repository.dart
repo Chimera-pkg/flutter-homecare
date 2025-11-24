@@ -4,7 +4,7 @@ import 'package:m2health/features/booking_appointment/personal_issue/domain/enti
 
 abstract class PersonalIssueRepository {
   Future<Either<Failure, List<PersonalIssue>>> getPersonalIssues(String serviceType);
-  Future<Either<Failure, Unit>> createPersonalIssue(PersonalIssue issue);
+  Future<Either<Failure, PersonalIssue>> createPersonalIssue(PersonalIssue issue);
   Future<Either<Failure, Unit>> updatePersonalIssue(int id, PersonalIssue issue);
   Future<Either<Failure, Unit>> deletePersonalIssue(int issueId);
 }

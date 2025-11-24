@@ -8,7 +8,7 @@ import 'package:m2health/utils.dart';
 
 abstract class PersonalIssueRemoteDataSource {
   Future<List<PersonalIssue>> getPersonalIssues(String serviceType);
-  Future<void> createPersonalIssue(PersonalIssueModel data);
+  Future<PersonalIssueModel> createPersonalIssue(PersonalIssueModel data);
   Future<void> updatePersonalIssue(int id, PersonalIssueModel data);
   Future<void> deletePersonalIssue(int issueId);
 }
@@ -42,7 +42,7 @@ class PersonalIssueRemoteDataSourceImpl
   }
 
   @override
-  Future<void> createPersonalIssue(PersonalIssueModel data) async {
+  Future<PersonalIssueModel> createPersonalIssue(PersonalIssueModel data) async {
     final token = await Utils.getSpString(Const.TOKEN);
 
     List<MultipartFile> imageFiles = [];
@@ -68,6 +68,7 @@ class PersonalIssueRemoteDataSourceImpl
 
       log('Create personal issue success. Response data: ${response.data}',
           name: 'PersonalIssueRemoteDataSourceImpl');
+      return PersonalIssueModel.fromJson(response.data['data']);
     } catch (e) {
       if (e is DioException) {
         log('DioError during createPersonalIssue: ${e.response?.data}',

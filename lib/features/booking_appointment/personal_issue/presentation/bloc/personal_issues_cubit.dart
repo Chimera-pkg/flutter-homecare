@@ -26,15 +26,36 @@ class PersonalIssuesCubit extends Cubit<PersonalIssuesState> {
     ));
     final result = await getPersonalIssues(state.serviceType);
     result.fold(
-      (failure) => emit(state.copyWith(
-        loadStatus: ActionStatus.error,
-        loadErrorMessage: failure.toString(),
-      )),
-      (issues) => emit(state.copyWith(
-        loadStatus: ActionStatus.success,
-        issues: issues,
-      )),
+      (failure) {
+        log('Failed to load issues: ${failure.toString()}',
+            name: 'PersonalIssuesCubit');
+        emit(state.copyWith(
+          loadStatus: ActionStatus.error,
+          loadErrorMessage: failure.toString(),
+        ));
+      },
+      (issues) {
+        log('Loaded ${issues.length} issues', name: 'PersonalIssuesCubit');
+        final validSelectedIds = state.selectedIssueIds
+            .where((id) => issues.any((issue) => issue.id == id))
+            .toList();
+        emit(state.copyWith(
+          loadStatus: ActionStatus.success,
+          issues: issues,
+          selectedIssueIds: validSelectedIds,
+        ));
+      },
     );
+  }
+
+  void toggleIssueSelection(int issueId) {
+    final newSelectedIds = List<int>.from(state.selectedIssueIds);
+    if (newSelectedIds.contains(issueId)) {
+      newSelectedIds.remove(issueId);
+    } else {
+      newSelectedIds.add(issueId);
+    }
+    emit(state.copyWith(selectedIssueIds: newSelectedIds));
   }
 
   Future<void> addIssue(PersonalIssue issue) async {
@@ -54,9 +75,14 @@ class PersonalIssuesCubit extends Cubit<PersonalIssuesState> {
           createErrorMessage: 'Failed to add issue. Please try again.',
         ));
       },
-      (_) async {
-        log('Issue added successfully');
-        emit(state.copyWith(createStatus: ActionStatus.success));
+      (newIssue) async {
+        log('Issue added successfully', name: 'PersonalIssuesCubit');
+        final newSelectedIds = List<int>.from(state.selectedIssueIds)
+          ..add(newIssue.id!);
+        emit(state.copyWith(
+          createStatus: ActionStatus.success,
+          selectedIssueIds: newSelectedIds,
+        ));
         await loadNursingIssues();
       },
     );
@@ -79,7 +105,11 @@ class PersonalIssuesCubit extends Cubit<PersonalIssuesState> {
         ));
       },
       (_) async {
-        emit(state.copyWith(deleteStatus: ActionStatus.success));
+        final newSelectedIds = List<int>.from(state.selectedIssueIds)
+          ..remove(issueId);
+        emit(state.copyWith(
+            deleteStatus: ActionStatus.success,
+            selectedIssueIds: newSelectedIds));
         await loadNursingIssues();
       },
     );
