@@ -1,15 +1,17 @@
-import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2health/const.dart';
 import 'package:m2health/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:m2health/features/auth/presentation/cubit/sign_in_cubit.dart';
 import 'package:m2health/route/app_routes.dart';
-import 'sign_in_cubit.dart';
+import 'package:m2health/service_locator.dart';
 
 class SignInPage extends StatefulWidget {
+  const SignInPage({super.key});
+
   @override
-  _SignInPageState createState() => _SignInPageState();
+  State<SignInPage> createState() => _SignInPageState();
 }
 
 class _SignInPageState extends State<SignInPage> {
@@ -17,22 +19,10 @@ class _SignInPageState extends State<SignInPage> {
   final passwordController = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-    BackButtonInterceptor.add(myInterceptor);
-  }
-
-  @override
   void dispose() {
-    BackButtonInterceptor.remove(myInterceptor);
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
-  }
-
-  bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
-    context.go(AppRoutes.home);
-    return true;
   }
 
   @override
@@ -41,7 +31,7 @@ class _SignInPageState extends State<SignInPage> {
       appBar: AppBar(),
       backgroundColor: Colors.white,
       body: BlocProvider(
-        create: (context) => SignInCubit(),
+        create: (context) => SignInCubit(authRepository: sl()),
         child: BlocConsumer<SignInCubit, SignInState>(
           listener: (context, state) {
             if (state is SignInSuccess) {
@@ -64,6 +54,8 @@ class _SignInPageState extends State<SignInPage> {
                   );
                 },
               );
+            } else if (state is SignInRequiresRole) {
+              _showRoleSelectionDialog(context, state.idToken);
             }
           },
           builder: (context, state) {
@@ -115,9 +107,9 @@ class _SignInPageState extends State<SignInPage> {
                   padding: const EdgeInsets.all(16.0),
                 ),
                 onPressed: () {
-                  String emailValue = emailController.text;
-                  String passwordValue = passwordController.text;
-                  context.read<SignInCubit>().signIn(emailValue, passwordValue);
+                  context
+                      .read<SignInCubit>()
+                      .signIn(emailController.text, passwordController.text);
                 },
                 child: const Text('Sign In',
                     style: TextStyle(
@@ -135,9 +127,9 @@ class _SignInPageState extends State<SignInPage> {
                 },
                 child: const Text(
                   'Create new account',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
-                    color: Const.aqua, // Turquoise green color
+                    color: Const.aqua,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -173,7 +165,7 @@ class _SignInPageState extends State<SignInPage> {
                     icon: Image.asset('assets/icons/ic_google.png'),
                     iconSize: 40,
                     onPressed: () {
-                      // Handle Google login
+                      context.read<SignInCubit>().signInWithGoogle();
                     },
                   ),
                   const SizedBox(width: 16),
@@ -252,6 +244,38 @@ class _SignInPageState extends State<SignInPage> {
             );
           },
         ),
+      ),
+    );
+  }
+
+  void _showRoleSelectionDialog(BuildContext context, String idToken) {
+    final cubit = context.read<SignInCubit>();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Complete Registration'),
+        content:
+            const Text('Welcome! Please select your account type to continue.'),
+        actions: [
+          ...['Patient', 'Nurse', 'Pharmacist', 'Radiologist']
+              .map((role) => SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        // Retry Google Auth with the selected role and cached token
+                        cubit.signInWithGoogle(role: role, idToken: idToken);
+                      },
+                      child: Text(role),
+                    ),
+                  )),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+        ],
       ),
     );
   }

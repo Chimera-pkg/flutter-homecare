@@ -3,12 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:m2health/const.dart';
+import 'package:m2health/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:m2health/route/app_routes.dart';
-import 'sign_up_cubit.dart';
+import 'package:m2health/service_locator.dart';
+import '../cubit/sign_up_cubit.dart';
 
 class SignUpPage extends StatefulWidget {
+  const SignUpPage({super.key});
+
   @override
-  _SignUpPageState createState() => _SignUpPageState();
+  State<SignUpPage> createState() => _SignUpPageState();
 }
 
 class _SignUpPageState extends State<SignUpPage> {
@@ -45,7 +49,7 @@ class _SignUpPageState extends State<SignUpPage> {
           );
     } else if (_selectedRole == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Please select a user type'),
           backgroundColor: Colors.red,
         ),
@@ -59,7 +63,7 @@ class _SignUpPageState extends State<SignUpPage> {
       appBar: AppBar(),
       backgroundColor: Colors.white,
       body: BlocProvider(
-        create: (context) => SignUpCubit(),
+        create: (context) => SignUpCubit(authRepository: sl()),
         child: BlocConsumer<SignUpCubit, SignUpState>(
           listener: (context, state) {
             if (state is SignUpSuccess) {
@@ -81,6 +85,8 @@ class _SignUpPageState extends State<SignUpPage> {
                   );
                 },
               );
+            } else if (state is SignUpSSOSuccess) {
+              context.read<AuthCubit>().loggedIn();
             } else if (state is SignUpFailure) {
               showDialog(
                 context: context,
@@ -224,7 +230,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                       ),
-                      value: _selectedRole,
+                      initialValue: _selectedRole,
                       items: <String>[
                         'Patient',
                         'Nurse',
@@ -233,7 +239,10 @@ class _SignUpPageState extends State<SignUpPage> {
                       ].map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value.toLowerCase(),
-                          child: Text(value),
+                          child: Text(
+                            value,
+                            style: const TextStyle(fontWeight: FontWeight.w400),
+                          ),
                         );
                       }).toList(),
                       onChanged: (String? newValue) {
@@ -304,7 +313,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             onPressed: () {
                               if (_selectedRole == null) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
+                                  const SnackBar(
                                     content:
                                         Text('Please select a user type first'),
                                     backgroundColor: Colors.orange,
@@ -324,7 +333,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             onPressed: () {
                               if (_selectedRole == null) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
+                                  const SnackBar(
                                     content:
                                         Text('Please select a user type first'),
                                     backgroundColor: Colors.orange,
@@ -332,9 +341,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                 );
                                 return;
                               }
-                              // context
-                              //     .read<SignUpCubit>()
-                              //     .signUpWithGoogle(_selectedRole!);
+                              context
+                                  .read<SignUpCubit>()
+                                  .signUpWithGoogle(_selectedRole!);
                             },
                           ),
                           const SizedBox(width: 16),
@@ -344,7 +353,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             onPressed: () {
                               if (_selectedRole == null) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
+                                  const SnackBar(
                                     content:
                                         Text('Please select a user type first'),
                                     backgroundColor: Colors.orange,

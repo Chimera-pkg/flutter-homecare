@@ -230,12 +230,14 @@ class _DashboardState extends State<Dashboard> {
                                 ),
                               ),
                             ] else
-                              Text(
-                                "Live Longer & Live Healthier, $displayName!",
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
+                              Expanded(
+                                child: Text(
+                                  "Live Longer & Live Healthier, $displayName!",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ),
                           ],
