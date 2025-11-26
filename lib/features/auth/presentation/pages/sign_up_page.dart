@@ -307,25 +307,25 @@ class _SignUpPageState extends State<SignUpPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          IconButton(
-                            icon: Image.asset('assets/icons/ic_fb.png'),
-                            iconSize: 40,
-                            onPressed: () {
-                              if (_selectedRole == null) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content:
-                                        Text('Please select a user type first'),
-                                    backgroundColor: Colors.orange,
-                                  ),
-                                );
-                                return;
-                              }
-                              // context
-                              //     .read<SignUpCubit>()
-                              //     .signUpWithFacebook(_selectedRole!);
-                            },
-                          ),
+                          // IconButton(
+                          //   icon: Image.asset('assets/icons/ic_fb.png'),
+                          //   iconSize: 40,
+                          //   onPressed: () {
+                          //     if (_selectedRole == null) {
+                          //       ScaffoldMessenger.of(context).showSnackBar(
+                          //         const SnackBar(
+                          //           content:
+                          //               Text('Please select a user type first'),
+                          //           backgroundColor: Colors.orange,
+                          //         ),
+                          //       );
+                          //       return;
+                          //     }
+                          //     // context
+                          //     //     .read<SignUpCubit>()
+                          //     //     .signUpWithFacebook(_selectedRole!);
+                          //   },
+                          // ),
                           const SizedBox(width: 16),
                           IconButton(
                             icon: Image.asset('assets/icons/ic_google.png'),
@@ -347,25 +347,25 @@ class _SignUpPageState extends State<SignUpPage> {
                             },
                           ),
                           const SizedBox(width: 16),
-                          IconButton(
-                            icon: Image.asset('assets/icons/ic_wechat.png'),
-                            iconSize: 40,
-                            onPressed: () {
-                              if (_selectedRole == null) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content:
-                                        Text('Please select a user type first'),
-                                    backgroundColor: Colors.orange,
-                                  ),
-                                );
-                                return;
-                              }
-                              // context
-                              //     .read<SignUpCubit>()
-                              //     .signUpWithWeChat(_selectedRole!);
-                            },
-                          ),
+                          // IconButton(
+                          //   icon: Image.asset('assets/icons/ic_wechat.png'),
+                          //   iconSize: 40,
+                          //   onPressed: () {
+                          //     if (_selectedRole == null) {
+                          //       ScaffoldMessenger.of(context).showSnackBar(
+                          //         const SnackBar(
+                          //           content:
+                          //               Text('Please select a user type first'),
+                          //           backgroundColor: Colors.orange,
+                          //         ),
+                          //       );
+                          //       return;
+                          //     }
+                          //     // context
+                          //     //     .read<SignUpCubit>()
+                          //     //     .signUpWithWeChat(_selectedRole!);
+                          //   },
+                          // ),
                         ],
                       ),
                     )

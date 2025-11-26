@@ -153,13 +153,13 @@ class _SignInPageState extends State<SignInPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  IconButton(
-                    icon: Image.asset('assets/icons/ic_fb.png'),
-                    iconSize: 40,
-                    onPressed: () {
-                      // Handle Facebook login
-                    },
-                  ),
+                  // IconButton(
+                  //   icon: Image.asset('assets/icons/ic_fb.png'),
+                  //   iconSize: 40,
+                  //   onPressed: () {
+                  //     // Handle Facebook login
+                  //   },
+                  // ),
                   const SizedBox(width: 16),
                   IconButton(
                     icon: Image.asset('assets/icons/ic_google.png'),
@@ -169,13 +169,13 @@ class _SignInPageState extends State<SignInPage> {
                     },
                   ),
                   const SizedBox(width: 16),
-                  IconButton(
-                    icon: Image.asset('assets/icons/ic_wechat.png'),
-                    iconSize: 40,
-                    onPressed: () {
-                      // Handle WeChat login
-                    },
-                  ),
+                  // IconButton(
+                  //   icon: Image.asset('assets/icons/ic_wechat.png'),
+                  //   iconSize: 40,
+                  //   onPressed: () {
+                  //     // Handle WeChat login
+                  //   },
+                  // ),
                 ],
               ),
             );
