@@ -232,6 +232,18 @@ class _SignInPageState extends State<SignInPage> {
                   email,
                   const SizedBox(height: 8.0),
                   password,
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {
+                        context.push(AppRoutes.forgotPassword);
+                      },
+                      child: const Text(
+                        'Forgot Password?',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 24.0),
                   loginButton,
                   const SizedBox(height: 11.0),
@@ -250,33 +262,73 @@ class _SignInPageState extends State<SignInPage> {
 
   void _showRoleSelectionDialog(BuildContext context, String idToken) {
     final cubit = context.read<SignInCubit>();
+    String selectedRole = 'patient';
 
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Complete Registration'),
-        content:
-            const Text('Welcome! Please select your account type to continue.'),
-        actions: [
-          ...['Patient', 'Nurse', 'Pharmacist', 'Radiologist']
-              .map((role) => SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(ctx);
-                        // Retry Google Auth with the selected role and cached token
-                        cubit.signInWithGoogle(role: role, idToken: idToken);
-                      },
-                      child: Text(role),
+      builder: (ctx) => StatefulBuilder(builder: (context, setState) {
+        return AlertDialog(
+          title: const Text('Complete Registration',
+              style: TextStyle(
+                color: Const.aqua,
+                fontWeight: FontWeight.w600,
+              )),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                  'Welcome!\nPlease select your account type to continue.'),
+              const SizedBox(height: 24),
+              DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  labelText: 'Select User Type',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+                initialValue: selectedRole,
+                items: <String>['Patient', 'Nurse', 'Pharmacist', 'Radiologist']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value.toLowerCase(),
+                    child: Text(
+                      value,
+                      style: const TextStyle(fontWeight: FontWeight.w400),
                     ),
-                  )),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
+                    setState(() {
+                      selectedRole = newValue;
+                    });
+                  }
+                },
+              ),
+            ],
           ),
-        ],
-      ),
+          backgroundColor: Colors.white,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                // Retry Google Auth with the selected role and cached token
+                cubit.signInWithGoogle(role: selectedRole, idToken: idToken);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Const.aqua,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Submit'),
+            ),
+          ],
+        );
+      }),
     );
   }
 }

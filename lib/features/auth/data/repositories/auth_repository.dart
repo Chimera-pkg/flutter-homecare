@@ -141,6 +141,84 @@ class AuthRepository {
     }
   }
 
+  // =======================
+  //  FORGOT PASSWORD FLOW
+  // =======================
+
+  Future<AuthResult> requestOtp(String email) async {
+    try {
+      final response = await dio.post(
+        Const.API_FORGOT_PASSWORD,
+        data: {"email": email},
+      );
+
+      return AuthResult(status: AuthResultStatus.success);
+    } on DioException catch (e) {
+      String errorMessage = e.toString();
+      if (e.response != null) {
+        errorMessage = e.response?.data['message'] ?? errorMessage;
+      }
+      log('Request OTP failed: ${e.response?.data}',
+          error: e, name: 'AuthRepository');
+      return AuthResult(
+          status: AuthResultStatus.failure, message: errorMessage);
+    } catch (e) {
+      log('Request OTP failed', error: e, name: 'AuthRepository');
+      return AuthResult(
+          status: AuthResultStatus.failure, message: e.toString());
+    }
+  }
+
+  Future<AuthResult> verifyOtp(String email, String otp) async {
+    try {
+      final response = await dio.post(
+        Const.API_VERIFY_OTP,
+        data: {"email": email, "otp": otp},
+        options: Options(validateStatus: (status) => status! < 500),
+      );
+
+      if (response.statusCode == 200) {
+        return AuthResult(
+            status: AuthResultStatus.success, data: response.data);
+      }
+
+      return AuthResult(
+          status: AuthResultStatus.failure,
+          message: response.data['message'] ?? 'Invalid OTP');
+    } catch (e) {
+      return AuthResult(
+          status: AuthResultStatus.failure, message: e.toString());
+    }
+  }
+
+  Future<AuthResult> resetPassword(
+      String resetToken, String password, String passwordConfirmation) async {
+    try {
+      final response = await dio.post(
+        Const.API_RESET_PASSWORD,
+        data: {
+          "resetToken": resetToken,
+          "password": password,
+          "confirmPassword": passwordConfirmation
+        },
+        options: Options(validateStatus: (status) => status! < 500),
+      );
+
+      if (response.statusCode == 200) {
+        return AuthResult(status: AuthResultStatus.success);
+      }
+
+      log('Reset password failed: ${response.data}', name: 'AuthRepository');
+
+      return AuthResult(
+          status: AuthResultStatus.failure,
+          message: response.data['message'] ?? 'Failed to reset password');
+    } catch (e) {
+      return AuthResult(
+          status: AuthResultStatus.failure, message: e.toString());
+    }
+  }
+
   // =========================================================
   //  HELPERS
   // =========================================================
