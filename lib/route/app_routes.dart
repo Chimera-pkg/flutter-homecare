@@ -10,6 +10,10 @@ class AppRoutes {
   // Auth
   static const String signIn = '/sign-in';
   static const String signUp = '/sign-up';
+  static const String forgotPassword = '/forgot-password';
+  static const String otpVerification = '/otp-verification';
+  static const String resetPassword = '/reset-password';
+  static const String resetPasswordSuccess = '/reset-password-success';
 
   // Dasboard Services
   static const String pharmaServices = '/pharma-services';

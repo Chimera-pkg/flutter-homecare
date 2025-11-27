@@ -1,43 +1,49 @@
-// TODO: Replace with actual firebase json
 {
   "project_info": {
-    "project_number": "123456789012",
-    "project_id": "your-project-id",
-    "storage_bucket": "your-project-id.appspot.com"
+    "project_number": "388506655192",
+    "project_id": "medmap-homecare",
+    "storage_bucket": "medmap-homecare.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:123456789012:android:abcdef1234567890",
+        "mobilesdk_app_id": "1:388506655192:android:5667c7f2c321743c40faad",
         "android_client_info": {
           "package_name": "org.medmap.homecare"
         }
       },
       "oauth_client": [
         {
-          "client_id": "123456789012-abcdefghijklmnopqrstuvwxyz123456.apps.googleusercontent.com",
+          "client_id": "388506655192-831g7eaeo074o79l7b82fpos0kp7ah7a.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "org.medmap.homecare",
-            "certificate_hash": "your_sha1_fingerprint_here"
+            "certificate_hash": "fa2c6eaabb3208467ac4e9858afc8be2fb50454b"
           }
         },
         {
-          "client_id": "123456789012-abcdefghijklmnopqrstuvwxyz123456.apps.googleusercontent.com",
+          "client_id": "388506655192-i25hmpe6jnsgr0lc9bal1mblkqtkbt1p.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "your_api_key_here"
+          "current_key": "AIzaSyArUWN_NShUYdfI6Sag21T1WU1b0jECQPM"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "123456789012-abcdefghijklmnopqrstuvwxyz123456.apps.googleusercontent.com",
+              "client_id": "388506655192-i25hmpe6jnsgr0lc9bal1mblkqtkbt1p.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "388506655192-0s8g1dlqf6b7hilhpkp4etlf6i4vqclg.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.medmap.homecare"
+              }
             }
           ]
         }

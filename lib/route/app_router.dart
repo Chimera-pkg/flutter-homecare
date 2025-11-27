@@ -24,7 +24,11 @@ final GoRouter router = GoRouter(
 
     // Define public routes that don't require login
     final bool isLoggingIn = state.matchedLocation == AppRoutes.signIn ||
-        state.matchedLocation == AppRoutes.signUp;
+        state.matchedLocation == AppRoutes.signUp ||
+        state.matchedLocation == AppRoutes.forgotPassword ||
+        state.matchedLocation == AppRoutes.otpVerification ||
+        state.matchedLocation == AppRoutes.resetPassword ||
+        state.matchedLocation == AppRoutes.resetPasswordSuccess;
 
     // Redirect to Login if not logged in and trying to access protected route
     if (!isLoggedIn && !isLoggingIn) {

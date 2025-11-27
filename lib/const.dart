@@ -9,6 +9,9 @@ class Const {
   static const String API_PRODUCTS = URL_API + '/products/';
   static const String API_LOGIN = URL_API + '/auth/login';
   static const String API_REGISTER = URL_API + '/auth/register';
+  static const String API_FORGOT_PASSWORD = URL_API + '/auth/forgot-password';
+  static const String API_VERIFY_OTP = URL_API + '/auth/verify-otp';
+  static const String API_RESET_PASSWORD = URL_API + '/auth/reset-password';
   static const String API_APPOINTMENT = URL_API + '/appointments';
   static const String API_PROFILE = URL_API + '/profiles';
   static const String API_MEDICAL_RECORDS = URL_API + '/medical-records';
