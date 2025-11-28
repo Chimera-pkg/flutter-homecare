@@ -56,17 +56,17 @@ class _DashboardState extends State<Dashboard> {
   }
 
   final List<Map<String, String>> services = [
-    {'image': 'assets/icons/ilu_physio.png', 'name': 'Physiotherapy'},
+    {'image': 'assets/icons/ilu_physio.webp', 'name': 'Physiotherapy'},
     {
       'image': 'assets/icons/ilu_remote_monitoring.png',
       'name': 'Remote Patient Monitoring'
     },
     {
-      'image': 'assets/icons/ilu_ocuTherapy.png',
+      'image': 'assets/icons/ilu_ocuTherapy.webp',
       'name': 'Occupational\nTherapy'
     },
     {'image': 'assets/icons/ilu_health.png', 'name': 'Health Risk\nAssessment'},
-    {'image': 'assets/icons/ilu_dietitian.jpg', 'name': 'Dietitian Services'},
+    {'image': 'assets/icons/ilu_dietitian.webp', 'name': 'Dietitian Services'},
     {'image': 'assets/icons/ilu_sleep.png', 'name': 'Sleep & Mental\nHealth'},
   ];
 
@@ -365,7 +365,7 @@ class _DashboardState extends State<Dashboard> {
                                 context.push(AppRoutes.precisionNutrition);
                               },
                               iconPath:
-                                  'assets/icons/ic_precision_nutrition.png',
+                                  'assets/icons/ic_precision_nutrition.webp',
                               title: AppLocalizations.of(context)!
                                   .translate('precision_nutrition'),
                               backgroundColor:
