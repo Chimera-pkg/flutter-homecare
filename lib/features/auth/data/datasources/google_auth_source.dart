@@ -7,7 +7,12 @@ class GoogleAuthSource {
 
   // Need to call this during app initialization
   Future<void> init() async {
-    await _googleSignIn.initialize();
+    try {
+      await _googleSignIn.initialize();
+    } catch (e) {
+      log("Error initializing Google Sign-In. Likely running on unsupported platform (Windows).",
+          name: 'GoogleAuthSource');
+    }
   }
 
   Future<String?> getGoogleIdToken() async {
