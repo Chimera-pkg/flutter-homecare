@@ -68,7 +68,6 @@ dependencies:
   # time_slot: ^1.0.0
   rename: ^3.0.2
   file_picker: ^8.1.7
-  syncfusion_flutter_pdfviewer: ^28.2.9
   bloc: ^8.1.4
   get_it: ^8.2.0
   dartz: ^0.10.1

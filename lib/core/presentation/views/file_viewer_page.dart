@@ -1,9 +1,10 @@
 import 'dart:typed_data';
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:m2health/service_locator.dart';
-import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
-import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:photo_view/photo_view.dart';
 
@@ -83,6 +84,15 @@ class _FileViewerPageState extends State<FileViewerPage> {
     throw Exception("Local file not found");
   }
 
+  /// flutter_pdfview requires a File Path, it cannot read raw bytes directly.
+  /// This helper writes the memory bytes to a temp file.
+  Future<String> _writeBytesToTempFile(Uint8List bytes) async {
+    final dir = await getTemporaryDirectory();
+    final file = File('${dir.path}/temp_viewer.pdf');
+    await file.writeAsBytes(bytes, flush: true);
+    return file.path;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,41 +112,40 @@ class _FileViewerPageState extends State<FileViewerPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline,
-                      color: Colors.white, size: 48),
-                  const SizedBox(height: 16),
-                  const Text('Failed to load file',
-                      style: TextStyle(color: Colors.white)),
-                  const SizedBox(height: 8),
-                  ElevatedButton(
-                    onPressed: _loadFile,
-                    child: const Text('Retry'),
-                  )
-                ],
-              ),
-            );
+            return _buildErrorWidget();
           } else if (snapshot.hasData) {
             if (_isPdf) {
-              return SfPdfViewer.memory(
-                snapshot.data!,
-                enableDoubleTapZooming: true,
+              // PDF Handling
+              return FutureBuilder<String>(
+                // Convert bytes to temp file for the viewer
+                future: _writeBytesToTempFile(snapshot.data!),
+                builder: (context, pathSnapshot) {
+                  if (pathSnapshot.hasData) {
+                    return PDFView(
+                      filePath: pathSnapshot.data!,
+                      enableSwipe: true,
+                      swipeHorizontal: false,
+                      autoSpacing: false,
+                      pageFling: false,
+                      onError: (error) {
+                        print(error.toString());
+                      },
+                      onPageError: (page, error) {
+                        print('$page: ${error.toString()}');
+                      },
+                    );
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                },
               );
             } else {
+              // Image Handling
               return PhotoView(
                 imageProvider: MemoryImage(snapshot.data!),
-                // Min scale: Contained (Fits screen, centered)
                 minScale: PhotoViewComputedScale.contained,
-                // Max scale: Covers screen * 4 (allows zooming in detail)
                 maxScale: PhotoViewComputedScale.covered * 4,
-                // Initial scale
                 initialScale: PhotoViewComputedScale.contained,
-                // Background color (matches Scaffold)
                 backgroundDecoration: const BoxDecoration(color: Colors.black),
-                // Custom error builder
                 errorBuilder: (context, error, stackTrace) {
                   return const Center(
                     child: Text(
@@ -145,7 +154,6 @@ class _FileViewerPageState extends State<FileViewerPage> {
                     ),
                   );
                 },
-                // Optional: Hero tag if you want smooth transitions from list
                 heroAttributes: PhotoViewHeroAttributes(
                     tag: widget.url ?? widget.path ?? "image"),
               );
@@ -153,6 +161,25 @@ class _FileViewerPageState extends State<FileViewerPage> {
           }
           return const SizedBox.shrink();
         },
+      ),
+    );
+  }
+
+  Widget _buildErrorWidget() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.error_outline, color: Colors.white, size: 48),
+          const SizedBox(height: 16),
+          const Text('Failed to load file',
+              style: TextStyle(color: Colors.white)),
+          const SizedBox(height: 8),
+          ElevatedButton(
+            onPressed: _loadFile,
+            child: const Text('Retry'),
+          )
+        ],
       ),
     );
   }
