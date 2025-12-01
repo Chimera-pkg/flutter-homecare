@@ -78,7 +78,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     ),
                     const SizedBox(height: 8),
                     const Text(
-                      "Don't worry! It occurs. Please enter the email address linked with your account.",
+                      "Don't worry! Please enter the email address linked with your account.",
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.grey,
