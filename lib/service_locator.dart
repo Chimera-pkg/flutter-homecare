@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
 import 'package:m2health/core/network/token_expiration_interceptor.dart';
+import 'package:m2health/features/auth/injection.dart';
 import 'package:m2health/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:m2health/features/booking_appointment/injection.dart';
 import 'package:m2health/features/home_health_screening/injection.dart';
@@ -21,10 +22,10 @@ Future<void> setupLocator() async {
     dio.interceptors.add(TokenExpirationInterceptor());
     return dio;
   });
-  sl.registerLazySingleton(() => AuthCubit());
   sl.registerLazySingleton(() => AppointmentService(sl()));
 
   // Feature Module Injectors
+  initAuthModule(sl);
   initBookingAppointmentModule(sl);
   initHomeHealthScreeningModule(sl);
   initPaymentModule(sl);

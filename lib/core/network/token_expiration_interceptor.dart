@@ -8,10 +8,12 @@ class TokenExpirationInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     // Check if the error is 401 Unauthorized
-    if (err.response?.statusCode == 401) {
+    if (err.response?.statusCode == 401 &&
+        err.response?.data['code'] == 'E_INVALID_CREDENTIALS') {
       rootScaffoldMessengerKey.currentState?.showSnackBar(
         const SnackBar(
-          content: Text('Session expired. Please log in again.'),
+          content: Text(
+              'Session expired or invalid credentials. Please log in again.'),
           backgroundColor: Colors.red,
           duration: Duration(seconds: 3),
         ),

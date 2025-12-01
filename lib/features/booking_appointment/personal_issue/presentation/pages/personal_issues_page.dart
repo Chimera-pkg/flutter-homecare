@@ -7,15 +7,17 @@ import 'package:m2health/const.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/domain/entities/personal_issue.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/presentation/bloc/personal_issues_cubit.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/presentation/bloc/personal_issues_state.dart';
-import 'package:m2health/features/booking_appointment/personal_issue/presentation/pages/add_issue_page.dart';
+import 'package:m2health/features/booking_appointment/personal_issue/presentation/pages/issue_form_page.dart';
 import 'package:m2health/features/booking_appointment/personal_issue/presentation/pages/personal_issue_detail_page.dart';
 
 class PersonalIssuesPage extends StatefulWidget {
   final Function(List<PersonalIssue>) onIssuesSelected;
+  final List<PersonalIssue>? initialSelectedIssues;
 
   const PersonalIssuesPage({
     super.key,
     required this.onIssuesSelected,
+    this.initialSelectedIssues,
   });
 
   @override
@@ -26,6 +28,11 @@ class _PersonalIssuesPageState extends State<PersonalIssuesPage> {
   @override
   void initState() {
     super.initState();
+    if (widget.initialSelectedIssues != null) {
+      context
+          .read<PersonalIssuesCubit>()
+          .setSelectedIssues(widget.initialSelectedIssues!);
+    }
     _loadData();
   }
 
@@ -148,6 +155,8 @@ class _PersonalIssuesPageState extends State<PersonalIssuesPage> {
                               itemCount: issues.length,
                               itemBuilder: (context, index) {
                                 final issue = issues[index];
+                                final isSelected =
+                                    state.selectedIssueIds.contains(issue.id);
                                 return GestureDetector(
                                   onTap: () {
                                     Navigator.push(
@@ -165,74 +174,144 @@ class _PersonalIssuesPageState extends State<PersonalIssuesPage> {
                                         vertical: 8.0),
                                     child: Padding(
                                       padding: const EdgeInsets.all(16.0),
-                                      child: Column(
+                                      child: Row(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                issue.title,
-                                                style: const TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              IconButton(
-                                                icon: const Icon(Icons.delete,
-                                                    color: Colors.red),
-                                                onPressed: () {
-                                                  _showDeleteConfirmationDialog(
-                                                      context, issue.id!);
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 4.0),
+                                            child: Transform.scale(
+                                              scale: 1.2,
+                                              child: Checkbox(
+                                                value: isSelected,
+                                                activeColor: Const.aqua,
+                                                visualDensity:
+                                                    VisualDensity.comfortable,
+                                                onChanged: (bool? value) {
+                                                  context
+                                                      .read<
+                                                          PersonalIssuesCubit>()
+                                                      .toggleIssueSelection(
+                                                          issue.id!);
                                                 },
                                               ),
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              Icon(Icons.access_time,
-                                                  size: 16,
-                                                  color: Colors.grey[600]),
-                                              const SizedBox(width: 8),
-                                              Text(
-                                                "Created on: ${DateFormat('MMM d, y, HH:yy').format(issue.createdAt!)}",
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.grey[600]),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 8),
-                                          Text(issue.description),
-                                          const SizedBox(height: 8),
-                                          if (issue.images.isNotEmpty ||
-                                              issue.imageUrls.isNotEmpty)
-                                            Wrap(
-                                              spacing: 8.0,
-                                              runSpacing: 8.0,
-                                              children:
-                                                  // Render remote images
-                                                  issue.imageUrls
-                                                      .map((imageUrl) {
-                                                return Image.network(
-                                                  imageUrl,
-                                                  width: 100,
-                                                  height: 100,
-                                                  fit: BoxFit.cover,
-                                                  errorBuilder: (context, error,
-                                                      stackTrace) {
-                                                    return Image.asset(
-                                                      'assets/images/no_img.jpg',
-                                                      width: 100,
-                                                      height: 100,
-                                                      fit: BoxFit.cover,
-                                                    );
-                                                  },
-                                                );
-                                              }).toList(),
                                             ),
+                                          ),
+                                          const SizedBox(width: 4.0),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        issue.title,
+                                                        style: const TextStyle(
+                                                          fontSize: 18,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    PopupMenuButton<String>(
+                                                      color: Colors.white,
+                                                      onSelected: (value) {
+                                                        if (value == 'edit') {
+                                                          final issuesCubit =
+                                                              context.read<
+                                                                  PersonalIssuesCubit>();
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  BlocProvider
+                                                                      .value(
+                                                                value:
+                                                                    issuesCubit,
+                                                                child: IssueFormPage(
+                                                                    issue:
+                                                                        issue),
+                                                              ),
+                                                            ),
+                                                          );
+                                                        } else if (value ==
+                                                            'delete') {
+                                                          _showDeleteConfirmationDialog(
+                                                              context,
+                                                              issue.id!);
+                                                        }
+                                                      },
+                                                      itemBuilder: (BuildContext
+                                                              context) =>
+                                                          <PopupMenuEntry<
+                                                              String>>[
+                                                        const PopupMenuItem<
+                                                            String>(
+                                                          value: 'edit',
+                                                          child: Text('Edit'),
+                                                        ),
+                                                        const PopupMenuItem<
+                                                            String>(
+                                                          value: 'delete',
+                                                          child: Text('Delete'),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Icon(Icons.access_time,
+                                                        size: 16,
+                                                        color:
+                                                            Colors.grey[600]),
+                                                    const SizedBox(width: 8),
+                                                    Text(
+                                                      "Updated on: ${DateFormat('MMM d, y, HH:mm').format(issue.updatedAt!)}",
+                                                      style: TextStyle(
+                                                          fontSize: 12,
+                                                          color:
+                                                              Colors.grey[600]),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 8),
+                                                Text(issue.description),
+                                                const SizedBox(height: 8),
+                                                if (issue.imageUrls.isNotEmpty)
+                                                  Wrap(
+                                                    spacing: 8.0,
+                                                    runSpacing: 8.0,
+                                                    children:
+                                                        // Render remote images
+                                                        issue.imageUrls
+                                                            .map((imageUrl) {
+                                                      return Image.network(
+                                                        imageUrl,
+                                                        width: 80,
+                                                        height: 80,
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (context,
+                                                            error, stackTrace) {
+                                                          return Image.asset(
+                                                            'assets/images/no_img.jpg',
+                                                            width: 80,
+                                                            height: 80,
+                                                            fit: BoxFit.cover,
+                                                          );
+                                                        },
+                                                      );
+                                                    }).toList(),
+                                                  ),
+                                              ],
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -249,9 +328,7 @@ class _PersonalIssuesPageState extends State<PersonalIssuesPage> {
             ),
             BlocBuilder<PersonalIssuesCubit, PersonalIssuesState>(
               builder: (context, state) {
-                final bool hasIssues =
-                    state.loadStatus == ActionStatus.success &&
-                        state.issues.isNotEmpty;
+                final bool canProceed = state.selectedIssueIds.isNotEmpty;
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -267,7 +344,7 @@ class _PersonalIssuesPageState extends State<PersonalIssuesPage> {
                             MaterialPageRoute(
                               builder: (context) => BlocProvider.value(
                                 value: issuesCubit,
-                                child: const AddIssuePage(),
+                                child: const IssueFormPage(),
                               ),
                             ),
                           );
@@ -289,12 +366,18 @@ class _PersonalIssuesPageState extends State<PersonalIssuesPage> {
                       width: 352,
                       height: 58,
                       child: ElevatedButton(
-                        onPressed: hasIssues
-                            ? () => _onClickNext(context, state.issues)
+                        onPressed: canProceed
+                            ? () {
+                                final selectedIssues = state.issues
+                                    .where((issue) => state.selectedIssueIds
+                                        .contains(issue.id))
+                                    .toList();
+                                _onClickNext(context, selectedIssues);
+                              }
                             : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor:
-                              hasIssues ? Const.aqua : const Color(0xFFB2B2B2),
+                              canProceed ? Const.aqua : const Color(0xFFB2B2B2),
                           disabledBackgroundColor: const Color(0xFFB2B9C4),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15),

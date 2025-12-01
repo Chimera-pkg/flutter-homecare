@@ -129,7 +129,7 @@ class _DietaryPlanView extends StatelessWidget {
                   ),
                 ),
                 // Replace with your actual illustration
-                Image.asset('assets/images/ilu_nutrition_diet.png',
+                Image.asset('assets/images/ilu_nutrition_diet.webp',
                     width: 160, height: 160),
               ],
             ),

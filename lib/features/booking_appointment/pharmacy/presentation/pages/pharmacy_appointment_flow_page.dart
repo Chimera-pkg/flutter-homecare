@@ -123,9 +123,11 @@ class PharmacyAppointmentFlowPageState
                     serviceType: 'pharmacy',
                     getPersonalIssues: sl(),
                     createPersonalIssue: sl(),
+                    updatePersonalIssue: sl(),
                     deletePersonalIssue: sl(),
                   ),
                   child: PersonalIssuesPage(
+                    initialSelectedIssues: state.selectedIssues,
                     onIssuesSelected: (issues) {
                       context
                           .read<PharmacyAppointmentFlowBloc>()

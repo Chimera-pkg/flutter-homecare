@@ -23,25 +23,25 @@ class PersonalIssueRepositoryImpl implements PersonalIssueRepository {
   }
 
   @override
-  Future<Either<Failure, Unit>> createPersonalIssue(PersonalIssue issue) async {
+  Future<Either<Failure, PersonalIssue>> createPersonalIssue(PersonalIssue issue) async {
     try {
       final model = PersonalIssueModel.fromEntity(issue);
       log('Creating Personal Issue: ${model.toJson()}',
           name: 'PersonalIssueRepositoryImpl');
-      await remoteDataSource.createPersonalIssue(model);
-      return const Right(unit);
+      final newIssue = await remoteDataSource.createPersonalIssue(model);
+      return Right(newIssue);
     } on Exception catch (e) {
       return Left(ServerFailure(e.toString()));
     }
   }
 
   @override
-  Future<Either<Failure, Unit>> updatePersonalIssue(
+  Future<Either<Failure, PersonalIssue>> updatePersonalIssue(
       int id, PersonalIssue issue) async {
     try {
       final model = PersonalIssueModel.fromEntity(issue);
-      await remoteDataSource.updatePersonalIssue(id, model);
-      return const Right(unit);
+      final updatedIssue = await remoteDataSource.updatePersonalIssue(id, model);
+      return Right(updatedIssue);
     } on Exception catch (e) {
       return Left(ServerFailure(e.toString()));
     }

@@ -123,13 +123,16 @@ class _NursingAppointmentFlowPageState
                     serviceType: 'nursing',
                     getPersonalIssues: sl(),
                     createPersonalIssue: sl(),
+                    updatePersonalIssue: sl(),
                     deletePersonalIssue: sl(),
                   ),
                   child: PersonalIssuesPage(
+                    initialSelectedIssues: state.selectedIssues,
                     onIssuesSelected: (issues) {
                       context
                           .read<NursingAppointmentFlowBloc>()
                           .add(FlowPersonalIssueUpdated(issues));
+                    
                     },
                   ),
                 ),

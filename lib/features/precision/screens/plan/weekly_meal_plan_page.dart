@@ -6,13 +6,13 @@ import 'package:m2health/features/precision/widgets/precision_widgets.dart';
 import 'package:m2health/route/app_routes.dart';
 
 const weeklyFoodImagePaths = [
-  'assets/images/food_chicken_breast.jpg',
-  'assets/images/food_salmon.png',
-  'assets/images/food_steak.png',
-  'assets/images/food_oatmeal.png',
-  'assets/images/food_vegetables.png',
-  'assets/images/food_bread.png',
-  'assets/images/food_beans.png',
+  'assets/images/food_chicken_breast.webp',
+  'assets/images/food_salmon.webp',
+  'assets/images/food_steak.webp',
+  'assets/images/food_oatmeal.webp',
+  'assets/images/food_vegetables.webp',
+  'assets/images/food_bread.webp',
+  'assets/images/food_beans.webp',
 ];
 
 class WeeklyMealPlanPage extends StatelessWidget {

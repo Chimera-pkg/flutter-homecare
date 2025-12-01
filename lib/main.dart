@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:m2health/features/auth/data/datasources/google_auth_source.dart';
 import 'package:m2health/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:m2health/features/diabetes/bloc/diabetes_form_cubit.dart';
 import 'package:m2health/features/medical_record/domain/usecases/delete_medical_record.dart';
@@ -44,6 +45,10 @@ void main() async {
   final String currentTimeZone =
       (await FlutterTimezone.getLocalTimezone()).identifier;
   tz.setLocalLocation(tz.getLocation(currentTimeZone));
+
+  // Google OAuth setup
+  final googleSource = sl<GoogleAuthSource>();
+  await googleSource.init();
 
   runApp(
     MultiBlocProvider(

@@ -130,6 +130,14 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
                       itemBuilder: (context, index) {
                         final professional = professionals[index];
                         return Card(
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            side: BorderSide(
+                              color: Colors.grey[200]!,
+                              width: 2.0,
+                            ),
+                          ),
                           child: Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Row(
@@ -140,8 +148,8 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
                                       clipBehavior: Clip.none,
                                       children: [
                                         Container(
-                                          width: 50,
-                                          height: 50,
+                                          width: 60,
+                                          height: 60,
                                           decoration: BoxDecoration(
                                             borderRadius:
                                                 BorderRadius.circular(8.0),
@@ -152,14 +160,14 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
                                                   BorderRadius.circular(8.0),
                                               child: Image.network(
                                                 professional.avatar ?? '',
-                                                width: 50,
-                                                height: 50,
+                                                width: 60,
+                                                height: 60,
                                                 fit: BoxFit.cover,
                                                 errorBuilder: (context, error,
                                                     stackTrace) {
                                                   return Icon(
                                                     Icons.person,
-                                                    size: 25,
+                                                    size: 30,
                                                     color: Colors.grey[600],
                                                   );
                                                 },
@@ -181,7 +189,9 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
                                       children: [
                                         if (professional.rating != null)
                                           StarRating(
-                                              rating: professional.rating!),
+                                            rating: professional.rating!,
+                                            color: const Color(0xFF8EF4BC),
+                                          ),
                                         const SizedBox(width: 4),
                                         Text(professional.rating.toString()),
                                       ],
@@ -197,10 +207,18 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
                                       Text(
                                         professional.name,
                                         style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16,
                                         ),
                                       ),
-                                      Text(professional.jobTitle ?? 'N/A'),
+                                      Text(
+                                        professional.jobTitle ?? 'N/A',
+                                        style: TextStyle(
+                                          color: Colors.grey[600],
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 12,
+                                        ),
+                                      ),
                                       Row(
                                         children: [
                                           TextButton(
@@ -208,10 +226,23 @@ class _SearchProfessionalPageState extends State<SearchProfessionalPage> {
                                               widget.onProfessionalSelected(
                                                   professional);
                                             },
+                                            style: TextButton.styleFrom(
+                                              backgroundColor: Colors.grey[200],
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 8),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8.0),
+                                              ),
+                                            ),
                                             child: const Text(
                                               'Appointment',
                                               style: TextStyle(
-                                                  color: Colors.black),
+                                                fontSize: 12,
+                                                color: Colors.black,
+                                              ),
                                             ),
                                           ),
                                           IconButton(

@@ -310,7 +310,7 @@ class _ProviderAppointmentPageState extends State<ProviderAppointmentPage>
                                 style: TextStyle(
                                   color: _getStatusColor(appointment.status),
                                   fontSize: 12,
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
