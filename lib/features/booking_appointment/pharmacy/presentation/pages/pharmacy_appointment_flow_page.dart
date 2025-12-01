@@ -127,6 +127,7 @@ class PharmacyAppointmentFlowPageState
                     deletePersonalIssue: sl(),
                   ),
                   child: PersonalIssuesPage(
+                    initialSelectedIssues: state.selectedIssues,
                     onIssuesSelected: (issues) {
                       context
                           .read<PharmacyAppointmentFlowBloc>()

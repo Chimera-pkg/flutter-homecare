@@ -61,6 +61,11 @@ class PersonalIssuesCubit extends Cubit<PersonalIssuesState> {
     emit(state.copyWith(selectedIssueIds: newSelectedIds));
   }
 
+  void setSelectedIssues(List<PersonalIssue> issues) {
+    final selectedIds = issues.map((issue) => issue.id!).toList();
+    emit(state.copyWith(selectedIssueIds: selectedIds));
+  }
+
   Future<void> addIssue(PersonalIssue issue) async {
     emit(state.copyWith(
       createStatus: ActionStatus.loading,

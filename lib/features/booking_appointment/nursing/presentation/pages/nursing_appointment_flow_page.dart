@@ -127,10 +127,12 @@ class _NursingAppointmentFlowPageState
                     deletePersonalIssue: sl(),
                   ),
                   child: PersonalIssuesPage(
+                    initialSelectedIssues: state.selectedIssues,
                     onIssuesSelected: (issues) {
                       context
                           .read<NursingAppointmentFlowBloc>()
                           .add(FlowPersonalIssueUpdated(issues));
+                    
                     },
                   ),
                 ),

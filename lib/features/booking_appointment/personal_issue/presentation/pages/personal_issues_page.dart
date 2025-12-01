@@ -12,10 +12,12 @@ import 'package:m2health/features/booking_appointment/personal_issue/presentatio
 
 class PersonalIssuesPage extends StatefulWidget {
   final Function(List<PersonalIssue>) onIssuesSelected;
+  final List<PersonalIssue>? initialSelectedIssues;
 
   const PersonalIssuesPage({
     super.key,
     required this.onIssuesSelected,
+    this.initialSelectedIssues,
   });
 
   @override
@@ -26,6 +28,11 @@ class _PersonalIssuesPageState extends State<PersonalIssuesPage> {
   @override
   void initState() {
     super.initState();
+    if (widget.initialSelectedIssues != null) {
+      context
+          .read<PersonalIssuesCubit>()
+          .setSelectedIssues(widget.initialSelectedIssues!);
+    }
     _loadData();
   }
 
@@ -213,6 +220,7 @@ class _PersonalIssuesPageState extends State<PersonalIssuesPage> {
                                                       ),
                                                     ),
                                                     PopupMenuButton<String>(
+                                                      color: Colors.white,
                                                       onSelected: (value) {
                                                         if (value == 'edit') {
                                                           final issuesCubit =
